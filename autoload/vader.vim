@@ -108,7 +108,9 @@ function! s:run(filename, cases)
       let given_comment = get(case.comment, 'given', '')
     endif
 
-    call s:append(prefix, 'given', given_comment)
+    if !empty(given)
+      call s:append(prefix, 'given', given_comment)
+    endif
     call vader#window#prepare(given, get(case, 'type', ''))
 
     if has_key(case, 'execute')
