@@ -66,7 +66,8 @@ endfunction
 
 function! vader#window#append(message, indent)
   2wincmd w
-  call append(line('$') - 1, repeat('  ', a:indent) . a:message)
+  call append(line('$') - 1,
+        \ substitute(repeat('  ', a:indent) . a:message, '\s*$', '', ''))
 endfunction
 
 function! vader#window#prepare(lines, type)
