@@ -39,7 +39,9 @@ function! s:flush_buffer(cases, case, lnum, label, newlabel, buffer, final)
 
     let data = map(reverse(rev), 'strpart(v:val, 2)')
     let a:case[a:label] = data
-    call remove(a:buffer, 0, -1)
+    if !empty(a:buffer)
+      call remove(a:buffer, 0, -1)
+    endif
 
     if a:final ||
           \ a:label == 'expect' ||
