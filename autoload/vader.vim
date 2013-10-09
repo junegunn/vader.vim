@@ -42,9 +42,11 @@ function! vader#run(...)
 
     for gl in patterns
       for fn in split(glob(gl), "\n")
-        let cases = vader#parser#parse(fn)
-        call add(all_cases, [fn, cases])
-        let total += len(cases)
+        if fnamemodify(fn, ':e') == 'vader'
+          let cases = vader#parser#parse(fn)
+          call add(all_cases, [fn, cases])
+          let total += len(cases)
+        endif
       endfor
     endfor
     if empty(all_cases) | return | endif
