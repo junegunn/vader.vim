@@ -41,7 +41,12 @@ function! s:flush_buffer(cases, case, lnum, label, newlabel, buffer, final)
     let a:case[a:label] = data
     call remove(a:buffer, 0, -1)
 
-    if a:final || a:label == 'expect' || a:newlabel == 'given' || has_key(a:case, a:newlabel)
+    if a:final ||
+          \ a:label == 'expect' ||
+          \ a:newlabel == 'given' ||
+          \ has_key(a:case, a:newlabel) ||
+          \ a:newlabel == 'do' && has_key(a:case, 'execute') ||
+          \ a:newlabel == 'execute' && has_key(a:case, 'do')
       call add(a:cases, deepcopy(a:case))
       for key in keys(a:case)
         call remove(a:case, key)
