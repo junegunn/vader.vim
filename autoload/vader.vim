@@ -37,6 +37,7 @@ function! vader#run(...)
   try
     let all_cases = []
     let qfl = []
+    let st  = reltime()
     let [success, total] = [0, 0]
 
     for gl in patterns
@@ -57,9 +58,12 @@ function! vader#run(...)
       let [cs, ct, lqfl] = s:run(fn, case)
       let success += cs
       call extend(qfl, lqfl)
-      call vader#window#append(printf('Success/Total: %s/%s', success, total), 0)
+      call vader#window#append(printf('Success/Total: %s/%s', cs, ct), 1)
     endfor
   finally
+    call vader#window#append(printf('Success/Total: %s/%s', success, total), 0)
+    call vader#window#append('Elapsed time: '.
+          \ substitute(reltimestr(reltime(st)), '^\s*', '', '') .' sec.', 0)
     call s:cleanup()
     call vader#window#cleanup()
     if !empty(qfl)
@@ -110,7 +114,7 @@ function! s:run(filename, cases)
       try
         call vader#window#execute(case.execute)
       catch
-        call s:append(prefix, 'execute', v:exception)
+        call s:append(prefix, 'execute', '(X) '.v:exception)
         let ok = 0
       endtry
     elseif has_key(case, 'do')

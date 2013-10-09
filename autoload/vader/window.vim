@@ -33,6 +33,7 @@ function! vader#window#open()
   if s:vader_tab != tabpagenr()
     tabnew
     set buftype=nofile
+    setf vader-result
     silent! bd \[Vader\]
     silent f \[Vader\]
     let s:vader_tab = tabpagenr()
@@ -100,12 +101,15 @@ endfunction
 function! vader#window#cleanup()
   silent! bd vader-workbench
 
-  nnoremap <buffer> q :silent! bd \[Vader\]<CR>:tabclose<CR>
-  normal! ggzt
+  nnoremap <buffer> q :tabclose<CR>
+  normal! Gzb
 endfunction
 
 function! vader#window#copen(qfl)
   call setqflist(a:qfl)
   copen
-  nnoremap <buffer> q :silent! bd \[Vader\]<CR>:tabclose<CR>
+  1wincmd w
+  normal! Gzb
+  2wincmd w
+  nnoremap <buffer> q :tabclose<CR>
 endfunction
