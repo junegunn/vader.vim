@@ -62,15 +62,16 @@ function! vader#run(...)
       call extend(qfl, lqfl)
       call vader#window#append(printf('Success/Total: %s/%s', cs, ct), 1)
     endfor
-  finally
+
     call vader#window#append(printf('Success/Total: %s/%s', success, total), 0)
     call vader#window#append('Elapsed time: '.
           \ substitute(reltimestr(reltime(st)), '^\s*', '', '') .' sec.', 0)
-    call s:cleanup()
     call vader#window#cleanup()
     if !empty(qfl)
       call vader#window#copen(qfl)
     endif
+  finally
+    call s:cleanup()
   endtry
 endfunction
 
@@ -158,7 +159,7 @@ function! s:run(filename, cases)
             \ given_comment,
             \ get(case.comment, 'do', get(case.comment, 'execute', '')),
             \ get(case.comment, 'expect', '')], '!empty(v:val)'), ' - ')
-      call add(qfl, { 'filename': a:filename, 'lnum': case.lnum, 'text': description })
+      call add(qfl, { 'type': 'E', 'filename': a:filename, 'lnum': case.lnum, 'text': description })
     endif
   endfor
 

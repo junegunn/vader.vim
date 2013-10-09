@@ -21,41 +21,25 @@
 " OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-let s:vader_tab = 0
-let s:vader_window = 0
+let s:quickfix_bfr = 0
 
 function! vader#window#open()
-  if s:vader_tab
-    execute "normal! ". s:vader_tab . "gt"
+  silent! bd \[Vader\]
+  silent! bd vader-workbench
+  if bufexists(s:quickfix_bfr)
+    execute "silent! bd ".s:quickfix_bfr
   endif
 
-  " No tab
-  if s:vader_tab != tabpagenr()
-    tabnew
-    set buftype=nofile
-    setf vader-result
-    silent! bd \[Vader\]
-    silent f \[Vader\]
-    let s:vader_tab = tabpagenr()
-  endif
+  tabnew
+  set buftype=nofile
+  setf vader-result
+  silent! bd \[Vader\]
+  silent f \[Vader\]
 
-  for i in range(1, winnr('$'))
-    execute i.'wincmd w'
-    if &filetype == 'qf'
-      bd
-    endif
-  endfor
-
-  if winnr('$') < 2
-    topleft new
-    set buftype=nofile
-    silent! bd vader-workbench
-    silent f vader-workbench
-  endif
-  1wincmd w
-  %d
-  2wincmd w
-  %d
+  topleft new
+  set buftype=nofile
+  silent! bd vader-workbench
+  silent f vader-workbench
 endfunction
 
 function! vader#window#execute(lines)
@@ -108,6 +92,7 @@ endfunction
 function! vader#window#copen(qfl)
   call setqflist(a:qfl)
   copen
+  let s:quickfix_bfr = bufnr('')
   1wincmd w
   normal! Gzb
   2wincmd w
