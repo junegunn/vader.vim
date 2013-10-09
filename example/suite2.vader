@@ -1,0 +1,30 @@
+Given:
+  Some string
+
+Do:
+  V~
+
+Expect:
+  sOME STRING
+
+Execute (without expectation):
+  AssertEqual 1, 2
+
+Do (with no expectation):
+  Vu
+
+Do:
+  Vu
+
+Expect:
+  some string
+
+Execute (with expectation):
+  " Ordinary Vim comment
+  call append(line('$'), 'more string')
+  call append(line('$'), 'even more string')
+
+Expect (strings appended):
+  some string
+  MORE string
+  even more string

@@ -1,0 +1,154 @@
+# This is comment - cannot appear inside indented block
+Execute (initialize (simple vimscript)):
+  silent! unlet g:easy_align_delimiters
+  silent! unlet g:easy_align_ignore_groups
+  silent! unlet g:easy_align_ignore_unmatched
+  silent! unlet g:easy_align_indentation
+  silent! unlet g:easy_align_delimiter_align
+  vnoremap <silent> <Enter> :EasyAlign<Enter>
+
+Given (the beatles):
+  Paul McCartney 1942
+  George Harrison 1943mmdd
+  Ringo Starr 1940mm
+  Pete Best 1941
+
+Do (around first space):
+  vip
+  \<Enter>
+  \<Space>
+
+Expect:
+  Paul   McCartney 1942
+  George Harrison 1943mmdd
+  Ringo  Starr 1940mm
+  Pete   Best 1941
+
+Do (around second space):
+  vip
+  \<Enter>
+  2\<Space>
+
+Expect:
+  Paul McCartney  1942
+  George Harrison 1943mmdd
+  Ringo Starr     1940mm
+  Pete Best       1941
+
+Do (around all spaces):
+  vip
+  \<Enter>
+  *\<Space>
+
+Expect:
+  Paul   McCartney 1942
+  George Harrison  1943mmdd
+  Ringo  Starr     1940mm
+  Pete   Best      1941
+
+Do (right-align around all spaces):
+  vip
+  \<Enter>\<Enter>
+  *\<Space>
+
+Expect:
+    Paul McCartney     1942
+  George  Harrison 1943mmdd
+   Ringo     Starr   1940mm
+    Pete      Best     1941
+
+Do (center-align around all spaces):
+  vip
+  \<Enter>\<Enter>\<Enter>
+  *\<Space>
+
+Expect:
+   Paul  McCartney   1942
+  George Harrison  1943mmdd
+  Ringo    Starr    1940mm
+   Pete    Best      1941
+
+Do (center-align around the last space):
+  vip
+  \<Enter>\<Enter>\<Enter>
+  -\<Space>
+
+Expect:
+  Paul  McCartney 1942
+  George Harrison 1943mmdd
+  Ringo   Starr   1940mm
+  Pete     Best   1941
+
+Do (right-align around second space):
+  vip
+  \<Enter>\<Enter>
+  2\<Space>
+
+Expect:
+  Paul  McCartney 1942
+  George Harrison 1943mmdd
+  Ringo     Starr 1940mm
+  Pete       Best 1941
+
+Do (left-right alternating alignment):
+  vip
+  \<Enter>
+  **\<Space>
+
+Expect:
+  Paul   McCartney 1942
+  George  Harrison 1943mmdd
+  Ringo      Starr 1940mm
+  Pete        Best 1941
+
+Do (right-left alternating alignment):
+  vip
+  \<Enter>\<Enter>
+  **\<Space>
+
+Expect:
+    Paul McCartney     1942
+  George Harrison  1943mmdd
+   Ringo Starr       1940mm
+    Pete Best          1941
+
+Do (with numeric left/right margin):
+  vip
+  \<Enter>
+  *
+  \<C-L>2\<Enter>
+  \<Enter>
+  \<C-R>5\<Enter>
+  *
+  \<Space>
+
+Expect:
+    Paul        McCartney            1942
+  George        Harrison         1943mmdd
+   Ringo        Starr              1940mm
+    Pete        Best                 1941
+
+Do (with string left/right margin):
+  vip
+  \<Enter>
+  \<C-L>lft\<Enter>
+  \<C-R>rgt\<Enter>
+  *\<Space>
+
+Expect:
+  Paul  lft rgtMcCartneylft rgt1942
+  Georgelft rgtHarrison lft rgt1943mmdd
+  Ringo lft rgtStarr    lft rgt1940mm
+  Pete  lft rgtBest     lft rgt1941
+
+Given ruby (delimiters in comments and strings):
+  xyz="abc=def"
+  a=b#=c
+
+Do (align around all =):
+  vip
+  \<Enter>*=
+
+Expect ruby (are not aligned):
+  xyz = "abc=def"
+  a   = b#=c
