@@ -121,7 +121,12 @@ function! s:run(filename, cases)
       endtry
     elseif has_key(case, 'do')
       call s:append(prefix, 'do', s:comment(case, 'do'))
-      call vader#window#replay(case.do)
+      try
+        call vader#window#replay(case.do)
+      catch
+        call s:append(prefix, 'do', '(X) '.v:exception)
+        let ok = 0
+      endtry
     endif
 
     if has_key(case, 'expect')

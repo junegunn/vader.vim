@@ -35,3 +35,5 @@ Expect ruby (indented):
       a = 1
     end
 
+Do (Error):
+  :non-existent-command\<Enter>
