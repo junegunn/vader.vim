@@ -50,7 +50,7 @@ hi def link vaderResultSequence Label
 hi def link vaderResultType Delimiter
 
 hi def link vaderResultGiven Include
-hi def link vaderResultDo Statement
+hi def link vaderResultDo PreProc
 hi def link vaderResultExecute Statement
 hi def link vaderResultExpect Boolean
 hi def link vaderResultError Error

@@ -52,11 +52,11 @@ syn match vaderExpectType /\(Expect\s*\)\@<=[^()\s]\+/ contained
 syn match vaderMessage /(\@<=.*)\@=/ contained
 syn match vaderComment /^#.*/
 
-hi def link vaderGiven      Label
+hi def link vaderGiven      Include
 hi def link vaderDo         PreProc
-hi def link vaderExecute    Function
+hi def link vaderExecute    Statement
 hi def link vaderMessage    Title
-hi def link vaderExpect     Constant
+hi def link vaderExpect     Boolean
 hi def link vaderGivenType  Identifier
 hi def link vaderExpectType Identifier
 hi def link vaderComment    Comment
