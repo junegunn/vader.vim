@@ -53,7 +53,7 @@ function! vader#run(...)
 
     call vader#window#open()
     call vader#window#append(
-    \ printf("Starting Vader (%d suite(s) - %d case(s))", len(all_cases), total), 0)
+    \ printf("Starting Vader: %d suite(s), %d case(s)", len(all_cases), total), 0)
 
     for pair in all_cases
       let [fn, case] = pair

@@ -25,11 +25,12 @@ if exists("b:current_syntax")
   finish
 endif
 
-syntax match vaderResultTitle /^\S.*/ contains=vaderResultNumber,vaderResultParens
-syntax match vaderResultTitle /^\S.*:\@=/ contains=vaderResultNumber,vaderResultParens
-syntax match vaderResultTitle2 /^  \S.*:\@=/ contains=vaderResultNumber,vaderResultParens
-syntax match vaderResultParens /(.*)/ contained contains=vaderResultNumber
-syntax match vaderResultNumber /[0-9]\+/ contained
+syntax match vaderResultTitle /^\S.*/ contains=vaderResultNumber
+syntax match vaderResultTitle /^\S.*:\@=/ contains=vaderResultNumber
+syntax match vaderResultTitleRest /\(^\S.*:\)\@<=.*/ contains=vaderResultNumber
+syntax match vaderResultTitle2 /^  \S.*:\@=/ contains=vaderResultNumber
+syntax match vaderResultTitle2Rest /\(^  \S.*:\)\@<=.*/ contains=vaderResultNumber
+syntax match vaderResultNumber /-\?[0-9]\+\(\.[0-9]\+\)\?/ contained
 syntax match vaderResultItem /^    [^\]]\+\]\( (X).*\)\?/ contains=vaderResultSequence,vaderResultType,vaderResultError
 syntax match vaderResultSequence /^    ([0-9/ ]\+)/ contains=vaderResultNumber contained
 syntax match vaderResultType /\[[A-Z ]\+\]/ contained contains=vaderResultDo,vaderResultGiven,vaderResultExpect,vaderResultExecute
@@ -45,7 +46,6 @@ syntax match vaderResultGot      /^      - Got/
 hi def link vaderResultTitle Title
 hi def link vaderResultTitle2 Conditional
 hi def link vaderResultNumber Number
-hi def link vaderResultParens Label
 hi def link vaderResultSequence Label
 hi def link vaderResultType Delimiter
 
