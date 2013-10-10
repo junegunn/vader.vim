@@ -46,33 +46,33 @@ Use your favorite plugin manager.
 Syntax of .vader file
 ---------------------
 
-### Given
+#### Given
 
 ```
 Given [filetype] [(comment)]:
   [input text]
 ```
 
-### Execute
+#### Execute
 
 ```
 Execute [(comment)]:
   [commands]
 ```
 
-#### Assertions
+##### Assertions
 
 - `Assert <boolean expr>`
 - `AssertEqual <expected>, <got>`
 
-### Do
+#### Do
 
 ```
 Do [(comment)]:
   [keystrokes]
 ```
 
-### Expect
+#### Expect
 
 ```
 Expect [filetype] [(comment)]:
@@ -96,8 +96,7 @@ Given ruby (some ruby code):
     end
 
 Do (indent the block):
-  vip
-  =
+  vip=
 
 Expect ruby (indented block):
   def a
@@ -105,10 +104,8 @@ Expect ruby (indented block):
   end
 
 Do (indent and shift):
-  vip
-  =
-  gv
-  >
+  vip=
+  gv>
 
 Expect ruby (indented and shifted):
     def a
@@ -124,8 +121,8 @@ Commands
     - Exit Vim after running the tests with exit status of 0 or 1
         - `vim +'Vader!*'`
 
-Real-life example
------------------
+Real-life examples
+------------------
 
 - [Test cases for vim-easy-align](https://github.com/junegunn/vim-easy-align/tree/master/test)
 - [Test cases for vim-emoji](https://github.com/junegunn/vim-emoji/tree/master/test)
