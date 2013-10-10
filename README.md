@@ -127,7 +127,8 @@ Commands
 Real-life example
 -----------------
 
-[Test cases for vim-easy-align](https://github.com/junegunn/vim-easy-align/tree/master/test)
+- [Test cases for vim-easy-align](https://github.com/junegunn/vim-easy-align/tree/master/test)
+- [Test cases for vim-emoji](https://github.com/junegunn/vim-emoji/tree/master/test)
 
 License
 -------
