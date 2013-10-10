@@ -95,6 +95,7 @@ endfunction
 
 function! vader#window#cleanup()
   silent! bd \[Vader-workbench\]
+  call s:console()
 
   nnoremap <buffer> q :tabclose<CR>
   normal! Gzb
