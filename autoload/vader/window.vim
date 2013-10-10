@@ -21,11 +21,21 @@
 " OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-let s:quickfix_bfr = 0
+let s:quickfix_bfr  = 0
+let s:console_tab   = 0
+let s:workbench_tab = 0
+
+function! s:console()
+  execute 'normal! '.s:console_tab.'gt'
+endfunction
+
+function! s:workbench()
+  execute 'normal! '.s:workbench_tab.'gt'
+endfunction
 
 function! vader#window#open()
   silent! bd \[Vader\]
-  silent! bd vader-workbench
+  silent! bd \[Vader-workbench\]
   if bufexists(s:quickfix_bfr)
     execute "silent! bd ".s:quickfix_bfr
   endif
@@ -33,17 +43,17 @@ function! vader#window#open()
   tabnew
   set buftype=nofile
   setf vader-result
-  silent! bd \[Vader\]
   silent f \[Vader\]
+  let s:console_tab = tabpagenr()
 
-  topleft new
+  tabnew
   set buftype=nofile
-  silent! bd vader-workbench
-  silent f vader-workbench
+  silent f \[Vader-workbench\]
+  let s:workbench_tab = tabpagenr()
 endfunction
 
 function! vader#window#execute(lines)
-  1wincmd w
+  call s:workbench()
   let temp = tempname()
   try
     call writefile(a:lines, temp)
@@ -54,24 +64,24 @@ function! vader#window#execute(lines)
 endfunction
 
 function! vader#window#replay(lines)
-  1wincmd w
+  call s:workbench()
   let @x = substitute(join(a:lines, ''), '\\<[^>]\+>', '\=eval("\"".submatch(0)."\"")', 'g')
   normal! @x
 endfunction
 
 function! vader#window#result()
-  1wincmd w
+  call s:workbench()
   return getline(1, line('$'))
 endfunction
 
 function! vader#window#append(message, indent)
-  2wincmd w
+  call s:console()
   call append(line('$') - 1,
         \ substitute(repeat('  ', a:indent) . a:message, '\s*$', '', ''))
 endfunction
 
 function! vader#window#prepare(lines, type)
-  1wincmd w
+  call s:workbench()
   if !empty(a:type)
     execute 'setf '.a:type
   endif
@@ -84,7 +94,7 @@ function! vader#window#prepare(lines, type)
 endfunction
 
 function! vader#window#cleanup()
-  silent! bd vader-workbench
+  silent! bd \[Vader-workbench\]
 
   nnoremap <buffer> q :tabclose<CR>
   normal! Gzb
