@@ -141,8 +141,13 @@ function! s:run(filename, cases)
     if has_key(case, 'expect')
       let result = vader#window#result()
 
-      setlocal noignorecase
-      let ok = case.expect == result
+      let oignorecase = &ignorecase
+      try
+        set noignorecase
+        let ok = case.expect == result
+      finally
+        let &ignorecase = oignorecase
+      endtry
 
       call s:append(prefix, 'expect', (ok ? '' : '(X) ') . s:comment(case, 'expect'))
 
