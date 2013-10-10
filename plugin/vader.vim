@@ -25,4 +25,4 @@ if exists(":Vader")
   finish
 endif
 
-command! -nargs=* -complete=file Vader :call vader#run(<f-args>)
+command! -bang -nargs=* -complete=file Vader :call vader#run('<bang>' == '!', <f-args>)

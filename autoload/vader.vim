@@ -26,7 +26,7 @@ if exists("g:loaded_vader")
 endif
 let g:loaded_vader = 1
 
-function! vader#run(...)
+function! vader#run(bang, ...)
   if a:0 == 0
     let patterns = [expand('%')]
   else
@@ -67,7 +67,13 @@ function! vader#run(...)
     call vader#window#append('Elapsed time: '.
           \ substitute(reltimestr(reltime(st)), '^\s*', '', '') .' sec.', 0)
     call vader#window#cleanup()
-    if !empty(qfl)
+    if a:bang
+      if empty(qfl)
+        qall
+      else
+        cq
+      endif
+    elseif !empty(qfl)
       call vader#window#copen(qfl)
     endif
   finally
