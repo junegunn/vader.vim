@@ -37,7 +37,7 @@ syn match vaderDo      /^Do\(\s*(.*)\s*\)\?:/           contains=vaderMessage ne
 syn match vaderExecute /^Execute\(\s*(.*)\s*\)\?:/      contains=vaderMessage nextgroup=vaderCommand skipempty
 
 let s:langs = get(g:, 'vader_types',
-  \ ['ruby', 'python', 'java', 'c', 'cpp', 'javascript', 'yaml', 'html', 'css', 'clojure', 'sh', 'plaintex'])
+  \ ['ruby', 'python', 'java', 'c', 'cpp', 'javascript', 'yaml', 'html', 'css', 'clojure', 'sh', 'tex'])
 for lang in s:langs
   silent! unlet b:current_syntax
   execute printf('syn include @%sSnippet syntax/%s.vim', lang, lang)
