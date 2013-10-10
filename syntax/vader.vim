@@ -30,14 +30,14 @@ syn include @vimSnippet syntax/vim.vim
 syn region vaderText    start=/^\s\{2,}/ end=/^\S\@=/
 syn region vaderCommand start=/^\s\{2,}/ end=/^\S\@=/ contains=@vimSnippet
 
-" No type
-syn match vaderGiven     /^Given\(\s*(.*)\s*\)\?:/ contains=vaderMessage nextgroup=vaderText skipempty
-syn match vaderExpect   /^Expect\(\s*(.*)\s*\)\?:/ contains=vaderMessage nextgroup=vaderText skipempty
-syn match vaderDo           /^Do\(\s*(.*)\s*\)\?:/ contains=vaderMessage nextgroup=vaderCommand skipempty
-syn match vaderExecute /^Execute\(\s*(.*)\s*\)\?:/ contains=vaderMessage nextgroup=vaderCommand skipempty
+syn match vaderGiven   /^Given\(\s*(.*)\s*\)\?:/        contains=vaderMessage nextgroup=vaderText skipempty
+syn match vaderGiven   /^Given\s*\S\+\s*\((.*)\)\?\s*:/ contains=vaderGivenType,vaderMessage nextgroup=vaderText skipempty
+syn match vaderExpect  /^Expect\(\s*(.*)\s*\)\?:/       contains=vaderMessage nextgroup=vaderText skipempty
+syn match vaderDo      /^Do\(\s*(.*)\s*\)\?:/           contains=vaderMessage nextgroup=vaderCommand skipempty
+syn match vaderExecute /^Execute\(\s*(.*)\s*\)\?:/      contains=vaderMessage nextgroup=vaderCommand skipempty
 
 let s:langs = get(g:, 'vader_types',
-  \ ['ruby', 'python', 'java', 'c', 'cpp', 'javascript', 'yaml', 'html', 'css', 'clojure', 'sh'])
+  \ ['ruby', 'python', 'java', 'c', 'cpp', 'javascript', 'yaml', 'html', 'css', 'clojure', 'sh', 'plaintex'])
 for lang in s:langs
   silent! unlet b:current_syntax
   execute printf('syn include @%sSnippet syntax/%s.vim', lang, lang)
