@@ -49,8 +49,10 @@ endfor
 syn match vaderGivenType /\(Given\s*\)\@<=[^()\s]\+/ contained
 syn match vaderExpectType /\(Expect\s*\)\@<=[^()\s]\+/ contained
 
-syn match vaderMessage /(\@<=.*)\@=/ contained
-syn match vaderComment /^#.*/
+syn match vaderMessage /(\@<=.*)\@=/ contained contains=Todo
+syn match vaderComment /^#.*/ contains=Todo
+
+syn keyword Todo TODO FIXME XXX TBD
 
 hi def link vaderGiven      Include
 hi def link vaderDo         PreProc
