@@ -93,7 +93,7 @@ endfunction
 function vader#restore(...)
   for varname in a:0 == 0 ? keys(s:register) : a:000
     if has_key(s:register, varname)
-      call eval(printf("let %s = s:register['%s']", varname, varname))
+      execute printf("let %s = s:register['%s']", varname, varname)
     endif
   endfor
 endfunction
