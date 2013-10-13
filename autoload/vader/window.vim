@@ -41,13 +41,15 @@ function! vader#window#open()
   endif
 
   tabnew
-  set buftype=nofile
+  setlocal buftype=nofile
+  setlocal noswapfile
   setf vader-result
   silent f \[Vader\]
   let s:console_tab = tabpagenr()
 
   tabnew
-  set buftype=nofile
+  setlocal buftype=nofile
+  setlocal noswapfile
   silent f \[Vader-workbench\]
   let s:workbench_tab = tabpagenr()
 endfunction
