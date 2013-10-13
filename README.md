@@ -68,7 +68,7 @@ Execute [(comment)]:
 
 ##### Assertions
 
-- `Assert <boolean expr>`
+- `Assert <boolean expr>, [message]`
 - `AssertEqual <expected>, <got>`
 
 #### Do

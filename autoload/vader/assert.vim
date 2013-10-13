@@ -21,10 +21,17 @@
 " OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-function! vader#assert#true(expr)
-  if !a:expr
-    " TODO message
-    throw "Assertion failure"
+function! vader#assert#true(...)
+  if a:0 == 1
+    let [expr, message] = [a:1, "Assertion failure"]
+  elseif a:0 == 2
+    let [expr, message] = a:000
+  else
+    throw 'Invalid number of arguments'
+  endif
+
+  if !expr
+    throw message
   endif
   return 1
 endfunction

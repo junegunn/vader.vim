@@ -82,7 +82,7 @@ function! vader#run(bang, ...)
 endfunction
 
 function! s:prepare()
-  command! -nargs=1 Assert      :call vader#assert#true(<args>)
+  command! -nargs=+ Assert      :call vader#assert#true(<args>)
   command! -nargs=+ AssertEqual :call vader#assert#equal(<args>)
 endfunction
 
