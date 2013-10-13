@@ -25,6 +25,9 @@ if exists("b:current_syntax")
   finish
 endif
 
+let s:oisk = &isk
+
+syn clear
 syn include @vimSnippet syntax/vim.vim
 
 syn region vaderText    start=/^\s\{2,}/ end=/^\S\@=/
@@ -66,3 +69,6 @@ hi def link vaderComment    Comment
 hi def link vaderText String
 
 let b:current_syntax = 'vader'
+
+let &isk = s:oisk
+
