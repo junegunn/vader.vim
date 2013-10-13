@@ -25,6 +25,7 @@ if exists("g:loaded_vader")
   finish
 endif
 let g:loaded_vader = 1
+let s:register = {}
 
 function! vader#run(bang, ...)
   if a:0 == 0
@@ -81,12 +82,33 @@ function! vader#run(bang, ...)
   endtry
 endfunction
 
+function vader#save(...)
+  for varname in a:000
+    if exists(varname)
+      let s:register[varname] = eval(varname)
+    endif
+  endfor
+endfunction
+
+function vader#restore(...)
+  for varname in a:0 == 0 ? keys(s:register) : a:000
+    if has_key(s:register, varname)
+      call eval(printf("let %s = s:register['%s']", varname, varname))
+    endif
+  endfor
+endfunction
+
 function! s:prepare()
+  command! -nargs=+ Save        :call vader#save(<args>)
+  command! -nargs=* Restore     :call vader#restore(<args>)
   command! -nargs=+ Assert      :call vader#assert#true(<args>)
   command! -nargs=+ AssertEqual :call vader#assert#equal(<args>)
 endfunction
 
 function! s:cleanup()
+  let s:register = {}
+  delcommand Save
+  delcommand Restore
   delcommand AssertEqual
   delcommand Assert
 endfunction
