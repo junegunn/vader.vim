@@ -1,39 +1,40 @@
 # Test case
-Execute (test vision#assertion):
-  Assert vader#assert#true('hey' == 'hey')
-  Assert vader#assert#equal('hey', 'hey')
+Execute (Assert and AssertEqual command):
   Assert 1 == 1
-  AssertEqual 'hey', 'h'.'e'.'y'
+  AssertEqual 'hey', tolower('HEY')
 
-Given ruby (some ruby code):
+Execute (Optional message parameter to Assert command):
+  Assert 1 == 2, '1 != 2'
+
+Given ruby (Block content is injected and highlighted as ruby code):
   def a
     a = 1
     end
 
-Do (indenting the block):
+Do (Do block content is keystrokes in normal mode):
   vip
   =
 
-Expect ruby:
+Expect ruby (Expect block content should match the result of previous Do block):
   def a
     a = 1
   end
 
-Expect ruby (what?):
+Expect ruby (Previous Given block is repeated, thus this should fail):
   def b
     a = 1
   end
 
-Do:
+Do (Indent and shift given ruby code):
   vip
   =
   gv
   >
 
-Expect ruby (indented):
+Expect ruby (indented and shifted):
     def a
       a = 1
     end
 
-Do (Error):
+Do (Execute a non-existent command should raise an error):
   :non-existent-command\<Enter>

@@ -1,0 +1,39 @@
+Execute (Initialize vars):
+  let g:abc   = 1
+  let g:def   = 2
+  let g:xyz   = 3
+  let $ENVVAR = 4
+
+Execute (Save vars - comma-separated list of optionally-quoted names):
+  Save g:abc, 'g:def', "g:xyz", $ENVVAR, &number
+
+Execute (Unlet vars):
+  unlet g:abc
+  unlet g:def
+  unlet g:xyz
+  let $ENVVAR = ''
+  set number!
+
+Execute (Restore g:abc and g:def - names can be optionally quoted):
+  Restore 'g:abc', g:def
+
+Execute (Check g:abc and g:def):
+  AssertEqual 1, g:abc
+  AssertEqual 2, g:def
+
+Execute (g:xyz and $ENVVAR should not exist):
+  Assert !exists('g:xyz'), 'g:xyz should not exist'
+  Assert empty($ENVVAR), '$ENVVAR should be empty'
+
+Execute (Restore everything):
+  let number = &number
+  Restore
+  AssertEqual 3, g:xyz
+  AssertEqual 4, $ENVVAR
+  AssertEqual !number, &number
+
+Execute (Cleanup):
+  unlet g:abc
+  unlet g:def
+  unlet g:xyz
+  unlet number

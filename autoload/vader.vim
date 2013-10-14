@@ -82,16 +82,29 @@ function! vader#run(bang, ...)
   endtry
 endfunction
 
-function vader#save(...)
-  for varname in a:000
+function s:split_args(arg)
+  let varnames = split(a:arg, ',')
+  let names = []
+  for varname in varnames
+    let name = substitute(varname, '^\s*\(.*\)\s*$', '\1', '')
+    let name = substitute(name, '^''\(.*\)''$', '\1', '')
+    let name = substitute(name, '^"\(.*\)"$',  '\1', '')
+    call add(names, name)
+  endfor
+  return names
+endfunction
+
+function vader#save(args)
+  for varname in s:split_args(a:args)
     if exists(varname)
       let s:register[varname] = eval(varname)
     endif
   endfor
 endfunction
 
-function vader#restore(...)
-  for varname in a:0 == 0 ? keys(s:register) : a:000
+function vader#restore(args)
+  let varnames = s:split_args(a:args)
+  for varname in empty(varnames) ? keys(s:register) : varnames
     if has_key(s:register, varname)
       execute printf("let %s = s:register['%s']", varname, varname)
     endif
@@ -99,8 +112,8 @@ function vader#restore(...)
 endfunction
 
 function! s:prepare()
-  command! -nargs=+ Save        :call vader#save(<args>)
-  command! -nargs=* Restore     :call vader#restore(<args>)
+  command! -nargs=+ Save        :call vader#save(<q-args>)
+  command! -nargs=* Restore     :call vader#restore(<q-args>)
   command! -nargs=+ Assert      :call vader#assert#true(<args>)
   command! -nargs=+ AssertEqual :call vader#assert#equal(<args>)
 endfunction

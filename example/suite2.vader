@@ -7,24 +7,24 @@ Do:
 Expect:
   sOME STRING
 
-Execute (without expectation):
+Execute (Execute block does not require an Expect block):
   AssertEqual 1, 2
 
-Do (with no expectation):
+Do (Do block *not* followed by an Expect block):
   Vu
 
-Do:
+Do (Do block followed by an Expect block):
   Vu
 
 Expect:
   some string
 
-Execute (with expectation):
+Execute (Execute block can also be followed by an Expect block):
   " Ordinary Vim comment
   call append(line('$'), 'more string')
   call append(line('$'), 'even more string')
 
-Expect (strings appended):
+Expect (Comparison is case-sensitive):
   some string
   MORE string
   even more string
