@@ -88,7 +88,7 @@ function! s:parse_vader(lines)
           let arg     = get(args, 1, '')
           let comment = get(args, 3, '')
 
-          if !empty(arg) && (l == 'Given' || l == 'Expect')
+          if !empty(arg) && (l == 'Given')
             let case.type = arg
           endif
           if !empty(comment)
