@@ -59,7 +59,7 @@ spaces.
 #### Given
 
 The content of a Given block is pasted into the "workbench buffer" for the
-subsequent Do/Execute blocks. `filetype` paremter is useful for testing
+subsequent Do/Execute blocks. `filetype` parameter is useful for testing
 syntax highlighting.
 
 ```
