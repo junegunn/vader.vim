@@ -22,12 +22,8 @@
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function! vader#parser#parse(fn)
-  let lines = s:load_file(a:fn)
+  let lines = readfile(a:fn)
   return s:parse_vader(lines)
-endfunction
-
-function! s:load_file(filename)
-  return readfile(fnamemodify(a:filename, ':p'))
 endfunction
 
 function! s:flush_buffer(cases, case, lnum, label, newlabel, buffer, final)
@@ -45,6 +41,8 @@ function! s:flush_buffer(cases, case, lnum, label, newlabel, buffer, final)
 
     if a:final ||
           \ a:label == 'expect' ||
+          \ a:newlabel == 'given' ||
+          \ index(['before', 'after'], a:newlabel) >= 0 && index(['before', 'after'], a:label) < 0 ||
           \ a:newlabel == 'given' ||
           \ has_key(a:case, a:newlabel) ||
           \ a:newlabel == 'do' && has_key(a:case, 'execute') ||
@@ -76,7 +74,7 @@ function! s:parse_vader(lines)
     endif
 
     let matched = 0
-    for l in ['Given', 'Execute', 'Expect', 'Do']
+    for l in ['Before', 'After', 'Given', 'Execute', 'Expect', 'Do']
       let m = matchlist(line, '^'.l.'\s*\(.*\)\s*:')
       if !empty(m)
         let newlabel = tolower(l)

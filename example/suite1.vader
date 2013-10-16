@@ -2,9 +2,14 @@
 Execute (Assert and AssertEqual command):
   Assert 1 == 1
   AssertEqual 'hey', tolower('HEY')
+  AssertEqual 'suite1.vader', fnamemodify(g:vader_file, ':t')
+  AssertThrows call reverse('not a list')
+
+Execute (AssertThrows expects an exception to be thrown):
+  AssertThrows call reverse([1, 2, 3])
 
 Execute (Optional message parameter to Assert command):
-  Assert 1 == 2, '1 != 2'
+  Assert 1 == 2, '1 is not equal to 2'
 
 Given ruby (Block content is injected and highlighted as ruby code):
   def a

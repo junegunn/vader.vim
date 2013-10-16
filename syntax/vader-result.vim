@@ -33,11 +33,13 @@ syntax match vaderResultTitle2Rest /\(^  \S.*:\)\@<=.*/ contains=vaderResultNumb
 syntax match vaderResultNumber /-\?[0-9]\+\(\.[0-9]\+\)\?/ contained
 syntax match vaderResultItem /^    [^\]]\+\]\( (X).*\)\?/ contains=vaderResultSequence,vaderResultType,vaderResultError
 syntax match vaderResultSequence /^    ([0-9/ ]\+)/ contains=vaderResultNumber contained
-syntax match vaderResultType /\[[A-Z ]\+\]/ contained contains=vaderResultDo,vaderResultGiven,vaderResultExpect,vaderResultExecute
+syntax match vaderResultType /\[[A-Z ]\+\]/ contained contains=vaderResultDo,vaderResultGiven,vaderResultExpect,vaderResultExecute,vaderResultBefore,vaderResultAfter
 syntax match vaderResultDo /DO/ contained
 syntax match vaderResultGiven /GIVEN/ contained
 syntax match vaderResultExpect /EXPECT/ contained
 syntax match vaderResultExecute /EXECUTE/ contained
+syntax match vaderResultBefore /BEFORE/ contained
+syntax match vaderResultAfter /AFTER/ contained
 syntax match vaderResultError /(X).*/ contained
 
 syntax match vaderResultExpected /^      - Expected/
@@ -51,6 +53,8 @@ hi def link vaderResultType Delimiter
 
 hi def link vaderResultGiven Include
 hi def link vaderResultDo PreProc
+hi def link vaderResultBefore Special
+hi def link vaderResultAfter Special
 hi def link vaderResultExecute Statement
 hi def link vaderResultExpect Boolean
 hi def link vaderResultError Error

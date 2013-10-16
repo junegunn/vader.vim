@@ -42,3 +42,16 @@ function! vader#assert#equal(exp, got)
   endif
   return 1
 endfunction
+
+function! vader#assert#throws(exp)
+  let ok = 0
+  try
+    execute a:exp
+  catch
+    let ok = 1
+  endtry
+
+  if ok | return 1
+  else  | throw 'Exception expected but not raised: '.a:exp
+  endif
+endfunction

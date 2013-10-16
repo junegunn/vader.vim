@@ -70,6 +70,19 @@ Execute [(comment)]:
 
 - `Assert <boolean expr>, [message]`
 - `AssertEqual <expected>, <got>`
+- `AssertThrows <expr>`
+
+##### Other commands
+
+Save and Restore commands can be used to backup and restore variables and
+settings before and after the test.
+
+- `Save <variable name>[, ...]`
+- `Restore [<variable name>, ...]`
+
+##### Variables
+
+- `g:vader_file`
 
 #### Do
 

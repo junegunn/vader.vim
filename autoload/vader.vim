@@ -44,8 +44,9 @@ function! vader#run(bang, ...)
     for gl in patterns
       for fn in split(glob(gl), "\n")
         if fnamemodify(fn, ':e') == 'vader'
-          let cases = vader#parser#parse(fn)
-          call add(all_cases, [fn, cases])
+          let afn = fnamemodify(fn, ':p')
+          let cases = vader#parser#parse(afn)
+          call add(all_cases, [afn, cases])
           let total += len(cases)
         endif
       endfor
@@ -112,18 +113,20 @@ function vader#restore(args)
 endfunction
 
 function! s:prepare()
-  command! -nargs=+ Save        :call vader#save(<q-args>)
-  command! -nargs=* Restore     :call vader#restore(<q-args>)
-  command! -nargs=+ Assert      :call vader#assert#true(<args>)
-  command! -nargs=+ AssertEqual :call vader#assert#equal(<args>)
+  command! -nargs=+ Save         :call vader#save(<q-args>)
+  command! -nargs=* Restore      :call vader#restore(<q-args>)
+  command! -nargs=+ Assert       :call vader#assert#true(<args>)
+  command! -nargs=+ AssertEqual  :call vader#assert#equal(<args>)
+  command! -nargs=+ AssertThrows :call vader#assert#throws(<q-args>)
 endfunction
 
 function! s:cleanup()
   let s:register = {}
   delcommand Save
   delcommand Restore
-  delcommand AssertEqual
   delcommand Assert
+  delcommand AssertEqual
+  delcommand AssertThrows
 endfunction
 
 function! s:comment(case, label)
@@ -132,28 +135,38 @@ endfunction
 
 function! s:run(filename, cases)
   let given = []
-  let given_comment = ''
+  let before = []
+  let after = []
+  let comment = { 'given': '', 'before': '', 'after': '' }
   let total = len(a:cases)
+  let just  = len(string(total))
   let cnt = 0
   let success = 0
   let qfl = []
+  let g:vader_file = a:filename
 
   call vader#window#append("Starting Vader: ". a:filename, 1)
 
   for case in a:cases
     let cnt += 1
     let ok = 1
-    let prefix = printf('(%2d/%2d)', cnt, total)
+    let prefix = printf('(%'.just.'d/%'.just.'d)', cnt, total)
 
-    if has_key(case, 'given')
-      let given = case.given
-      let given_comment = get(case.comment, 'given', '')
-    endif
+    for label in ['given', 'before', 'after']
+      if has_key(case, label)
+        execute 'let '.label.' = case[label]'
+        let comment[label] = get(case.comment, label, '')
+      endif
+    endfor
 
     if !empty(given)
-      call s:append(prefix, 'given', given_comment)
+      call s:append(prefix, 'given', comment.given)
     endif
     call vader#window#prepare(given, get(case, 'type', ''))
+
+    if !empty(before)
+      call vader#window#execute(before)
+    endif
 
     if has_key(case, 'execute')
       call s:append(prefix, 'execute', s:comment(case, 'execute'))
@@ -171,6 +184,10 @@ function! s:run(filename, cases)
         call s:append(prefix, 'do', '(X) '.v:exception)
         let ok = 0
       endtry
+    endif
+
+    if !empty(after)
+      call vader#window#execute(after)
     endif
 
     if has_key(case, 'expect')
@@ -202,13 +219,14 @@ function! s:run(filename, cases)
       let success += 1
     else
       let description = join(filter([
-            \ given_comment,
+            \ comment.given,
             \ get(case.comment, 'do', get(case.comment, 'execute', '')),
             \ get(case.comment, 'expect', '')], '!empty(v:val)'), ' - ')
       call add(qfl, { 'type': 'E', 'filename': a:filename, 'lnum': case.lnum, 'text': description })
     endif
   endfor
 
+  unlet g:vader_file
   return [success, total, qfl]
 endfunction
 

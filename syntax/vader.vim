@@ -38,6 +38,8 @@ syn match vaderGiven   /^Given\s*\S\+\s*\((.*)\)\?\s*:/ contains=vaderGivenType,
 syn match vaderExpect  /^Expect\(\s*(.*)\s*\)\?:/       contains=vaderMessage nextgroup=vaderText skipempty
 syn match vaderDo      /^Do\(\s*(.*)\s*\)\?:/           contains=vaderMessage nextgroup=vaderCommand skipempty
 syn match vaderExecute /^Execute\(\s*(.*)\s*\)\?:/      contains=vaderMessage nextgroup=vaderCommand skipempty
+syn match vaderBefore  /^Before\(\s*(.*)\s*\)\?:/       contains=vaderMessage nextgroup=vaderCommand skipempty
+syn match vaderAfter   /^After\(\s*(.*)\s*\)\?:/        contains=vaderMessage nextgroup=vaderCommand skipempty
 
 let s:langs = get(g:, 'vader_types',
   \ ['ruby', 'python', 'java', 'c', 'cpp', 'javascript', 'yaml', 'html', 'css', 'clojure', 'sh', 'tex'])
@@ -58,6 +60,8 @@ syn match vaderComment /^#.*/ contains=Todo
 syn keyword Todo TODO FIXME XXX TBD
 
 hi def link vaderGiven      Include
+hi def link vaderBefore     Special
+hi def link vaderAfter      Special
 hi def link vaderDo         PreProc
 hi def link vaderExecute    Statement
 hi def link vaderMessage    Title
