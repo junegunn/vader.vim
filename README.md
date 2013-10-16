@@ -1,30 +1,7 @@
 vader.vim
 =========
 
-```
-                        _--~~| |~~--_
-                       /     | |   \ \
-                      |      |      | |
-                     |       | |       |
-                     |       |         |
-                    /__----_ | | _----__\
-                   |/_-~~~-_\| |/_-~~~-_\|
-                   //    #  \===/    #  \\
-                  //        |===|        \\
-                 / |________|/~\|________| \
-                /  \        |___|        /  \
-               /   ^\      /| | |\      /^   \
-              /     ^\   /| | | | |\   /^     \
-             /       ^\/| | | | | | |\/^       \
-            <          O|_|_|_|_|_|_|O          >
-             ~\        \   -------   /        /~
-               ~\       ~\ \_____/ /~       /~
-                 ~\       ^-_____-^       /~
-           _________>                   <__________
-/~~~~~~~~~~                                        ~~~~~~~~~~~\
-```
-
-> I use Vader to test Vimscript.
+I use Vader to test Vimscript.
 
 ### Vader test cases
 ![](https://raw.github.com/junegunn/vader.vim/png/vader.png)
@@ -49,53 +26,112 @@ Use your favorite plugin manager.
   1. Add `Plug 'junegunn/vader.vim'` to .vimrc
   2. Run `:PlugInstall`
 
+Running Vader tests
+-------------------
+
+- `Vader  [file glob ...]`
+- `Vader! [file glob ...]`
+    - Exit Vim after running the tests with exit status of 0 or 1
+        - `vim '+Vader!*' && echo Success || echo Failure`
+
 Syntax of .vader file
 ---------------------
 
+A Vader file is a flat sequence of blocks each of which starts with the block
+label, such as `Execute:`, followed by the content of the block indented by 2
+spaces.
+
+- `Given`
+    - Content to fill the execution buffer
+- `Do`
+    - Normal-mode keystrokes that can span multiple lines
+- `Execute`
+    - Vimscript to execute
+- `Expect`
+    - Expected result of the preceding `Do`/`Execute` block
+- `Before`
+    - Vimscript to run before each test case
+- `After`
+    - Vimscript to run after each test case
+
+### Basic blocks
+
 #### Given
+
+The "workbench buffer" for the following `Do`/`Execute` blocks will be
+initialized with the content of the `Given` block. `filetype` paremter is useful
+for testing syntax highlighting.
 
 ```
 Given [filetype] [(comment)]:
   [input text]
 ```
 
-#### Execute
-
-```
-Execute [(comment)]:
-  [commands]
-```
-
-##### Assertions
-
-- `Assert <boolean expr>, [message]`
-- `AssertEqual <expected>, <got>`
-- `AssertThrows <expr>`
-
-##### Other commands
-
-Save and Restore commands can be used to backup and restore variables and
-settings before and after the test.
-
-- `Save <variable name>[, ...]`
-- `Restore [<variable name>, ...]`
-
-##### Variables
-
-- `g:vader_file`
-
 #### Do
+
+The content of a `Do` block is a sequence of normal-mode keystrokes that can span
+multiple lines. Special keys can be written with `\`-escape (e.g. `\<Enter>`).
+`Do` block can be followed by an optional `Expect` block.
 
 ```
 Do [(comment)]:
   [keystrokes]
 ```
 
+#### Execute
+
+The content of an `Execute` block is plain Vimscript that will be executed by
+Vader. `Execute` block can be followed by optional `Expect` block.
+
+```
+Execute [(comment)]:
+  [vimscript]
+```
+
+In `Execute` block, the following commands are provided.
+
+- Assertions
+    - `Assert <boolean expr>, [message]`
+    - `AssertEqual <expected>, <got>`
+    - `AssertThrows <expr>`
+- Other commands
+    - `Log "Message"`
+    - `Save <name>[, ...]`
+    - `Restore [<name>, ...]`
+
+The path of the current .vader file is stored in `g:vader_file`.
+
 #### Expect
+
+If `Expect` block follows an `Execute` block or a `Do` block, the result of the
+preceding block is compared to the content of the `Expect` block. Comparison is
+case-sensitive.
 
 ```
 Expect [filetype] [(comment)]:
   [expected output]
+```
+
+### Hooks
+
+#### Before
+
+The content of a `Before` block is executed before every following
+`Do`/`Execute` block.
+
+```
+Before [(comment)]:
+  [vim script]
+```
+
+#### After
+
+The content of an `After` block is executed after every following
+`Do`/`Execute` block.
+
+```
+After [(comment)]:
+  [vim script]
 ```
 
 ### Example
@@ -132,19 +168,12 @@ Expect ruby (indented and shifted):
     end
 ```
 
-Commands
---------
-
-- `Vader  [file glob...]`
-- `Vader! [file glob...]`
-    - Exit Vim after running the tests with exit status of 0 or 1
-        - `vim +'Vader!*'`
-
 Real-life examples
 ------------------
 
-- [Test cases for vim-easy-align](https://github.com/junegunn/vim-easy-align/tree/master/test)
 - [Test cases for vim-emoji](https://github.com/junegunn/vim-emoji/tree/master/test)
+- [Test cases for seoul256.vim](https://github.com/junegunn/seoul256.vim/tree/master/test)
+- [Test cases for vim-easy-align](https://github.com/junegunn/vim-easy-align/tree/master/test)
 
 License
 -------

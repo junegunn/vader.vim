@@ -25,11 +25,11 @@ if exists("b:current_syntax")
   finish
 endif
 
-syntax match vaderResultTitle /^\S.*/ contains=vaderResultNumber
-syntax match vaderResultTitle /^\S.*:\@=/ contains=vaderResultNumber
-syntax match vaderResultTitleRest /\(^\S.*:\)\@<=.*/ contains=vaderResultNumber
-syntax match vaderResultTitle2 /^  \S.*:\@=/ contains=vaderResultNumber
-syntax match vaderResultTitle2Rest /\(^  \S.*:\)\@<=.*/ contains=vaderResultNumber
+syntax match vaderResultTitle /^[^:]*/ contains=vaderResultNumber
+syntax match vaderResultTitle /^[^:]*:\@=/ contains=vaderResultNumber
+syntax match vaderResultTitleRest /\(^[^:]*:\)\@<=.*/ contains=vaderResultNumber
+syntax match vaderResultTitle2 /^  [^:]*:\@=/ contains=vaderResultNumber
+syntax match vaderResultTitle2Rest /\(^  [^:]*:\)\@<=.*/ contains=vaderResultNumber
 syntax match vaderResultNumber /-\?[0-9]\+\(\.[0-9]\+\)\?/ contained
 syntax match vaderResultItem /^    [^\]]\+\]\( (X).*\)\?/ contains=vaderResultSequence,vaderResultType,vaderResultError
 syntax match vaderResultSequence /^    ([0-9/ ]\+)/ contains=vaderResultNumber contained
@@ -44,6 +44,9 @@ syntax match vaderResultError /(X).*/ contained
 
 syntax match vaderResultExpected /^      - Expected/
 syntax match vaderResultGot      /^      - Got/
+syntax match vaderResultLog      /^    > .*/ contains=vaderResultLogBullet
+syntax match vaderResultLog      /^      > .*/ contains=vaderResultLogBullet
+syntax match vaderResultLogBullet /^\s*> / contained
 
 hi def link vaderResultTitle Title
 hi def link vaderResultTitle2 Conditional
@@ -61,3 +64,6 @@ hi def link vaderResultError Error
 
 hi def link vaderResultExpected Conditional
 hi def link vaderResultGot Exception
+hi def link vaderResultLog String
+hi def link vaderResultLogBullet Special
+

@@ -21,7 +21,20 @@
 " OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
+let s:assertions = [0, 0]
+
+function! vader#assert#reset()
+  let s:assertions = [0, 0]
+endfunction
+
+function! vader#assert#stat()
+  return s:assertions
+endfunction
+
 function! vader#assert#true(...)
+  let s:assertions[1] += 1
+
   if a:0 == 1
     let [expr, message] = [a:1, "Assertion failure"]
   elseif a:0 == 2
@@ -33,17 +46,23 @@ function! vader#assert#true(...)
   if !expr
     throw message
   endif
+  let s:assertions[0] += 1
   return 1
 endfunction
 
 function! vader#assert#equal(exp, got)
+  let s:assertions[1] += 1
+
   if a:exp != a:got
     throw printf("Assertion failure: %s != %s", a:exp, a:got)
   endif
+  let s:assertions[0] += 1
   return 1
 endfunction
 
 function! vader#assert#throws(exp)
+  let s:assertions[1] += 1
+
   let ok = 0
   try
     execute a:exp
@@ -51,6 +70,7 @@ function! vader#assert#throws(exp)
     let ok = 1
   endtry
 
+  let s:assertions[0] += ok
   if ok | return 1
   else  | throw 'Exception expected but not raised: '.a:exp
   endif

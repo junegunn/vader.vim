@@ -26,6 +26,7 @@ if exists("g:loaded_vader")
 endif
 let g:loaded_vader = 1
 let s:register = {}
+let s:indent = 2
 
 function! vader#run(bang, ...)
   if a:0 == 0
@@ -34,6 +35,7 @@ function! vader#run(bang, ...)
     let patterns = a:000
   endif
 
+  call vader#assert#reset()
   call s:prepare()
   try
     let all_cases = []
@@ -65,7 +67,9 @@ function! vader#run(bang, ...)
       call vader#window#append(printf('Success/Total: %s/%s', cs, ct), 1)
     endfor
 
-    call vader#window#append(printf('Success/Total: %s/%s', success, total), 0)
+    let stats = vader#assert#stat()
+    call vader#window#append(printf('Success/Total: %s/%s (assertions: %d/%d)',
+          \ success, total, stats[0], stats[1]), 0)
     call vader#window#append('Elapsed time: '.
           \ substitute(reltimestr(reltime(st)), '^\s*', '', '') .' sec.', 0)
     call vader#window#cleanup()
@@ -95,6 +99,10 @@ function s:split_args(arg)
   return names
 endfunction
 
+function vader#log(msg)
+  call vader#window#append('> '.a:msg, s:indent)
+endfunction
+
 function vader#save(args)
   for varname in s:split_args(a:args)
     if exists(varname)
@@ -113,6 +121,7 @@ function vader#restore(args)
 endfunction
 
 function! s:prepare()
+  command! -nargs=+ Log          :call vader#log(<args>)
   command! -nargs=+ Save         :call vader#save(<q-args>)
   command! -nargs=* Restore      :call vader#restore(<q-args>)
   command! -nargs=+ Assert       :call vader#assert#true(<args>)
@@ -122,6 +131,7 @@ endfunction
 
 function! s:cleanup()
   let s:register = {}
+  delcommand Log
   delcommand Save
   delcommand Restore
   delcommand Assert
@@ -165,9 +175,11 @@ function! s:run(filename, cases)
     call vader#window#prepare(given, get(case, 'type', ''))
 
     if !empty(before)
+      let s:indent = 2
       call vader#window#execute(before)
     endif
 
+    let s:indent = 3
     if has_key(case, 'execute')
       call s:append(prefix, 'execute', s:comment(case, 'execute'))
       try
@@ -187,6 +199,7 @@ function! s:run(filename, cases)
     endif
 
     if !empty(after)
+      let s:indent = 2
       call vader#window#execute(after)
     endif
 
