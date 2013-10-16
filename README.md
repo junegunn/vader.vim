@@ -59,8 +59,9 @@ spaces.
 #### Given
 
 The content of a Given block is pasted into the "workbench buffer" for the
-subsequent Do/Execute blocks. `filetype` parameter is useful for testing
-syntax highlighting.
+subsequent Do/Execute blocks. If `filetype` parameter is given, `&filetype` of
+the buffer is set accordingly. It is also used to syntax-highlight the block in
+.vader file.
 
 ```
 Given [filetype] [(comment)]:
@@ -108,7 +109,7 @@ Also, the path of the current .vader file can be accessed via `g:vader_file`.
 
 If an Expect block follows an Execute block or a Do block, the result of the
 preceding block is compared to the content of the Expect block. Comparison is
-case-sensitive.
+case-sensitive. `filetype` parameter is used to syntax-highlight the block.
 
 ```
 Expect [filetype] [(comment)]:
