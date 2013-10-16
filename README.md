@@ -41,26 +41,26 @@ A Vader file is a flat sequence of blocks each of which starts with the block
 label, such as `Execute:`, followed by the content of the block indented by 2
 spaces.
 
-- `Given`
+- Given
     - Content to fill the execution buffer
-- `Do`
+- Do
     - Normal-mode keystrokes that can span multiple lines
-- `Execute`
+- Execute
     - Vimscript to execute
-- `Expect`
-    - Expected result of the preceding `Do`/`Execute` block
-- `Before`
+- Expect
+    - Expected result of the preceding Do/Execute block
+- Before
     - Vimscript to run before each test case
-- `After`
+- After
     - Vimscript to run after each test case
 
 ### Basic blocks
 
 #### Given
 
-The "workbench buffer" for the following `Do`/`Execute` blocks will be
-initialized with the content of the `Given` block. `filetype` paremter is useful
-for testing syntax highlighting.
+The content of a Given block is pasted into the "workbench buffer" for the
+subsequent Do/Execute blocks. `filetype` paremter is useful for testing
+syntax highlighting.
 
 ```
 Given [filetype] [(comment)]:
@@ -69,9 +69,11 @@ Given [filetype] [(comment)]:
 
 #### Do
 
-The content of a `Do` block is a sequence of normal-mode keystrokes that can span
-multiple lines. Special keys can be written with `\`-escape (e.g. `\<Enter>`).
-`Do` block can be followed by an optional `Expect` block.
+The content of a Do block is a sequence of normal-mode keystrokes that can
+freely span multiple lines. A special key can be written in its name surrounded
+by angle brackets preceded by a backlash (e.g. `\<Enter>`).
+
+Do block can be followed by an optional Expect block.
 
 ```
 Do [(comment)]:
@@ -80,15 +82,16 @@ Do [(comment)]:
 
 #### Execute
 
-The content of an `Execute` block is plain Vimscript that will be executed by
-Vader. `Execute` block can be followed by optional `Expect` block.
+The content of an Execute block is plain Vimscript to be executed.
+
+Execute block can also be followed by optional Expect block.
 
 ```
 Execute [(comment)]:
   [vimscript]
 ```
 
-In `Execute` block, the following commands are provided.
+In Execute block, the following commands are provided.
 
 - Assertions
     - `Assert <boolean expr>, [message]`
@@ -99,12 +102,12 @@ In `Execute` block, the following commands are provided.
     - `Save <name>[, ...]`
     - `Restore [<name>, ...]`
 
-The path of the current .vader file is stored in `g:vader_file`.
+Also, the path of the current .vader file can be accessed via `g:vader_file`.
 
 #### Expect
 
-If `Expect` block follows an `Execute` block or a `Do` block, the result of the
-preceding block is compared to the content of the `Expect` block. Comparison is
+If an Expect block follows an Execute block or a Do block, the result of the
+preceding block is compared to the content of the Expect block. Comparison is
 case-sensitive.
 
 ```
@@ -116,8 +119,8 @@ Expect [filetype] [(comment)]:
 
 #### Before
 
-The content of a `Before` block is executed before every following
-`Do`/`Execute` block.
+The content of a Before block is executed before every following
+Do/Execute block.
 
 ```
 Before [(comment)]:
@@ -126,8 +129,8 @@ Before [(comment)]:
 
 #### After
 
-The content of an `After` block is executed after every following
-`Do`/`Execute` block.
+The content of an After block is executed after every following
+Do/Execute block.
 
 ```
 After [(comment)]:
