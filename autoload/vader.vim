@@ -101,6 +101,7 @@ endfunction
 
 function vader#log(msg)
   call vader#window#append('> '.a:msg, s:indent)
+  call vader#window#workbench()
 endfunction
 
 function vader#save(args)

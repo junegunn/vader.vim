@@ -33,6 +33,10 @@ function! s:workbench()
   execute 'normal! '.s:workbench_tab.'gt'
 endfunction
 
+function! vader#window#workbench()
+  call s:workbench()
+endfunction
+
 function! vader#window#open()
   silent! bd \[Vader\]
   silent! bd \[Vader-workbench\]
