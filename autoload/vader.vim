@@ -210,14 +210,15 @@ function! s:run(filename, cases)
       let oignorecase = &ignorecase
       try
         set noignorecase
-        let ok = case.expect == result
+        let match = case.expect == result
       finally
         let &ignorecase = oignorecase
       endtry
 
-      call s:append(prefix, 'expect', (ok ? '' : '(X) ') . s:comment(case, 'expect'))
+      call s:append(prefix, 'expect', (match ? '' : '(X) ') . s:comment(case, 'expect'))
 
-      if !ok
+      if !match
+        let ok = 0
         call vader#window#append('- Expected:', 3)
         for line in case.expect
           call vader#window#append(line, 5)
