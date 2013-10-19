@@ -97,6 +97,8 @@ function! vader#window#prepare(lines, type)
     call append(line('$') - 1, line)
   endfor
   normal! ddgg
+
+  let &undolevels = &undolevels " Break undo block
 endfunction
 
 function! vader#window#cleanup()
