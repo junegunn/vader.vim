@@ -4,10 +4,10 @@ vader.vim
 I use Vader to test Vimscript.
 
 ### Vader test cases
-![](https://raw.github.com/junegunn/vader.vim/png/vader.png)
+![](https://raw.github.com/junegunn/i/master/vader.png)
 
 ### Vader result
-![](https://raw.github.com/junegunn/vader.vim/png/vader-result.png)
+![](https://raw.github.com/junegunn/i/master/vader-result.png)
 
 Installation
 ------------
