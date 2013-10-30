@@ -107,6 +107,6 @@ function! s:parse_vader(lines)
   endfor
   call s:flush_buffer(cases, case, lnum, label, '', buffer, 1)
 
-  return cases
+  return filter(cases, 'has_key(v:val, "do") || has_key(v:val, "execute")')
 endfunction
 
