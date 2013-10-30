@@ -104,6 +104,16 @@ function! s:parse_vader(lines)
   endfor
   call s:flush_buffer(cases, case, lnum, label, '', buffer, 1)
 
-  return filter(cases, 'has_key(v:val, "do") || has_key(v:val, "execute")')
+  let ret = []
+  let prev = {}
+  for case in cases
+    if has_key(case, "do") || has_key(case, "execute")
+      call add(ret, extend(prev, case))
+      let prev = {}
+    else
+      let prev = case
+    endif
+  endfor
+  return ret
 endfunction
 
