@@ -72,7 +72,7 @@ Given [filetype] [(comment)]:
 
 The content of a Do block is a sequence of normal-mode keystrokes that can
 freely span multiple lines. A special key can be written in its name surrounded
-by angle brackets preceded by a backlash (e.g. `\<Enter>`).
+by angle brackets preceded by a backslash (e.g. `\<Enter>`).
 
 Do block can be followed by an optional Expect block.
 
