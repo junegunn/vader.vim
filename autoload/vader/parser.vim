@@ -39,14 +39,11 @@ function! s:flush_buffer(cases, case, lnum, label, newlabel, buffer, final)
       call remove(a:buffer, 0, -1)
     endif
 
+    let filled = has_key(a:case, 'do') || has_key(a:case, 'execute')
     if a:final ||
-          \ a:label == 'expect' ||
-          \ a:newlabel == 'given' ||
-          \ index(['before', 'after'], a:newlabel) >= 0 && index(['before', 'after'], a:label) < 0 ||
-          \ a:newlabel == 'given' ||
-          \ has_key(a:case, a:newlabel) ||
-          \ a:newlabel == 'do' && has_key(a:case, 'execute') ||
-          \ a:newlabel == 'execute' && has_key(a:case, 'do')
+     \ a:label == 'expect' ||
+     \ a:newlabel == 'given' ||
+     \ index(['before', 'after', 'do', 'execute'], a:newlabel) >= 0 && filled
       call add(a:cases, deepcopy(a:case))
       for key in keys(a:case)
         call remove(a:case, key)
