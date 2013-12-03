@@ -58,11 +58,18 @@ function! vader#window#open()
   let s:workbench_tab = tabpagenr()
 endfunction
 
-function! vader#window#execute(lines)
+function! vader#window#execute(lines, lang_if)
   call s:workbench()
   let temp = tempname()
   try
-    call writefile(a:lines, temp)
+    if empty(a:lang_if)
+      let lines = a:lines
+    else
+      let lines = copy(a:lines)
+      call insert(lines, a:lang_if . ' << __VADER__LANG__IF__')
+      call add(lines, '__VADER__LANG__IF__')
+    endif
+    call writefile(lines, temp)
     execute 'source '.temp
   finally
     call delete(temp)

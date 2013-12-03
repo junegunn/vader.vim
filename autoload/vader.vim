@@ -144,9 +144,9 @@ function! s:comment(case, label)
   return get(a:case.comment, a:label, '')
 endfunction
 
-function! s:execute(prefix, type, block)
+function! s:execute(prefix, type, block, lang_if)
   try
-    call vader#window#execute(a:block)
+    call vader#window#execute(a:block, a:lang_if)
     return 1
   catch
     call s:append(a:prefix, a:type, '(X) '.v:exception)
@@ -187,13 +187,13 @@ function! s:run(filename, cases)
 
     if !empty(before)
       let s:indent = 2
-      let ok = ok && s:execute(prefix, 'before', before)
+      let ok = ok && s:execute(prefix, 'before', before, '')
     endif
 
     let s:indent = 3
     if has_key(case, 'execute')
       call s:append(prefix, 'execute', s:comment(case, 'execute'))
-      let ok = ok && s:execute(prefix, 'execute', case.execute)
+      let ok = ok && s:execute(prefix, 'execute', case.execute, get(case, 'lang_if', ''))
     elseif has_key(case, 'do')
       call s:append(prefix, 'do', s:comment(case, 'do'))
       try
@@ -206,7 +206,7 @@ function! s:run(filename, cases)
 
     if !empty(after)
       let s:indent = 2
-      let ok = ok && s:execute(prefix, 'after', after)
+      let ok = ok && s:execute(prefix, 'after', after, '')
     endif
 
     if has_key(case, 'expect')

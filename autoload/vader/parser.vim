@@ -83,8 +83,12 @@ function! s:parse_vader(lines)
           let arg     = get(args, 1, '')
           let comment = get(args, 3, '')
 
-          if !empty(arg) && (l == 'Given')
-            let case.type = arg
+          if !empty(arg)
+            if l == 'Given'
+              let case.type = arg
+            elseif l == 'Execute'
+              let case.lang_if = arg
+            end
           endif
           if !empty(comment)
             let case.comment[tolower(l)] = comment

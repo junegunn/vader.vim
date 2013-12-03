@@ -1,0 +1,26 @@
+Given (Some string):
+  Hello
+
+Execute ruby (Ruby code):
+  VIM.command('normal! yyp')
+  $curbuf.append $curbuf.count,
+                 File.basename(VIM.evaluate 'g:vader_file')
+
+Expect:
+  Hello
+  Hello
+  lang_if.vader
+
+Execute python (Python code):
+  import os
+  import vim
+  from vim import current, vars
+  vim.command('normal! yy2p')
+  current.buffer.append(os.path.basename(vars['vader_file']))
+
+Expect:
+  Hello
+  Hello
+  Hello
+  lang_if.vader
+

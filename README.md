@@ -103,7 +103,18 @@ In Execute block, the following commands are provided.
     - `Save <name>[, ...]`
     - `Restore [<name>, ...]`
 
-Also, the path of the current .vader file can be accessed via `g:vader_file`.
+And the path of the current .vader file can be accessed via `g:vader_file`.
+
+In addition to plain Vimscript, you can also test Ruby/Python/Perl/Lua interface
+with Execute block as follows:
+
+```
+Execute [lang] [(comment)]:
+  [<lang> code]
+```
+
+See Ruby and Python examples
+[here](https://github.com/junegunn/vader.vim/blob/master/example/lang_if.vader).
 
 #### Expect
 
