@@ -78,7 +78,7 @@ endfunction
 
 function! vader#window#replay(lines)
   call s:workbench()
-  let @x = substitute(join(a:lines, ''), '\\<[^>]\+>', '\=eval("\"".submatch(0)."\"")', 'g')
+  call setreg('x', substitute(join(a:lines, ''), '\\<[^>]\+>', '\=eval("\"".submatch(0)."\"")', 'g'), 'c')
   normal! @x
 endfunction
 

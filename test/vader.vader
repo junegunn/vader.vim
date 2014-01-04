@@ -1,0 +1,17 @@
+Given:
+  Copyright (c) 2014 Junegunn Choi
+
+  MIT License
+
+# :help let-@
+# > If the result of {expr1} ends in a <CR> or <NL>, the
+# > register will be linewise, otherwise it will be set to
+# > characterwise.
+# A workaround is to use setreg() instead to force characterwise mode
+Do (Macro that ends with <CR>):
+  \<Enter>
+
+Expect:
+  Copyright (c) 2014 Junegunn Choi
+
+  MIT License
