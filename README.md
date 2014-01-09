@@ -186,9 +186,11 @@ Expect ruby (indented and shifted):
 Real-life examples
 ------------------
 
-- [Test cases for vim-emoji](https://github.com/junegunn/vim-emoji/tree/master/test)
-- [Test cases for seoul256.vim](https://github.com/junegunn/seoul256.vim/tree/master/test)
-- [Test cases for vim-easy-align](https://github.com/junegunn/vim-easy-align/tree/master/test)
+- [vim-emoji](https://github.com/junegunn/vim-emoji/tree/master/test)
+- [seoul256.vim](https://github.com/junegunn/seoul256.vim/tree/master/test)
+- [vim-easy-align](https://github.com/junegunn/vim-easy-align/tree/master/test)
+- [vim-sneak](https://github.com/justinmk/vim-sneak/tree/master/tests)
+- [simplenote.vim](https://github.com/mrtazz/simplenote.vim/tree/master/tests)
 
 License
 -------
