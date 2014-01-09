@@ -104,7 +104,9 @@ function! s:parse_vader(lines)
     if !empty(line) && line !~ '^  '
       throw "Syntax error: " . line
     endif
-    call add(buffer, line)
+    if !empty(label)
+      call add(buffer, line)
+    endif
   endfor
   call s:flush_buffer(cases, case, lnum, label, '', buffer, 1)
 
