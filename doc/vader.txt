@@ -1,0 +1,268 @@
+vader.txt	vader	Last change: January 15 2014
+VADER - TABLE OF CONTENTS                                      *vader* *vader-toc*
+==============================================================================
+
+  vader.vim
+      Vader test cases                                           |vader-0-1|
+      Vader result                                               |vader-0-2|
+    Installation                                                 |vader-1|
+    Running Vader tests                                          |vader-2|
+    Syntax of .vader file                                        |vader-3|
+      Basic blocks                                               |vader-3-1|
+        Given                                                    |vader-3-1-1|
+        Do                                                       |vader-3-1-2|
+        Execute                                                  |vader-3-1-3|
+        Expect                                                   |vader-3-1-4|
+      Hooks                                                      |vader-3-2|
+        Before                                                   |vader-3-2-1|
+        After                                                    |vader-3-2-2|
+      Example                                                    |vader-3-3|
+    Real-life examples                                           |vader-4|
+    License                                                      |vader-5|
+
+
+VADER.VIM                                                            *vader-vim*
+==============================================================================
+
+I use Vader to test Vimscript.
+
+
+< Vader test cases >__________________________________________________________~
+                                                              *vader-test-cases*
+                                                                     *vader-0-1*
+https://raw.github.com/junegunn/i/master/vader.png
+
+
+< Vader result >______________________________________________________________~
+                                                                  *vader-result*
+                                                                     *vader-0-2*
+https://raw.github.com/junegunn/i/master/vader-result.png
+
+
+                                                                       *vader-1*
+INSTALLATION                                                *vader-installation*
+==============================================================================
+
+Use your favorite plugin manager.
+
+ - {1}{Pathogen}
+     - `git clone https://github.com/junegunn/vader.vim.git ~/.vim/bundle/vader.vim`
+ - {2}{Vundle}
+     1. Add `Bundle 'junegunn/vader.vim'` to .vimrc
+     2. Run `:BundleInstall`
+ - {3}{NeoBundle}
+     1. Add `NeoBundle 'junegunn/vader.vim'` to .vimrc
+     2. Run `:NeoBundleInstall`
+ - {4}{vim-plug}
+     1. Add `Plug 'junegunn/vader.vim'` to .vimrc
+     2. Run `:PlugInstall`
+
+                                   {1} https://github.com/tpope/vim-pathogen
+                                   {2} https://github.com/gmarik/vundle
+                                   {3} https://github.com/Shougo/neobundle.vim
+                                   {4} https://github.com/junegunn/vim-plug
+
+
+                                                                       *vader-2*
+RUNNING VADER TESTS                                  *vader-running-vader-tests*
+==============================================================================
+
+ - `Vader  [file glob ...]`
+ - `Vader! [file glob ...]`
+     - Exit Vim after running the tests with exit status of 0 or 1
+         - `vim '+Vader!*' && echo Success || echo Failure`
+
+
+                                                                       *vader-3*
+SYNTAX OF .VADER FILE                               *vader-syntax-of-vader-file*
+==============================================================================
+
+A Vader file is a flat sequence of blocks each of which starts with the block
+label, such as `Execute:`, followed by the content of the block indented by 2
+spaces.
+
+ - Given
+     - Content to fill the execution buffer
+ - Do
+     - Normal-mode keystrokes that can span multiple lines
+ - Execute
+     - Vimscript to execute
+ - Expect
+     - Expected result of the preceding Do/Execute block
+ - Before
+     - Vimscript to run before each test case
+ - After
+     - Vimscript to run after each test case
+
+
+< Basic blocks >______________________________________________________________~
+                                                            *vader-basic-blocks*
+                                                                     *vader-3-1*
+
+
+Given~
+                                                                   *vader-given*
+                                                                   *vader-3-1-1*
+
+The content of a Given block is pasted into the "workbench buffer" for the
+subsequent Do/Execute blocks. If `filetype` parameter is given, `&filetype` of
+the buffer is set accordingly. It is also used to syntax-highlight the block in
+.vader file.
+
+>
+    Given [filetype] [(comment)]:
+      [input text]
+<
+
+Do~
+                                                                      *vader-do*
+                                                                   *vader-3-1-2*
+
+The content of a Do block is a sequence of normal-mode keystrokes that can
+freely span multiple lines. A special key can be written in its name surrounded
+by angle brackets preceded by a backslash (e.g. `\<Enter>`).
+
+Do block can be followed by an optional Expect block.
+
+>
+    Do [(comment)]:
+      [keystrokes]
+<
+
+Execute~
+                                                                 *vader-execute*
+                                                                   *vader-3-1-3*
+
+The content of an Execute block is plain Vimscript to be executed.
+
+Execute block can also be followed by optional Expect block.
+
+>
+    Execute [(comment)]:
+      [vimscript]
+<
+In Execute block, the following commands are provided.
+
+ - Assertions
+     - `Assert <boolean expr>, [message]`
+     - `AssertEqual <expected>, <got>`
+     - `AssertThrows <expr>`
+ - Other commands
+     - `Log "Message"`
+     - `Save <name>[, ...]`
+     - `Restore [<name>, ...]`
+
+And the path of the current .vader file can be accessed via `g:vader_file`.
+
+In addition to plain Vimscript, you can also test Ruby/Python/Perl/Lua interface
+with Execute block as follows:
+
+>
+    Execute [lang] [(comment)]:
+      [<lang> code]
+<
+See Ruby and Python examples {5}{here}.
+
+   {5} https://github.com/junegunn/vader.vim/blob/master/example/lang_if.vader
+
+
+Expect~
+                                                                  *vader-expect*
+                                                                   *vader-3-1-4*
+
+If an Expect block follows an Execute block or a Do block, the result of the
+preceding block is compared to the content of the Expect block. Comparison is
+case-sensitive. `filetype` parameter is used to syntax-highlight the block.
+
+>
+    Expect [filetype] [(comment)]:
+      [expected output]
+<
+
+< Hooks >_____________________________________________________________________~
+                                                                   *vader-hooks*
+                                                                     *vader-3-2*
+
+
+Before~
+                                                                  *vader-before*
+                                                                   *vader-3-2-1*
+
+The content of a Before block is executed before every following
+Do/Execute block.
+
+>
+    Before [(comment)]:
+      [vim script]
+<
+
+After~
+                                                                   *vader-after*
+                                                                   *vader-3-2-2*
+
+The content of an After block is executed after every following
+Do/Execute block.
+
+>
+    After [(comment)]:
+      [vim script]
+<
+
+< Example >___________________________________________________________________~
+                                                                 *vader-example*
+                                                                     *vader-3-3*
+
+>
+    # Test case
+    Execute (test assertion):
+      %d
+      Assert 1 == line('$')
+
+      setf python
+      AssertEqual 'python', &filetype
+
+    Given ruby (some ruby code):
+      def a
+        a = 1
+        end
+
+    Do (indent the block):
+      vip=
+
+    Expect ruby (indented block):
+      def a
+        a = 1
+      end
+
+    Do (indent and shift):
+      vip=
+      gv>
+
+    Expect ruby (indented and shifted):
+        def a
+          a = 1
+        end
+<
+
+                                                                       *vader-4*
+REAL-LIFE EXAMPLES                                    *vader-real-life-examples*
+==============================================================================
+
+ - {6}{vim-emoji}
+ - {7}{seoul256.vim}
+ - {8}{vim-easy-align}
+ - {9}{vim-sneak}
+ - {10}{simplenote.vim}
+
+               {6} https://github.com/junegunn/vim-emoji/tree/master/test
+               {7} https://github.com/junegunn/seoul256.vim/tree/master/test
+               {8} https://github.com/junegunn/vim-easy-align/tree/master/test
+               {9} https://github.com/justinmk/vim-sneak/tree/master/tests
+               {10} https://github.com/mrtazz/simplenote.vim/tree/master/tests
+
+
+                                                                       *vader-5*
+LICENSE                                                          *vader-license*
+==============================================================================
+
+MIT
