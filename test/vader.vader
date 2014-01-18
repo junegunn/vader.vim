@@ -1,6 +1,8 @@
 
 # Vader file
 
+Include: include/setup.vader
+
 Given:
   Copyright (c) 2014 Junegunn Choi
 
@@ -18,3 +20,6 @@ Expect:
   Copyright (c) 2014 Junegunn Choi
 
   MIT License
+
+Include (again): include/teardown.vader
+

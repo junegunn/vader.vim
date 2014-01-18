@@ -149,6 +149,20 @@ After [(comment)]:
   [vim script]
 ```
 
+### Macros
+
+#### Include
+
+You can include other vader files using Include macro.
+
+```
+Include: setup.vader
+
+# ...
+
+Include: cleanup.vader
+```
+
 ### Example
 
 ```

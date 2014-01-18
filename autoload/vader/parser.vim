@@ -22,7 +22,7 @@
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function! vader#parser#parse(fn)
-  let lines = readfile(a:fn)
+  let lines = s:read_vader(a:fn)
   return s:parse_vader(lines)
 endfunction
 
@@ -52,6 +52,38 @@ function! s:flush_buffer(cases, case, lnum, label, newlabel, buffer, final)
       let a:case.lnum = a:lnum
     endif
   endif
+endfunction
+
+function! s:read_vader(fn)
+  let lines = readfile(a:fn)
+  let max_depth = 5
+
+  for i in range(1, max_depth)
+    let expanded = 0
+    let olines   = lines
+    let lines    = []
+    for line in olines
+      let m = matchlist(line, '^Include\(\s*(.*)\s*\)\?:\s*\(.\{-}\)\s*$')
+      if !empty(m)
+        let file = findfile(m[2], fnamemodify(a:fn, ':h'))
+        if empty(file)
+          echoerr "Cannot find ".m[2]
+        endif
+        call extend(lines, readfile(file))
+        let expanded = 1
+      else
+        call add(lines, line)
+      endif
+    endfor
+
+    if !expanded
+      break
+    elseif i == max_depth
+      echoerr 'Recursive inclusion limit exceeded'
+    endif
+  endfor
+
+  return lines
 endfunction
 
 function! s:parse_vader(lines)

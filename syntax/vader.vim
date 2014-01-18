@@ -39,6 +39,7 @@ syn match vaderDo      /^Do\(\s*(.*)\s*\)\?:/           contains=vaderMessage ne
 syn match vaderExecute /^Execute\(\s*(.*)\s*\)\?:/      contains=vaderMessage nextgroup=vaderCommand skipempty
 syn match vaderBefore  /^Before\(\s*(.*)\s*\)\?:/       contains=vaderMessage nextgroup=vaderCommand skipempty
 syn match vaderAfter   /^After\(\s*(.*)\s*\)\?:/        contains=vaderMessage nextgroup=vaderCommand skipempty
+syn match vaderInclude /^Include\(\s*(.*)\s*\)\?:/      contains=vaderMessage
 
 let s:ifs = ['lua', 'perl', 'ruby', 'python']
 let s:langs = get(g:, 'vader_types',
@@ -63,6 +64,7 @@ syn match vaderComment /^#.*/ contains=Todo
 
 syn keyword Todo TODO FIXME XXX TBD
 
+hi def link vaderInclude     Repeat
 hi def link vaderGiven       Include
 hi def link vaderBefore      Special
 hi def link vaderAfter       Special
