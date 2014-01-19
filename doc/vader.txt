@@ -264,7 +264,7 @@ You can include other vader files using Include macro.
 SETTING UP ISOLATED TESTING ENVIRONMENT
 ==============================================================================
 
-When you test a plugin, it"s generally a good idea to setup a testing
+When you test a plugin, it's generally a good idea to setup a testing
 environment that is isolated from the other plugins and settings irrelevant to
 the test. The simplest way to achieve this is to write a minimal .vimrc such
 as follows and start a clean Vim process with it.
