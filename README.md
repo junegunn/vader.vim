@@ -197,6 +197,36 @@ Expect ruby (indented and shifted):
     end
 ```
 
+Setting up isolated testing environment
+---------------------------------------
+
+When you test a plugin, it's generally a good idea to setup a testing
+environment that is isolated from the other plugins and settings irrelevant to
+the test. The simplest way to achieve this is to write a minimal .vimrc such as
+follows and start a clean Vim process with it.
+
+```vim
+set nocompatible
+
+" Assuming that plugins are installed under ~/.vim/bundle
+
+" Dependency to vader.vim
+set rtp+=~/.vim/bundle/vader.vim
+
+" The plugin under test
+set rtp+=~/.vim/bundle/vim-emoji
+```
+
+Then you can start Vim process with the configuration file and run Vader tests.
+
+```sh
+vim -u mini-vimrc +Vader*
+```
+
+Consider writing a script to further automate the process. You may refer to
+[the one from easy-align](https://github.com/junegunn/vim-easy-align/blob/master/test/run).
+
+
 Real-life examples
 ------------------
 

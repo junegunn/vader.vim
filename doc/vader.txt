@@ -1,4 +1,4 @@
-vader.txt	vader	Last change: January 15 2014
+vader.txt	vader	Last change: January 19 2014
 VADER - TABLE OF CONTENTS                                      *vader* *vader-toc*
 ==============================================================================
 
@@ -16,9 +16,12 @@ VADER - TABLE OF CONTENTS                                      *vader* *vader-to
       Hooks                                                      |vader-3-2|
         Before                                                   |vader-3-2-1|
         After                                                    |vader-3-2-2|
-      Example                                                    |vader-3-3|
-    Real-life examples                                           |vader-4|
-    License                                                      |vader-5|
+      Macros                                                     |vader-3-3|
+        Include                                                  |vader-3-3-1|
+      Example                                                    |vader-3-4|
+    Setting up isolated testing environment                      |vader-4|
+    Real-life examples                                           |vader-5|
+    License                                                      |vader-6|
 
 
 VADER.VIM                                                            *vader-vim*
@@ -106,9 +109,8 @@ Given~
 
 The content of a Given block is pasted into the "workbench buffer" for the
 subsequent Do/Execute blocks. If `filetype` parameter is given, `&filetype` of
-the buffer is set accordingly. It is also used to syntax-highlight the block in
-.vader file.
-
+the buffer is set accordingly. It is also used to syntax-highlight the block
+in .vader file.
 >
     Given [filetype] [(comment)]:
       [input text]
@@ -119,11 +121,10 @@ Do~
                                                                    *vader-3-1-2*
 
 The content of a Do block is a sequence of normal-mode keystrokes that can
-freely span multiple lines. A special key can be written in its name surrounded
-by angle brackets preceded by a backslash (e.g. `\<Enter>`).
+freely span multiple lines. A special key can be written in its name
+surrounded by angle brackets preceded by a backslash (e.g. `\<Enter>`).
 
 Do block can be followed by an optional Expect block.
-
 >
     Do [(comment)]:
       [keystrokes]
@@ -136,7 +137,6 @@ Execute~
 The content of an Execute block is plain Vimscript to be executed.
 
 Execute block can also be followed by optional Expect block.
-
 >
     Execute [(comment)]:
       [vimscript]
@@ -152,11 +152,12 @@ In Execute block, the following commands are provided.
      - `Save <name>[, ...]`
      - `Restore [<name>, ...]`
 
+                                                                  *g:vader_file*
+
 And the path of the current .vader file can be accessed via `g:vader_file`.
 
-In addition to plain Vimscript, you can also test Ruby/Python/Perl/Lua interface
-with Execute block as follows:
-
+In addition to plain Vimscript, you can also test Ruby/Python/Perl/Lua
+interface with Execute block as follows:
 >
     Execute [lang] [(comment)]:
       [<lang> code]
@@ -173,7 +174,6 @@ Expect~
 If an Expect block follows an Execute block or a Do block, the result of the
 preceding block is compared to the content of the Expect block. Comparison is
 case-sensitive. `filetype` parameter is used to syntax-highlight the block.
-
 >
     Expect [filetype] [(comment)]:
       [expected output]
@@ -188,9 +188,8 @@ Before~
                                                                   *vader-before*
                                                                    *vader-3-2-1*
 
-The content of a Before block is executed before every following
-Do/Execute block.
-
+The content of a Before block is executed before every following Do/Execute
+block.
 >
     Before [(comment)]:
       [vim script]
@@ -200,18 +199,34 @@ After~
                                                                    *vader-after*
                                                                    *vader-3-2-2*
 
-The content of an After block is executed after every following
-Do/Execute block.
-
+The content of an After block is executed after every following Do/Execute
+block.
 >
     After [(comment)]:
       [vim script]
 <
 
-< Example >___________________________________________________________________~
-                                                                 *vader-example*
+< Macros >____________________________________________________________________~
+                                                                  *vader-macros*
                                                                      *vader-3-3*
 
+
+Include~
+                                                                 *vader-include*
+                                                                   *vader-3-3-1*
+
+You can include other vader files using Include macro.
+>
+    Include: setup.vader
+
+    # ...
+
+    Include: cleanup.vader
+<
+
+< Example >___________________________________________________________________~
+                                                                 *vader-example*
+                                                                     *vader-3-4*
 >
     # Test case
     Execute (test assertion):
@@ -245,23 +260,54 @@ Do/Execute block.
 <
 
                                                                        *vader-4*
-REAL-LIFE EXAMPLES                                    *vader-real-life-examples*
+                                 *vader-setting-up-isolated-testing-environment*
+SETTING UP ISOLATED TESTING ENVIRONMENT
 ==============================================================================
 
- - {6}{vim-emoji}
- - {7}{seoul256.vim}
- - {8}{vim-easy-align}
- - {9}{vim-sneak}
- - {10}{simplenote.vim}
+When you test a plugin, it"s generally a good idea to setup a testing
+environment that is isolated from the other plugins and settings irrelevant to
+the test. The simplest way to achieve this is to write a minimal .vimrc such
+as follows and start a clean Vim process with it.
+>
+    set nocompatible
 
-               {6} https://github.com/junegunn/vim-emoji/tree/master/test
-               {7} https://github.com/junegunn/seoul256.vim/tree/master/test
-               {8} https://github.com/junegunn/vim-easy-align/tree/master/test
-               {9} https://github.com/justinmk/vim-sneak/tree/master/tests
-               {10} https://github.com/mrtazz/simplenote.vim/tree/master/tests
+    " Assuming that plugins are installed under ~/.vim/bundle
+
+    " Dependency to vader.vim
+    set rtp+=~/.vim/bundle/vader.vim
+
+    " The plugin under test
+    set rtp+=~/.vim/bundle/vim-emoji
+<
+Then you can start Vim process with the configuration file and run Vader
+tests.
+>
+    vim -u mini-vimrc +Vader*
+<
+Consider writing a script to further automate the process. You may refer to
+{6}{the one from easy-align}.
+
+           {6} https://github.com/junegunn/vim-easy-align/blob/master/test/run
 
 
                                                                        *vader-5*
+REAL-LIFE EXAMPLES                                    *vader-real-life-examples*
+==============================================================================
+
+ - {7}{vim-emoji}
+ - {8}{seoul256.vim}
+ - {9}{vim-easy-align}
+ - {10}{vim-sneak}
+ - {11}{simplenote.vim}
+
+               {7} https://github.com/junegunn/vim-emoji/tree/master/test
+               {8} https://github.com/junegunn/seoul256.vim/tree/master/test
+               {9} https://github.com/junegunn/vim-easy-align/tree/master/test
+               {10} https://github.com/justinmk/vim-sneak/tree/master/tests
+               {11} https://github.com/mrtazz/simplenote.vim/tree/master/tests
+
+
+                                                                       *vader-6*
 LICENSE                                                          *vader-license*
 ==============================================================================
 
