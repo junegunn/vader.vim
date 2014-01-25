@@ -21,14 +21,16 @@
 " OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+let b:vader_eos = '\(^.*\n\(^[^# ].*:\)\@=\)\|\%$'
+
 nnoremap <buffer><silent> [[ :call search('^[^# ]', 'bW')<CR>
-nnoremap <buffer><silent> [] :call search('^.*\n\(^[^# ].*:\)\@=', 'bW')<CR>
+nnoremap <buffer><silent> [] :call search(b:vader_eos, 'bW')<CR>
 
 nnoremap <buffer><silent> ]] :call search('^[^# ]', 'W')<CR>
-nnoremap <buffer><silent> ][ :call search('^.*\n\(^[^# ].*:\)\@=', 'W')<CR>
+nnoremap <buffer><silent> ][ :call search(b:vader_eos, 'W')<CR>
 
 vnoremap <buffer><silent> [[ <ESC>:execute "normal! gv"<BAR>call search('^[^# ]', 'bW')<CR>
-vnoremap <buffer><silent> [] <ESC>:execute "normal! gv"<BAR>call search('^.*\n\(^[^# ].*:\)\@=', 'bW')<CR>
+vnoremap <buffer><silent> [] <ESC>:execute "normal! gv"<BAR>call search(b:vader_eos, 'bW')<CR>
 
 vnoremap <buffer><silent> ]] <ESC>:execute "normal! gv"<BAR>call search('^[^# ]', 'W')<CR>
-vnoremap <buffer><silent> ][ <ESC>:execute "normal! gv"<BAR>call search('^.*\n\(^[^# ].*:\)\@=', 'W')<CR>
+vnoremap <buffer><silent> ][ <ESC>:execute "normal! gv"<BAR>call search(b:vader_eos, 'W')<CR>
