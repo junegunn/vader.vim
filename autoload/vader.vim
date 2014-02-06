@@ -74,7 +74,7 @@ function! vader#run(bang, ...)
           \ substitute(reltimestr(reltime(st)), '^\s*', '', '') .' sec.', 0)
     call vader#window#cleanup()
 
-    let g:vader_report = join(getline(1, line('$')), "\n")
+    let g:vader_report = join(getline(1, '$'), "\n")
     let g:vader_errors = qfl
 
     if a:bang
