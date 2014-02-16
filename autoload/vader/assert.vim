@@ -54,7 +54,7 @@ function! vader#assert#equal(exp, got)
   let s:assertions[1] += 1
 
   if a:exp !=# a:got
-    throw printf("Assertion failure: %s != %s", a:exp, a:got)
+    throw printf("Assertion failure: %s != %s", string(a:exp), string(a:got))
   endif
   let s:assertions[0] += 1
   return 1
