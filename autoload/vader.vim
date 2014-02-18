@@ -104,7 +104,8 @@ function s:split_args(arg)
 endfunction
 
 function vader#log(msg)
-  call vader#window#append('> '.a:msg, s:indent)
+  let msg = type(a:msg) == 1 ? a:msg : string(a:msg)
+  call vader#window#append('> ' . msg, s:indent)
   call vader#window#workbench()
 endfunction
 
