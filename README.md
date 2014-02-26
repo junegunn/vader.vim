@@ -275,7 +275,7 @@ Do (Using doautocmd):
 ### Search history may not be correctly updated
 
 This is likely a bug of Vim itself. For some reason, search history is not
-correctly updated when searches are performed inside a Do-block. The following
+correctly updated when searches are performed inside a Do block. The following
 test scenario fails due to this problem.
 
 ```vim
