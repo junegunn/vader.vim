@@ -236,6 +236,90 @@ Real-life examples
 - [vim-sneak](https://github.com/justinmk/vim-sneak/tree/master/tests)
 - [simplenote.vim](https://github.com/mrtazz/simplenote.vim/tree/master/tests)
 
+Known issues
+------------
+
+### feedkeys() cannot be tested
+
+The keystrokes given to the feedkeys() function are consumed only after Vader
+finishes executing the content of the Do/Execute block. Take the following case
+as an example:
+
+```vim
+Do (Test feedkeys() function):
+  i123
+  \<C-O>:call feedkeys('456')\<CR>
+  789
+
+Expect (Wrong!):
+  123456789
+```
+
+You may have expected `123456789`, but the result is `123789456`. Unfortunately
+I have yet to find a workaround for this problem. Please let me know if you find
+one.
+
+### Some events may not be triggered
+
+[It is reported](https://github.com/junegunn/vader.vim/issues/2) that
+CursorMoved event is not triggered inside a Do block. If you need to test a
+feature that involves autocommands on CursorMoved event, you have to manually
+invoke it in the middle of the block using `:doautocmd`.
+
+```vim
+Do (Using doautocmd):
+  jjj
+  :doautocmd CursorMoved\<CR>
+```
+
+### Search history may not be correctly updated
+
+This is likely a bug of Vim itself. For some reason, search history is not
+correctly updated when searches are performed inside a Do-block. The following
+test scenario fails due to this problem.
+
+```vim
+Execute (Clear search history):
+  for _ in range(&history)
+    call histdel('/', -1)
+  endfor
+
+Given (Search and destroy):
+  I'm a street walking cheetah with a heart full of napalm
+  I'm a runaway son of the nuclear A-bomb
+  I'm a world's forgotten boy
+  The one who searches and destroys
+
+Do (Searches):
+  /street\<CR>
+  /walking\<CR>
+  /cheetah\<CR>
+  /runaway\<CR>
+  /search\<CR>
+
+Execute (Assertions):
+  Log string(map(range(1, &history), 'histget("/", - v:val)'))
+  AssertEqual 'runaway', histget('/', -2)
+  AssertEqual 'search', histget('/', -1)
+```
+
+The result is given as follows:
+
+```vim
+Starting Vader: 1 suite(s), 3 case(s)
+  Starting Vader: /Users/jg/.vim/plugged/vader.vim/search-and-destroy.vader
+    (1/3) [EXECUTE] Clear search history
+    (2/3) [  GIVEN] Search and destroy
+    (2/3) [     DO] Searches
+    (3/3) [  GIVEN] Search and destroy
+    (3/3) [EXECUTE] Assertions
+      > ['search', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+    (3/3) [EXECUTE] (X) Assertion failure: 'runaway' != ''
+  Success/Total: 2/3
+Success/Total: 2/3 (assertions: 0/1)
+Elapsed time: 0.366118 sec.
+```
+
 License
 -------
 
