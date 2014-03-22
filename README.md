@@ -207,8 +207,7 @@ follows and start a clean Vim process with it.
 
 ```vim
 set nocompatible
-
-filetype plugin indent on
+filetype off
 
 " Assuming that plugins are installed under ~/.vim/bundle
 
@@ -218,6 +217,9 @@ set rtp^=~/.vim/bundle/vader.vim
 " The plugin under test
 set rtp^=~/.vim/bundle/vim-markdown
 set rtp+=~/.vim/bundle/vim-markdown/after
+
+" Enable loading plugins and indent files for specific file types
+filetype plugin indent on
 ```
 
 Then you can start Vim process with the configuration file and run Vader tests.
