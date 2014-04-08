@@ -44,7 +44,7 @@ syn match vaderInclude /^Include\(\s*(.*)\s*\)\?:/      contains=vaderMessage
 let s:ifs = ['lua', 'perl', 'ruby', 'python']
 let s:langs = get(g:, 'vader_types',
   \ ['lua', 'perl', 'ruby', 'python', 'java', 'c', 'cpp', 'javascript', 'yaml', 'html', 'css', 'clojure', 'sh', 'tex'])
-for lang in filter(copy(s:langs), '!empty(globpath(&rtp, "syntax/".v:val.".vim"))')
+for lang in filter(copy(s:langs), '!empty(globpath(&rtp, "syntax/".v:val.".vim", 1))')
   silent! unlet b:current_syntax
   execute printf('syn include @%sSnippet syntax/%s.vim', lang, lang)
   execute printf('syn region vader_%s start=/^\s\{2,}/ end=/^\(\s\?\S\)\@=/ contains=@%sSnippet', lang, lang)
