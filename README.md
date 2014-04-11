@@ -163,6 +163,31 @@ Include: setup.vader
 Include: cleanup.vader
 ```
 
+### Comments
+
+Any line that starts with `#`, `=`, `-`, `~`, `^`, or `*` without indentation is
+considered to be a comment and simply ignored.
+
+```
+# Typical comment
+#################
+
+Given (fixture):
+================
+  Hello
+
+Do (modification):
+------------------
+* change inner word
+  ciw
+* to
+  World
+
+Expect (result):
+~~~~~~~~~~~~~~~~
+  World
+```
+
 ### Example
 
 ```

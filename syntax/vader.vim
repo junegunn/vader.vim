@@ -30,37 +30,50 @@ let s:oisk = &isk
 syn clear
 syn include @vimSnippet syntax/vim.vim
 
-syn region vaderText    start=/^\s\{2,}/ end=/^\S\@=/
-syn region vaderCommand start=/^\s\{2,}/ end=/^\S\@=/ contains=@vimSnippet
+syn region vaderText    start=/^\s\{2,}/ end=/^\S\@=/ contained
+syn region vaderCommand start=/^\s\{2,}/ end=/^\S\@=/ contains=@vimSnippet contained
 
-syn match vaderGiven   /^Given\(\s*(.*)\s*\)\?:/        contains=vaderMessage nextgroup=vaderText skipempty
-syn match vaderExpect  /^Expect\(\s*(.*)\s*\)\?:/       contains=vaderMessage nextgroup=vaderText skipempty
-syn match vaderDo      /^Do\(\s*(.*)\s*\)\?:/           contains=vaderMessage nextgroup=vaderCommand skipempty
-syn match vaderExecute /^Execute\(\s*(.*)\s*\)\?:/      contains=vaderMessage nextgroup=vaderCommand skipempty
-syn match vaderBefore  /^Before\(\s*(.*)\s*\)\?:/       contains=vaderMessage nextgroup=vaderCommand skipempty
-syn match vaderAfter   /^After\(\s*(.*)\s*\)\?:/        contains=vaderMessage nextgroup=vaderCommand skipempty
-syn match vaderInclude /^Include\(\s*(.*)\s*\)\?:/      contains=vaderMessage
-
-let s:ifs = ['lua', 'perl', 'ruby', 'python']
-let s:langs = get(g:, 'vader_types',
-  \ ['lua', 'perl', 'ruby', 'python', 'java', 'c', 'cpp', 'javascript', 'yaml', 'html', 'css', 'clojure', 'sh', 'tex'])
-for lang in filter(copy(s:langs), '!empty(globpath(&rtp, "syntax/".v:val.".vim", 1))')
-  silent! unlet b:current_syntax
-  execute printf('syn include @%sSnippet syntax/%s.vim', lang, lang)
-  execute printf('syn region vader_%s start=/^\s\{2,}/ end=/^\(\s\?\S\)\@=/ contains=@%sSnippet', lang, lang)
-  execute printf('syn match vaderGiven /^Given\s*%s\s*\((.*)\)\?\s*:/ contains=vaderGivenType,vaderMessage nextgroup=vader_%s skipempty', lang, lang)
-  execute printf('syn match vaderExpect /^Expect\s*%s\s*\((.*)\)\?\s*:/ contains=vaderExpectType,vaderMessage nextgroup=vader_%s skipempty', lang, lang)
-  if index(s:ifs, lang) >= 0
-    execute printf('syn match vaderExecute /^Execute\s*%s\s*\((.*)\)\?\s*:/ contains=vaderExecuteType,vaderMessage nextgroup=vader_%s skipempty', lang, lang)
-  endif
-endfor
-
+syn match vaderMessage /(\@<=.*)\@=/ contained contains=Todo
 syn match vaderGivenType /\(Given\s*\)\@<=[^()\s]\+/ contained
 syn match vaderExpectType /\(Expect\s*\)\@<=[^()\s]\+/ contained
 syn match vaderExecuteType /\(Execute\s*\)\@<=[^()\s]\+/ contained
 
-syn match vaderMessage /(\@<=.*)\@=/ contained contains=Todo
 syn match vaderComment /^#.*/ contains=Todo
+syn match vaderSepCaret /^^.*/ contains=Todo
+syn match vaderSepTilde /^\~.*/ contains=Todo
+syn match vaderSepDouble /^=.*/ contains=Todo
+syn match vaderSepSingle /^-.*/ contains=Todo
+syn match vaderSepAsterisk /^\*.*/ contains=Todo
+syn cluster vaderIgnored contains=vaderComment,vaderSepCaret,vaderSepTilde,vaderSepDouble,vaderSepSingle,vaderSepAsterisk
+
+syn region vaderGiven   start=/^Given\(\s*(.*)\)\?\s*:/   end=/\(^[^ ^#~=*-]\)\@=/ contains=vaderMessage,vaderText,@vaderIgnored nextgroup=@vaderTopLevel skipempty
+syn region vaderExpect  start=/^Expect\(\s*(.*)\)\?\s*:/  end=/\(^[^ ^#~=*-]\)\@=/ contains=vaderMessage,vaderText,@vaderIgnored nextgroup=@vaderTopLevel skipempty
+syn region vaderDo      start=/^Do\(\s*(.*)\)\?\s*:/      end=/\(^[^ ^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,@vaderIgnored nextgroup=@vaderTopLevel skipempty
+syn region vaderExecute start=/^Execute\(\s*(.*)\)\?\s*:/ end=/\(^[^ ^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,@vaderIgnored nextgroup=@vaderTopLevel skipempty
+syn region vaderBefore  start=/^Before\(\s*(.*)\)\?\s*:/  end=/\(^[^ ^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,@vaderIgnored nextgroup=@vaderTopLevel skipempty
+syn region vaderAfter   start=/^After\(\s*(.*)\)\?\s*:/   end=/\(^[^ ^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,@vaderIgnored nextgroup=@vaderTopLevel skipempty
+syn match vaderInclude /^Include\(\s*(.*)\)\?\s*:/ contains=vaderMessage
+syn cluster vaderTopLevel contains=vaderGiven,vaderExpect,vaderDo,vaderExpect,vaderBefore,vaderAfter,vaderInclude
+
+let s:ifs = ['lua', 'perl', 'ruby', 'python']
+let s:langs = get(g:, 'vader_types',
+  \ ['lua', 'perl', 'ruby', 'python', 'java', 'c', 'cpp', 'javascript', 'yaml', 'html', 'css', 'clojure', 'sh', 'tex'])
+
+function! s:syn_lang_region(block, lang)
+  execute printf('syn region vader%s start=/^%s\s*%s\s*\((.*)\)\?\s*:/ end=/\(^[^ ^#~=*-]\)\@=/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_%s nextgroup=@vaderTopLevel skipempty', a:block, a:block, a:lang, a:block, a:lang)
+endfunction
+
+for s:lang in filter(copy(s:langs), '!empty(globpath(&rtp, "syntax/".v:val.".vim", 1))')
+  unlet! b:current_syntax
+  execute printf('syn include @%sSnippet syntax/%s.vim', s:lang, s:lang)
+  execute printf('syn region vader_%s start=/^\s\{2,}/ end=/^\S\@=/ contains=@%sSnippet contained', s:lang, s:lang)
+
+  call s:syn_lang_region('Given', s:lang)
+  call s:syn_lang_region('Expect', s:lang)
+  if index(s:ifs, s:lang) >= 0
+    call s:syn_lang_region('Execute', s:lang)
+  endif
+endfor
 
 syn keyword Todo TODO FIXME XXX TBD
 
@@ -75,9 +88,13 @@ hi def link vaderMessage     Title
 hi def link vaderExpect      Boolean
 hi def link vaderGivenType   Identifier
 hi def link vaderExpectType  Identifier
+hi def link vaderText        String
 hi def link vaderComment     Comment
-
-hi def link vaderText String
+hi def link vaderSepCaret    Error
+hi def link vaderSepTilde    Debug
+hi def link vaderSepDouble   Label
+hi def link vaderSepSingle   Label
+hi def link vaderSepAsterisk Exception
 
 let b:current_syntax = 'vader'
 

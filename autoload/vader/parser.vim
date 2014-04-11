@@ -97,8 +97,8 @@ function! s:parse_vader(lines)
   for line in a:lines
     let lnum += 1
 
-    " Comment
-    if line =~ '^#'
+    " Comment / separators
+    if line =~ '^[#=~*^-]'
       continue
     endif
 
