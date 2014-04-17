@@ -21,5 +21,12 @@ Expect:
 
   MIT License
 
+Execute (Assertions):
+  Assert getline(1) ==? tolower(getline(1))
+  Assert getline(1) ==# getline(1)
+  AssertEqual getline(1), getline(1)
+  AssertNotEqual getline(1), getline(3)
+  AssertThrows getline()
+
 Include (again): include/teardown.vader
 

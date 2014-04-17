@@ -97,6 +97,7 @@ In Execute block, the following commands are provided.
 - Assertions
     - `Assert <boolean expr>, [message]`
     - `AssertEqual <expected>, <got>`
+    - `AssertNotEqual <expected>, <got>`
     - `AssertThrows <expr>`
 - Other commands
     - `Log "Message"`

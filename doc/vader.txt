@@ -1,4 +1,4 @@
-vader.txt	vader	Last change: March 26 2014
+vader.txt	vader	Last change: April 17 2014
 VADER - TABLE OF CONTENTS                                      *vader* *vader-toc*
 ==============================================================================
 
@@ -18,7 +18,8 @@ VADER - TABLE OF CONTENTS                                      *vader* *vader-to
         After                                                    |vader-3-2-2|
       Macros                                                     |vader-3-3|
         Include                                                  |vader-3-3-1|
-      Example                                                    |vader-3-4|
+      Comments                                                   |vader-3-4|
+      Example                                                    |vader-3-5|
     Setting up isolated testing environment                      |vader-4|
     Real-life examples                                           |vader-5|
     Known issues                                                 |vader-6|
@@ -150,6 +151,7 @@ In Execute block, the following commands are provided.
  - Assertions
      - `Assert <boolean expr>, [message]`
      - `AssertEqual <expected>, <got>`
+     - `AssertNotEqual <expected>, <got>`
      - `AssertThrows <expr>`
  - Other commands
      - `Log "Message"`
@@ -228,9 +230,36 @@ You can include other vader files using Include macro.
     Include: cleanup.vader
 <
 
+< Comments >__________________________________________________________________~
+                                                                *vader-comments*
+                                                                     *vader-3-4*
+
+Any line that starts with `#`, `=`, `-`, `~`, `^`, or `*` without indentation
+is considered to be a comment and simply ignored.
+>
+    #################
+    # Typical comment
+    #################
+
+    Given (fixture):
+    ================
+      Hello
+
+    Do (modification):
+    ------------------
+    * change inner word
+      ciw
+    * to
+      World
+
+    Expect (result):
+    ~~~~~~~~~~~~~~~~
+      World
+<
+
 < Example >___________________________________________________________________~
                                                                  *vader-example*
-                                                                     *vader-3-4*
+                                                                     *vader-3-5*
 >
     # Test case
     Execute (test assertion):

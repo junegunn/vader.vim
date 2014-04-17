@@ -127,12 +127,13 @@ function vader#restore(args)
 endfunction
 
 function! s:prepare()
-  command! -nargs=+ Log          :call vader#log(<args>)
-  command! -nargs=+ Save         :call vader#save(<q-args>)
-  command! -nargs=* Restore      :call vader#restore(<q-args>)
-  command! -nargs=+ Assert       :call vader#assert#true(<args>)
-  command! -nargs=+ AssertEqual  :call vader#assert#equal(<args>)
-  command! -nargs=+ AssertThrows :call vader#assert#throws(<q-args>)
+  command! -nargs=+ Log            :call vader#log(<args>)
+  command! -nargs=+ Save           :call vader#save(<q-args>)
+  command! -nargs=* Restore        :call vader#restore(<q-args>)
+  command! -nargs=+ Assert         :call vader#assert#true(<args>)
+  command! -nargs=+ AssertEqual    :call vader#assert#equal(<args>)
+  command! -nargs=+ AssertNotEqual :call vader#assert#not_equal(<args>)
+  command! -nargs=+ AssertThrows   :call vader#assert#throws(<q-args>)
 endfunction
 
 function! s:cleanup()
@@ -142,6 +143,7 @@ function! s:cleanup()
   delcommand Restore
   delcommand Assert
   delcommand AssertEqual
+  delcommand AssertNotEqual
   delcommand AssertThrows
 endfunction
 
