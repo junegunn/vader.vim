@@ -85,7 +85,7 @@ Do [(comment)]:
 
 The content of an Execute block is plain Vimscript to be executed.
 
-Execute block can also be followed by optional Expect block.
+Execute block can also be followed by an optional Expect block.
 
 ```
 Execute [(comment)]:
