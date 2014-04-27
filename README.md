@@ -256,6 +256,37 @@ vim -u mini-vimrc +Vader*
 Consider writing a script to further automate the process. You may refer to
 [the one from easy-align](https://github.com/junegunn/vim-easy-align/blob/master/test/run).
 
+Travis CI integration
+---------------------
+
+To make your project tested on [Travis CI](https://travis-ci.org), you need to
+add `.travis.yml` to your project root. For most plugins the following example
+should suffice.
+
+```yaml
+language: vim
+
+before_script: |
+  git clone https://github.com/junegunn/vader.vim.git
+
+script: |
+  vim -Nu <(cat << VIMRC
+  filetype off
+  set rtp+=vader.vim
+  set rtp+=.
+  set rtp+=after
+  filetype plugin indent on
+  VIMRC) -c 'Vader! test/*'
+```
+
+(Note that `vim` is not a valid language for Travis CI. It just sets up Ruby
+execution environment instead as the default.)
+
+### Example: seoul256.vim
+
+- [.travis.yml](https://github.com/junegunn/seoul256.vim/blob/master/.travis.yml)
+- [Build result - success](https://travis-ci.org/junegunn/seoul256.vim/builds/23866989)
+- [Build result - failure](https://travis-ci.org/junegunn/seoul256.vim/builds/23866901)
 
 Real-life examples
 ------------------
