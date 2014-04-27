@@ -1,4 +1,4 @@
-vader.txt	vader	Last change: April 17 2014
+vader.txt	vader	Last change: April 27 2014
 VADER - TABLE OF CONTENTS                                      *vader* *vader-toc*
 ==============================================================================
 
@@ -21,12 +21,14 @@ VADER - TABLE OF CONTENTS                                      *vader* *vader-to
       Comments                                                   |vader-3-4|
       Example                                                    |vader-3-5|
     Setting up isolated testing environment                      |vader-4|
-    Real-life examples                                           |vader-5|
-    Known issues                                                 |vader-6|
-      feedkeys() cannot be tested                                |vader-6-1|
-      Some events may not be triggered                           |vader-6-2|
-      Search history may not be correctly updated                |vader-6-3|
-    License                                                      |vader-7|
+    Travis CI integration                                        |vader-5|
+      Example: seoul256.vim                                      |vader-5-1|
+    Real-life examples                                           |vader-6|
+    Known issues                                                 |vader-7|
+      feedkeys() cannot be tested                                |vader-7-1|
+      Some events may not be triggered                           |vader-7-2|
+      Search history may not be correctly updated                |vader-7-3|
+    License                                                      |vader-8|
 
 
 VADER.VIM                                                            *vader-vim*
@@ -329,30 +331,74 @@ Consider writing a script to further automate the process. You may refer to
 
 
                                                                        *vader-5*
-REAL-LIFE EXAMPLES                                    *vader-real-life-examples*
+TRAVIS CI INTEGRATION                              *vader-travis-ci-integration*
 ==============================================================================
 
- - {7}{vim-emoji}
- - {8}{seoul256.vim}
- - {9}{vim-easy-align}
- - {10}{vim-sneak}
- - {11}{simplenote.vim}
+To make your project tested on {7}{Travis CI}, you need to add `.travis.yml`
+to your project root. For most plugins the following example should suffice.
+>
+    language: vim
 
-               {7} https://github.com/junegunn/vim-emoji/tree/master/test
-               {8} https://github.com/junegunn/seoul256.vim/tree/master/test
-               {9} https://github.com/junegunn/vim-easy-align/tree/master/test
-               {10} https://github.com/justinmk/vim-sneak/tree/master/tests
-               {11} https://github.com/mrtazz/simplenote.vim/tree/master/tests
+    before_script: |
+      git clone https://github.com/junegunn/vader.vim.git
+
+    script: |
+      vim -Nu <(cat << VIMRC
+      filetype off
+      set rtp+=vader.vim
+      set rtp+=.
+      set rtp+=after
+      filetype plugin indent on
+      VIMRC) -c 'Vader! test/*'
+<
+(Note that `vim` is not a valid language for Travis CI. It just sets up Ruby
+execution environment instead as the default.)
+
+                                                     {7} https://travis-ci.org
+
+
+< Example: seoul256.vim >_____________________________________________________~
+                                                    *vader-example-seoul256-vim*
+                                                                     *vader-5-1*
+
+ - {8}{.travis.yml}
+ - {9}{Build result - success}
+ - {10}{Build result - failure}
+
+          {8} https://github.com/junegunn/seoul256.vim/blob/master/.travis.yml
+          {9} https://travis-ci.org/junegunn/seoul256.vim/builds/23866989
+          {10} https://travis-ci.org/junegunn/seoul256.vim/builds/23866901
 
 
                                                                        *vader-6*
+REAL-LIFE EXAMPLES                                    *vader-real-life-examples*
+==============================================================================
+
+ - {11}{vim-emoji}
+ - {12}{seoul256.vim}
+ - {13}{vim-easy-align}
+ - {14}{vim-sneak}
+ - {15}{simplenote.vim}
+ - {16}{erlang-motions.vim}
+ - {17}{vim-alt-mappings}
+
+              {11} https://github.com/junegunn/vim-emoji/tree/master/test
+              {12} https://github.com/junegunn/seoul256.vim/tree/master/test
+              {13} https://github.com/junegunn/vim-easy-align/tree/master/test
+              {14} https://github.com/justinmk/vim-sneak/tree/master/tests
+              {15} https://github.com/mrtazz/simplenote.vim/tree/master/tests
+              {16} https://github.com/edkolev/erlang-motions.vim
+              {17} https://github.com/bruno-/vim-alt-mappings
+
+
+                                                                       *vader-7*
 KNOWN ISSUES                                                *vader-known-issues*
 ==============================================================================
 
 
 < feedkeys() cannot be tested >_______________________________________________~
                                                *vader-feedkeys-cannot-be-tested*
-                                                                     *vader-6-1*
+                                                                     *vader-7-1*
 
 The keystrokes given to the feedkeys() function are consumed only after Vader
 finishes executing the content of the Do/Execute block. Take the following
@@ -373,9 +419,9 @@ know if you find one.
 
 < Some events may not be triggered >__________________________________________~
                                         *vader-some-events-may-not-be-triggered*
-                                                                     *vader-6-2*
+                                                                     *vader-7-2*
 
-{12}{It is reported} that CursorMoved event is not triggered inside a Do
+{18}{It is reported} that CursorMoved event is not triggered inside a Do
 block. If you need to test a feature that involves autocommands on CursorMoved
 event, you have to manually invoke it in the middle of the block using
 `:doautocmd`.
@@ -384,12 +430,12 @@ event, you have to manually invoke it in the middle of the block using
       jjj
       :doautocmd CursorMoved\<CR>
 <
-                           {12} https://github.com/junegunn/vader.vim/issues/2
+                           {18} https://github.com/junegunn/vader.vim/issues/2
 
 
 < Search history may not be correctly updated >_______________________________~
                              *vader-search-history-may-not-be-correctly-updated*
-                                                                     *vader-6-3*
+                                                                     *vader-7-3*
 
 This is likely a bug of Vim itself. For some reason, search history is not
 correctly updated when searches are performed inside a Do block. The following
@@ -434,7 +480,7 @@ The result is given as follows:
     Elapsed time: 0.366118 sec.
 <
 
-                                                                       *vader-7*
+                                                                       *vader-8*
 LICENSE                                                          *vader-license*
 ==============================================================================
 
