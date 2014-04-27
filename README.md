@@ -265,6 +265,8 @@ Real-life examples
 - [vim-easy-align](https://github.com/junegunn/vim-easy-align/tree/master/test)
 - [vim-sneak](https://github.com/justinmk/vim-sneak/tree/master/tests)
 - [simplenote.vim](https://github.com/mrtazz/simplenote.vim/tree/master/tests)
+- [erlang-motions.vim](https://github.com/edkolev/erlang-motions.vim)
+- [vim-alt-mappings](https://github.com/bruno-/vim-alt-mappings)
 
 Known issues
 ------------
