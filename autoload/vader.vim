@@ -78,6 +78,10 @@ function! vader#run(bang, ...)
     let g:vader_errors = qfl
 
     if a:bang
+      let tmp = tempname()
+      call writefile(split(g:vader_report, '\n'), tmp)
+      execute 'silent !cat '.tmp
+      call delete(tmp)
       if empty(qfl)
         qall
       else
