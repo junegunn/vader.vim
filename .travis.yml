@@ -5,4 +5,9 @@ script: |
   filetype off
   set rtp+=.
   filetype plugin indent on
-  VIMRC) -c 'Vader! example/* test/*' > /dev/null
+  VIMRC) -c 'Vader! example/before-after.vader \
+                    example/comment.vader \
+                    example/save-restore.vader \
+                    example/suite1.vader \
+                    example/suite2.vader \
+                    test/*' > /dev/null
