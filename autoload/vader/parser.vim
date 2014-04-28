@@ -50,6 +50,7 @@ function! s:flush_buffer(cases, case, lnum, label, newlabel, buffer, final)
       endfor
       let a:case.comment = {}
       let a:case.lnum = a:lnum
+      let a:case.pending = 0
     endif
   endif
 endfunction
@@ -91,7 +92,7 @@ function! s:parse_vader(lines)
   let newlabel = ''
   let buffer   = []
   let cases    = []
-  let case     = { 'lnum': 1, 'comment': {} }
+  let case     = { 'lnum': 1, 'comment': {}, 'pending': 0 }
   let lnum     = 0
 
   for line in a:lines
@@ -114,6 +115,10 @@ function! s:parse_vader(lines)
           let args    = matchlist(m[1], '^\(.\{-}\)\?\s*\((\(.*\))\)\?$')
           let arg     = get(args, 1, '')
           let comment = get(args, 3, '')
+          if index(['do', 'execute'], label) >= 0 &&
+                \ comment =~# '\<TODO\>\|\<FIXME\>'
+            let case.pending = 1
+          endif
 
           if !empty(arg)
             if l == 'Given'

@@ -7,7 +7,7 @@ Do:
 Expect:
   sOME STRING
 
-Execute (Execute block does not require an Expect block):
+Execute (FIXME: Execute block does not require an Expect block):
   AssertEqual 1, 2
 
 Do (Do block *not* followed by an Expect block):
@@ -19,7 +19,7 @@ Do (Do block followed by an Expect block):
 Expect:
   some string
 
-Execute (Execute block can also be followed by an Expect block):
+Execute (FIXME: Execute block can also be followed by an Expect block):
   " Ordinary Vim comment
   call append(line('$'), 'more string')
   call append(line('$'), 'even more string')

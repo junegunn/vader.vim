@@ -41,7 +41,7 @@ function! vader#run(bang, ...)
     let all_cases = []
     let qfl = []
     let st  = reltime()
-    let [success, total] = [0, 0]
+    let [success, pending, total] = [0, 0, 0]
 
     for gl in patterns
       for fn in split(glob(gl), "\n")
@@ -61,15 +61,20 @@ function! vader#run(bang, ...)
 
     for pair in all_cases
       let [fn, case] = pair
-      let [cs, ct, lqfl] = s:run(fn, case)
+      let [cs, cp, ct, lqfl] = s:run(fn, case)
       let success += cs
+      let pending += cp
       call extend(qfl, lqfl)
-      call vader#window#append(printf('Success/Total: %s/%s', cs, ct), 1)
+      call vader#window#append(
+            \ printf('Success/Total: %s/%s%s',
+            \     cs, ct, cp > 0 ? (' ('.cp.' pending)') : ''),
+            \ 1)
     endfor
 
     let stats = vader#assert#stat()
-    call vader#window#append(printf('Success/Total: %s/%s (assertions: %d/%d)',
-          \ success, total, stats[0], stats[1]), 0)
+    call vader#window#append(printf('Success/Total: %s/%s (%sassertions: %d/%d)',
+          \ success, total, (pending > 0 ? pending . ' pending, ' : ''),
+          \ stats[0], stats[1]), 0)
     call vader#window#append('Elapsed time: '.
           \ substitute(reltimestr(reltime(st)), '^\s*', '', '') .' sec.', 0)
     call vader#window#cleanup()
@@ -82,7 +87,7 @@ function! vader#run(bang, ...)
       call writefile(split(g:vader_report, '\n'), tmp)
       execute 'silent !cat '.tmp.' 1>&2'
       call delete(tmp)
-      if empty(qfl)
+      if success + pending == total
         qall
       else
         cq
@@ -173,6 +178,7 @@ function! s:run(filename, cases)
   let total = len(a:cases)
   let just  = len(string(total))
   let cnt = 0
+  let pending = 0
   let success = 0
   let qfl = []
   let g:vader_file = a:filename
@@ -241,6 +247,7 @@ function! s:run(filename, cases)
     if ok
       let success += 1
     else
+      let pending += case.pending
       let description = join(filter([
             \ comment.given,
             \ get(case.comment, 'do', get(case.comment, 'execute', '')),
@@ -250,7 +257,7 @@ function! s:run(filename, cases)
   endfor
 
   unlet g:vader_file
-  return [success, total, qfl]
+  return [success, pending, total, qfl]
 endfunction
 
 function! s:append(prefix, type, message)
