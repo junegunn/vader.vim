@@ -80,7 +80,7 @@ function! vader#run(bang, ...)
     if a:bang
       let tmp = tempname()
       call writefile(split(g:vader_report, '\n'), tmp)
-      execute 'silent !cat '.tmp
+      execute 'silent !cat '.tmp.' 1>&2'
       call delete(tmp)
       if empty(qfl)
         qall

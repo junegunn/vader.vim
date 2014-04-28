@@ -276,7 +276,7 @@ script: |
   set rtp+=.
   set rtp+=after
   filetype plugin indent on
-  VIMRC) -c 'Vader! test/*'
+  VIMRC) -c 'Vader! test/*' > /dev/null
 ```
 
 (Note that `vim` is not a valid language for Travis CI. It just sets up Ruby
