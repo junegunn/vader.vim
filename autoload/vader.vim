@@ -83,8 +83,12 @@ function! vader#run(bang, ...)
     let g:vader_errors = qfl
 
     if a:bang
+      redir => ver
+      silent version
+      redir END
+
       let tmp = tempname()
-      call writefile(split(g:vader_report, '\n'), tmp)
+      call writefile(extend(split(ver, '\n'), split(g:vader_report, '\n')), tmp)
       execute 'silent !cat '.tmp.' 1>&2'
       call delete(tmp)
       if success + pending == total
