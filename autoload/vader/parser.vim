@@ -22,8 +22,7 @@
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function! vader#parser#parse(fn)
-  let lines = s:read_vader(a:fn)
-  return s:parse_vader(lines)
+  return s:parse_vader(s:read_vader(a:fn))
 endfunction
 
 function! s:flush_buffer(cases, case, lnum, label, newlabel, buffer, final)
@@ -56,33 +55,43 @@ function! s:flush_buffer(cases, case, lnum, label, newlabel, buffer, final)
 endfunction
 
 function! s:read_vader(fn)
-  let lines = readfile(a:fn)
-  let max_depth = 5
+  let remains   = readfile(a:fn)
+  let lnum      = 1
+  let lines     = []
+  let reserved  = 0
+  let depth     = 0 " Not a strict depth
+  let max_depth = 10
 
-  for i in range(1, max_depth)
-    let expanded = 0
-    let olines   = lines
-    let lines    = []
-    for line in olines
-      let m = matchlist(line, '^Include\(\s*(.*)\s*\)\?:\s*\(.\{-}\)\s*$')
-      if !empty(m)
-        let file = findfile(m[2], fnamemodify(a:fn, ':h'))
-        if empty(file)
-          echoerr "Cannot find ".m[2]
-        endif
-        call extend(lines, readfile(file))
-        let expanded = 1
-      else
-        call add(lines, line)
+  while len(remains) > 0
+    let line = remove(remains, 0)
+    let m = matchlist(line, '^Include\(\s*(.*)\s*\)\?:\s*\(.\{-}\)\s*$')
+    if !empty(m)
+      let file = findfile(m[2], fnamemodify(a:fn, ':h'))
+      if empty(file)
+        echoerr "Cannot find ".m[2]
       endif
-    endfor
+      if reserved > 0
+        let depth += 1
+        if depth >= max_depth
+          echoerr 'Recursive inclusion limit exceeded'
+        endif
+        let reserved -= 1
+      endif
+      let included = readfile(file)
+      let reserved += len(included)
+      call extend(remains, included, 0)
+      continue
+    end
 
-    if !expanded
-      break
-    elseif i == max_depth
-      echoerr 'Recursive inclusion limit exceeded'
+    call add(lines, [lnum, line])
+    if reserved > 0
+      let reserved -= 1
+    end
+    if reserved == 0
+      let depth = 0
+      let lnum += 1
     endif
-  endfor
+  endwhile
 
   return lines
 endfunction
@@ -93,10 +102,8 @@ function! s:parse_vader(lines)
   let buffer   = []
   let cases    = []
   let case     = { 'lnum': 1, 'comment': {}, 'pending': 0 }
-  let lnum     = 0
 
-  for line in a:lines
-    let lnum += 1
+  for [lnum, line] in a:lines
 
     " Comment / separators
     if line =~ '^[#=~*^-]'
