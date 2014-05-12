@@ -1,13 +1,18 @@
 language: vim
 
+before_script: |
+  sudo apt-get remove -y vim vim-runtime vim-tiny vim-common
+  hg clone https://code.google.com/p/vim/
+  cd vim
+  ./configure --with-features=huge --prefix=/usr \
+      --enable-rubyinterp --enable-pythoninterp
+  make VIMRUNTIMEDIR=/usr/share/vim/vim74
+  sudo make install
+  cd -
+
 script: |
   vim -Nu <(cat << VIMRC
   filetype off
   set rtp+=.
   filetype plugin indent on
-  VIMRC) -c 'Vader! example/before-after.vader \
-                    example/comment.vader \
-                    example/save-restore.vader \
-                    example/suite1.vader \
-                    example/suite2.vader \
-                    test/*' > /dev/null
+  VIMRC) -c 'Vader! example/* test/*' > /dev/null
