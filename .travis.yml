@@ -1,17 +1,15 @@
 language: vim
 
 before_script: |
-  sudo apt-get remove -y vim vim-runtime vim-tiny vim-common
   hg clone https://code.google.com/p/vim/
   cd vim
-  ./configure --with-features=huge --prefix=/usr \
-      --enable-rubyinterp --enable-pythoninterp
-  make VIMRUNTIMEDIR=/usr/share/vim/vim74
+  ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp
+  make
   sudo make install
   cd -
 
 script: |
-  vim -Nu <(cat << VIMRC
+  /usr/local/bin/vim -Nu <(cat << VIMRC
   filetype off
   set rtp+=.
   filetype plugin indent on

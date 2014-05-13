@@ -285,11 +285,14 @@ script: |
 (Note that `vim` is not a valid language for Travis CI. It just sets up Ruby
 execution environment instead as the default.)
 
-### Example: seoul256.vim
+### Examples
 
-- [.travis.yml](https://github.com/junegunn/seoul256.vim/blob/master/.travis.yml)
-- [Build result - success](https://travis-ci.org/junegunn/seoul256.vim/builds/23866989)
-- [Build result - failure](https://travis-ci.org/junegunn/seoul256.vim/builds/23866901)
+- [Simple .travis.yml](https://github.com/junegunn/seoul256.vim/blob/master/.travis.yml)
+    - [Build result](https://travis-ci.org/junegunn/seoul256.vim/builds/23905890)
+- [Advanced .travis.yml](https://github.com/junegunn/vim-oblique/blob/master/.travis.yml)
+    - Multiple dependencies
+    - Builds Vim from source
+    - [Build result](https://travis-ci.org/junegunn/vim-oblique/builds/25033116)
 
 Real-life examples
 ------------------
