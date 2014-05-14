@@ -64,7 +64,9 @@ spaces.
 The content of a Given block is pasted into the "workbench buffer" for the
 subsequent Do/Execute blocks. If `filetype` parameter is given, `&filetype` of
 the buffer is set accordingly. It is also used to syntax-highlight the block in
-.vader file.
+.vader file. (`FIXME` Syntax highlighting is enabled for only a fixed set of
+filetypes. If the language of your choice is not correctly highlighted, try
+setting `g:vader_types` like so: `let g:vader_types = ['rust', 'erlang']`)
 
 ```
 Given [filetype] [(comment)]:
