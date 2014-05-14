@@ -64,13 +64,21 @@ spaces.
 The content of a Given block is pasted into the "workbench buffer" for the
 subsequent Do/Execute blocks. If `filetype` parameter is given, `&filetype` of
 the buffer is set accordingly. It is also used to syntax-highlight the block in
-.vader file. (`FIXME` Syntax highlighting is enabled for only a fixed set of
-filetypes. If the language of your choice is not correctly highlighted, try
-setting `g:vader_types` like so: `let g:vader_types = ['rust', 'erlang']`)
+.vader file.
 
 ```
 Given [filetype] [(comment)]:
   [input text]
+```
+
+Syntax highlighting is enabled for only [a fixed set of
+filetypes](https://github.com/junegunn/vader.vim/blob/master/syntax/vader.vim#L59-L60).
+If the language of your choice is not correctly highlighted, try setting
+`g:vader_types` like so:
+
+```
+" Syntax-highlight rust and erlang codes in Given and Expect blocks
+let g:vader_types = ['rust', 'erlang']
 ```
 
 #### Do
