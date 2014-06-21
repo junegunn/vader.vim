@@ -23,7 +23,7 @@
 
 let b:vader_eos = '\(^.*\n\(^[^# ].*:\)\@=\)\|\%$'
 
-setlocal shiftwidth=2 tabstop=2 expandtab
+setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 
 nnoremap <buffer><silent> [[ :call search('^[^# ]', 'bW')<CR>
 nnoremap <buffer><silent> [] :call search(b:vader_eos, 'bW')<CR>
