@@ -240,34 +240,18 @@ Setting up isolated testing environment
 
 When you test a plugin, it's generally a good idea to setup a testing
 environment that is isolated from the other plugins and settings irrelevant to
-the test. The simplest way to achieve this is to write a minimal .vimrc such as
-follows and start a clean Vim process with it.
-
-```vim
-set nocompatible
-filetype off
-
-" Assuming that plugins are installed under ~/.vim/bundle
-
-" Dependency to vader.vim
-set rtp^=~/.vim/bundle/vader.vim
-
-" The plugin under test
-set rtp^=~/.vim/bundle/vim-markdown
-set rtp+=~/.vim/bundle/vim-markdown/after
-
-" Enable loading plugins and indent files for specific file types
-filetype plugin indent on
-```
-
-Then you can start Vim process with the configuration file and run Vader tests.
+the test. The simplest way to achieve this is to start Vim with a mini
+.vimrc as follows:
 
 ```sh
-vim -u mini-vimrc +Vader*
+vim -Nu <(cat << EOF
+filetype off
+set rtp+=~/.vim/bundle/vader.vim
+set rtp+=~/.vim/bundle/vim-markdown
+set rtp+=~/.vim/bundle/vim-markdown/after
+filetype plugin indent on
+EOF) +Vader*
 ```
-
-Consider writing a script to further automate the process. You may refer to
-[the one from easy-align](https://github.com/junegunn/vim-easy-align/blob/master/test/run).
 
 Travis CI integration
 ---------------------
@@ -304,8 +288,8 @@ execution environment instead as the default.)
     - Builds Vim from source
     - [Build result](https://travis-ci.org/junegunn/vim-oblique/builds/25033116)
 
-Real-life examples
-------------------
+Projects using Vader
+--------------------
 
 - [vim-emoji](https://github.com/junegunn/vim-emoji/tree/master/test)
 - [seoul256.vim](https://github.com/junegunn/seoul256.vim/tree/master/test)
