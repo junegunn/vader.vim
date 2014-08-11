@@ -116,8 +116,7 @@ function! vader#window#cleanup()
   normal! Gzb
 endfunction
 
-function! vader#window#copen(qfl)
-  call setqflist(a:qfl)
+function! vader#window#copen()
   copen
   let s:quickfix_bfr = bufnr('')
   1wincmd w

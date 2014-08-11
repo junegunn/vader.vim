@@ -81,6 +81,7 @@ function! vader#run(bang, ...)
 
     let g:vader_report = join(getline(1, '$'), "\n")
     let g:vader_errors = qfl
+    call setqflist(qfl)
 
     if a:bang
       redir => ver
@@ -97,7 +98,7 @@ function! vader#run(bang, ...)
         cq
       endif
     elseif !empty(qfl)
-      call vader#window#copen(qfl)
+      call vader#window#copen()
     endif
   finally
     call s:cleanup()
