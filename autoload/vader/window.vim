@@ -22,6 +22,7 @@
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 let s:quickfix_bfr  = 0
+let s:console_bfr   = 0
 let s:console_tab   = 0
 let s:workbench_tab = 0
 
@@ -50,6 +51,9 @@ function! vader#window#open()
   setf vader-result
   silent f \[Vader\]
   let s:console_tab = tabpagenr()
+  let s:console_bfr = bufnr('')
+  let b:vader_data = {}
+  nnoremap <silent> <buffer> <CR> :call <SID>action(line('.'))<CR>
 
   tabnew
   setlocal buftype=nofile
@@ -93,7 +97,9 @@ function! vader#window#append(message, indent, ...)
   if get(a:, 1, 1)
     let message = substitute(message, '\s*$', '', '')
   endif
-  call append(line('$') - 1, message)
+  let curr = line('$')
+  call append(curr - 1, message)
+  return curr
 endfunction
 
 function! vader#window#prepare(lines, type)
@@ -114,7 +120,7 @@ endfunction
 function! vader#window#cleanup()
   silent! bd \[Vader-workbench\]
   call s:console()
-
+  setlocal nomodifiable
   nnoremap <buffer> q :tabclose<CR>
   normal! Gzb
 endfunction
@@ -126,4 +132,60 @@ function! vader#window#copen()
   normal! Gzb
   2wincmd w
   nnoremap <buffer> q :tabclose<CR>
+  nnoremap <buffer> <CR> :call <SID>move()<CR><CR>
+endfunction
+
+function! vader#window#set_data(l1, l2, data)
+  let var = getbufvar(s:console_bfr, 'vader_data', {})
+  for l in range(a:l1, a:l2)
+    let var[l] = a:data
+  endfor
+  call setbufvar(s:console_bfr, 'vader_data', var)
+endfunction
+
+function! s:scratch(type, data, title)
+  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap modifiable
+  silent! execute 'setf '.a:type
+  call append(0, a:data)
+  nnoremap <silent> <buffer> q :tabclose<cr>
+  autocmd TabLeave <buffer> tabclose
+
+  execute 'silent f '.escape(a:title, '[]')
+  normal! G"_ddgg
+  diffthis
+  setlocal nomodifiable
+endfunction
+
+function! s:action(line)
+  if has_key(b:vader_data, a:line)
+    let data = b:vader_data[a:line]
+    if has_key(data, 'expect')
+      tabnew
+      call s:scratch(data.type, data.expect, '[Vader-expect]')
+
+      vertical botright new
+      call s:scratch(data.type, data.got, '[Vader-got]')
+
+      redraw
+      echo "Press 'q' to close"
+    endif
+  else
+    execute "normal! \<CR>"
+  endif
+endfunction
+
+function! s:move()
+  let lno = matchstr(getline('.'), '(#[0-9]\+)')[2:-2]
+  let wq = winnr()
+  let wc = bufwinnr(s:console_bfr)
+  if wc >= 0
+    execute wc . 'wincmd w'
+    let scrolloff = &scrolloff
+    set scrolloff=0
+    execute lno
+    normal! zt
+    redraw
+    let &scrolloff = scrolloff
+    execute wq . 'wincmd w'
+  endif
 endfunction

@@ -29,6 +29,8 @@ let s:register = {}
 let s:indent = 2
 
 function! vader#run(bang, ...)
+  let s:error_line = 0
+
   if a:0 == 0
     let patterns = [expand('%')]
   else
@@ -170,7 +172,7 @@ function! s:execute(prefix, type, block, lang_if)
     call vader#window#execute(a:block, a:lang_if)
     return 1
   catch
-    call s:append(a:prefix, a:type, '(X) '.v:exception)
+    call s:append(a:prefix, a:type, v:exception, 1)
     return 0
   endtry
 endfunction
@@ -221,7 +223,7 @@ function! s:run(filename, cases)
       try
         call vader#window#replay(case.do)
       catch
-        call s:append(prefix, 'do', '(X) '.v:exception)
+        call s:append(prefix, 'do', v:exception, 1)
         let ok = 0
       endtry
     endif
@@ -234,18 +236,21 @@ function! s:run(filename, cases)
     if has_key(case, 'expect')
       let result = vader#window#result()
       let match = case.expect ==# result
-      call s:append(prefix, 'expect', (match ? '' : '(X) ') . s:comment(case, 'expect'))
-
-      if !match
+      if match
+        call s:append(prefix, 'expect', s:comment(case, 'expect'))
+      else
+        let begin = s:append(prefix, 'expect', s:comment(case, 'expect'), 1)
         let ok = 0
+        let data = { 'type': get(case, 'type', ''), 'got': result, 'expect': case.expect }
         call vader#window#append('- Expected:', 3)
         for line in case.expect
           call vader#window#append(line, 5, 0)
         endfor
-        call vader#window#append('- Got:', 3)
+        let end = vader#window#append('- Got:', 3)
         for line in result
-          call vader#window#append(line, 5, 0)
+          let end = vader#window#append(line, 5, 0)
         endfor
+        call vader#window#set_data(begin, end, data)
       endif
     endif
 
@@ -256,7 +261,8 @@ function! s:run(filename, cases)
       let description = join(filter([
             \ comment.given,
             \ get(case.comment, 'do', get(case.comment, 'execute', '')),
-            \ get(case.comment, 'expect', '')], '!empty(v:val)'), ' - ')
+            \ get(case.comment, 'expect', '')], '!empty(v:val)'), ' - ') .
+            \ ' (#'.s:error_line.')'
       call add(qfl, { 'type': 'E', 'filename': a:filename, 'lnum': case.lnum, 'text': description })
     endif
   endfor
@@ -265,6 +271,13 @@ function! s:run(filename, cases)
   return [success, pending, total, qfl]
 endfunction
 
-function! s:append(prefix, type, message)
-  call vader#window#append(printf("%s [%7s] %s", a:prefix, toupper(a:type), a:message), 2)
+function! s:append(prefix, type, message, ...)
+  let error = get(a:, 1, 0)
+  let message = (error ? '(X) ' : '') . a:message
+  let line = vader#window#append(printf("%s [%7s] %s", a:prefix, toupper(a:type), message), 2)
+  if error
+    let s:error_line = line
+  endif
+  return line
 endfunction
+
