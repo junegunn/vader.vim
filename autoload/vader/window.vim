@@ -121,7 +121,7 @@ function! vader#window#cleanup()
   silent! bd \[Vader-workbench\]
   call s:console()
   setlocal nomodifiable
-  nnoremap <buffer> q :tabclose<CR>
+  nnoremap <silent> <buffer> q :tabclose<CR>
   normal! Gzb
 endfunction
 
@@ -131,8 +131,8 @@ function! vader#window#copen()
   1wincmd w
   normal! Gzb
   2wincmd w
-  nnoremap <buffer> q :tabclose<CR>
-  nnoremap <buffer> <CR> :call <SID>move()<CR><CR>
+  nnoremap <silent> <buffer> q :tabclose<CR>
+  nnoremap <silent> <buffer> <CR> :call <SID>move()<CR><CR>
 endfunction
 
 function! vader#window#set_data(l1, l2, data)
