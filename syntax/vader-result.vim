@@ -34,6 +34,7 @@ syntax match vaderResultNumber /-\?[0-9]\+\(\.[0-9]\+\)\?/ contained
 syntax match vaderResultItem /^    [^\]]\+\]\( (X).*\)\?/ contains=vaderResultSequence,vaderResultType,vaderResultError
 syntax match vaderResultSequence /^    ([0-9/ ]\+)/ contains=vaderResultNumber contained
 syntax match vaderResultType /\[[A-Z ]\+\]/ contained contains=vaderResultDo,vaderResultGiven,vaderResultExpect,vaderResultExecute,vaderResultBefore,vaderResultAfter
+syntax match vaderResultDiff /^          .*/
 syntax match vaderResultDo /DO/ contained
 syntax match vaderResultGiven /GIVEN/ contained
 syntax match vaderResultExpect /EXPECT/ contained
@@ -61,6 +62,7 @@ hi def link vaderResultAfter Special
 hi def link vaderResultExecute Statement
 hi def link vaderResultExpect Boolean
 hi def link vaderResultError Error
+hi def link vaderResultDiff None
 
 hi def link vaderResultExpected Conditional
 hi def link vaderResultGot Exception
