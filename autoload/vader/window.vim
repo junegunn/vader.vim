@@ -161,7 +161,7 @@ function! s:action(line)
     let data = b:vader_data[a:line]
     if has_key(data, 'expect')
       tabnew
-      call s:scratch(data.type, data.expect, '[Vader-expect]')
+      call s:scratch(data.type, data.expect, '[Vader-expected]')
 
       vertical botright new
       call s:scratch(data.type, data.got, '[Vader-got]')
