@@ -89,8 +89,7 @@ endfunction
 
 function! vader#window#append(message, indent)
   call s:console()
-  call append(line('$') - 1,
-        \ substitute(repeat('  ', a:indent) . a:message, '\s*$', '', ''))
+  call append(line('$') - 1, repeat('  ', a:indent) . a:message)
 endfunction
 
 function! vader#window#prepare(lines, type)
