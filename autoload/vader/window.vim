@@ -87,9 +87,13 @@ function! vader#window#result()
   return getline(1, line('$'))
 endfunction
 
-function! vader#window#append(message, indent)
+function! vader#window#append(message, indent, ...)
   call s:console()
-  call append(line('$') - 1, repeat('  ', a:indent) . a:message)
+  let message = repeat('  ', a:indent) . a:message
+  if get(a:, 1, 1)
+    let message = substitute(message, '\s*$', '', '')
+  endif
+  call append(line('$') - 1, message)
 endfunction
 
 function! vader#window#prepare(lines, type)

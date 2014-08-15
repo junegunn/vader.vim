@@ -240,11 +240,11 @@ function! s:run(filename, cases)
         let ok = 0
         call vader#window#append('- Expected:', 3)
         for line in case.expect
-          call vader#window#append(line, 5)
+          call vader#window#append(line, 5, 0)
         endfor
         call vader#window#append('- Got:', 3)
         for line in result
-          call vader#window#append(line, 5)
+          call vader#window#append(line, 5, 0)
         endfor
       endif
     endif
