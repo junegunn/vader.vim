@@ -173,8 +173,15 @@ function! s:execute(prefix, type, block, lang_if)
     return 1
   catch
     call s:append(a:prefix, a:type, v:exception, 1)
+    call s:print_throwpoint()
     return 0
   endtry
+endfunction
+
+function! s:print_throwpoint()
+  if v:throwpoint !~ 'vader#assert'
+    Log v:throwpoint
+  endif
 endfunction
 
 function! s:run(filename, cases)
@@ -224,6 +231,7 @@ function! s:run(filename, cases)
         call vader#window#replay(case.do)
       catch
         call s:append(prefix, 'do', v:exception, 1)
+        call s:print_throwpoint()
         let ok = 0
       endtry
     endif
