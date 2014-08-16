@@ -44,12 +44,11 @@ function! s:flush_buffer(cases, case, lnum, label, newlabel, buffer, final)
      \ a:newlabel == 'given' ||
      \ index(['before', 'after', 'do', 'execute'], a:newlabel) >= 0 && filled
       call add(a:cases, deepcopy(a:case))
-      for key in keys(a:case)
-        call remove(a:case, key)
-      endfor
-      let a:case.comment = {}
-      let a:case.lnum = a:lnum
-      let a:case.pending = 0
+      let new = { 'comment': {}, 'lnum': a:lnum, 'pending': 0 }
+      if !empty(get(a:case, 'type', ''))
+        let new.type = a:case.type
+      endif
+      call extend(filter(a:case, '0'), new)
     endif
   endif
 endfunction
