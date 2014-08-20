@@ -24,6 +24,7 @@
 let b:vader_eos = '\(^.*\n\(^[^# ].*:\)\@=\)\|\%$'
 
 setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+let &l:commentstring = '" %s'
 
 nnoremap <buffer><silent> [[ :call search('^[^# ]', 'bW')<CR>
 nnoremap <buffer><silent> [] :call search(b:vader_eos, 'bW')<CR>

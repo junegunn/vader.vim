@@ -105,7 +105,7 @@ function! s:parse_vader(lines)
   for [lnum, line] in a:lines
 
     " Comment / separators
-    if line =~ '^[#=~*^-]'
+    if line =~ '^[#"=~*^-]'
       continue
     endif
 

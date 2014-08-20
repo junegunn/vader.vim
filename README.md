@@ -179,12 +179,12 @@ Include: cleanup.vader
 
 ### Comments
 
-Any line that starts with `#`, `=`, `-`, `~`, `^`, or `*` without indentation is
-considered to be a comment and simply ignored.
+Any line that starts with `#`, `"`, `=`, `-`, `~`, `^`, or `*` without
+indentation is considered to be a comment and simply ignored.
 
-    #################
-    # Typical comment
-    #################
+    ###################
+    # Typical comment #
+    ###################
 
     Given (fixture):
     ================

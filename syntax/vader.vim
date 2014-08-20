@@ -38,7 +38,7 @@ syn match vaderGivenType /\(Given\s*\)\@<=[^()\s]\+/ contained
 syn match vaderExpectType /\(Expect\s*\)\@<=[^()\s]\+/ contained
 syn match vaderExecuteType /\(Execute\s*\)\@<=[^()\s]\+/ contained
 
-syn match vaderComment /^#.*/ contains=Todo
+syn match vaderComment /^["#].*/ contains=Todo
 syn match vaderSepCaret /^^.*/ contains=Todo
 syn match vaderSepTilde /^\~.*/ contains=Todo
 syn match vaderSepDouble /^=.*/ contains=Todo
