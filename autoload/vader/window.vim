@@ -136,11 +136,14 @@ function! vader#window#copen()
 endfunction
 
 function! vader#window#set_data(l1, l2, data)
-  let var = getbufvar(s:console_bfr, 'vader_data', {})
-  for l in range(a:l1, a:l2)
-    let var[l] = a:data
-  endfor
-  call setbufvar(s:console_bfr, 'vader_data', var)
+  try
+    let var = getbufvar(s:console_bfr, 'vader_data', {})
+    for l in range(a:l1, a:l2)
+      let var[l] = a:data
+    endfor
+    call setbufvar(s:console_bfr, 'vader_data', var)
+  catch
+  endtry
 endfunction
 
 function! s:scratch(type, data, title)
