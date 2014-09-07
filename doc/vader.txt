@@ -1,4 +1,4 @@
-vader.txt	vader	Last change: April 27 2014
+vader.txt	vader	Last change: September 7 2014
 VADER - TABLE OF CONTENTS                                      *vader* *vader-toc*
 ==============================================================================
 
@@ -22,8 +22,8 @@ VADER - TABLE OF CONTENTS                                      *vader* *vader-to
       Example                                                    |vader-3-5|
     Setting up isolated testing environment                      |vader-4|
     Travis CI integration                                        |vader-5|
-      Example: seoul256.vim                                      |vader-5-1|
-    Real-life examples                                           |vader-6|
+      Examples                                                   |vader-5-1|
+    Projects using Vader                                         |vader-6|
     Known issues                                                 |vader-7|
       feedkeys() cannot be tested                                |vader-7-1|
       Some events may not be triggered                           |vader-7-2|
@@ -81,7 +81,9 @@ RUNNING VADER TESTS                                  *vader-running-vader-tests*
  - `Vader! [file glob ...]`
      - Exit Vim after running the tests with exit status of 0 or 1
          - `vim '+Vader!*' && echo Success || echo Failure`
-
+     - If the description of `Do` or `Execute` block includes `FIXME` or `TODO`,
+       the block is recognized as a pending test case and does not affect the
+       exit status.
 
                                                                        *vader-3*
 SYNTAX OF .VADER FILE                               *vader-syntax-of-vader-file*
@@ -236,12 +238,12 @@ You can include other vader files using Include macro.
                                                                 *vader-comments*
                                                                      *vader-3-4*
 
-Any line that starts with `#`, `=`, `-`, `~`, `^`, or `*` without indentation
-is considered to be a comment and simply ignored.
+Any line that starts with `#`, `"`, `=`, `-`, `~`, `^`, or `*` without
+indentation is considered to be a comment and simply ignored.
 >
-    #################
-    # Typical comment
-    #################
+    ###################
+    # Typical comment #
+    ###################
 
     Given (fixture):
     ================
@@ -301,40 +303,23 @@ SETTING UP ISOLATED TESTING ENVIRONMENT
 
 When you test a plugin, it's generally a good idea to setup a testing
 environment that is isolated from the other plugins and settings irrelevant to
-the test. The simplest way to achieve this is to write a minimal .vimrc such
-as follows and start a clean Vim process with it.
+the test. The simplest way to achieve this is to start Vim with a mini .vimrc
+as follows:
 >
-    set nocompatible
+    vim -Nu <(cat << EOF
     filetype off
-
-    " Assuming that plugins are installed under ~/.vim/bundle
-
-    " Dependency to vader.vim
-    set rtp^=~/.vim/bundle/vader.vim
-
-    " The plugin under test
-    set rtp^=~/.vim/bundle/vim-markdown
+    set rtp+=~/.vim/bundle/vader.vim
+    set rtp+=~/.vim/bundle/vim-markdown
     set rtp+=~/.vim/bundle/vim-markdown/after
-
-    " Enable loading plugins and indent files for specific file types
     filetype plugin indent on
+    EOF) +Vader*
 <
-Then you can start Vim process with the configuration file and run Vader
-tests.
->
-    vim -u mini-vimrc +Vader*
-<
-Consider writing a script to further automate the process. You may refer to
-{6}{the one from easy-align}.
-
-           {6} https://github.com/junegunn/vim-easy-align/blob/master/test/run
-
 
                                                                        *vader-5*
 TRAVIS CI INTEGRATION                              *vader-travis-ci-integration*
 ==============================================================================
 
-To make your project tested on {7}{Travis CI}, you need to add `.travis.yml`
+To make your project tested on {6}{Travis CI}, you need to add `.travis.yml`
 to your project root. For most plugins the following example should suffice.
 >
     language: vim
@@ -349,29 +334,33 @@ to your project root. For most plugins the following example should suffice.
       set rtp+=.
       set rtp+=after
       filetype plugin indent on
-      VIMRC) -c 'Vader! test/*'
+      VIMRC) -c 'Vader! test/*' > /dev/null
 <
 (Note that `vim` is not a valid language for Travis CI. It just sets up Ruby
 execution environment instead as the default.)
 
-                                                     {7} https://travis-ci.org
+                                                     {6} https://travis-ci.org
 
 
-< Example: seoul256.vim >_____________________________________________________~
-                                                    *vader-example-seoul256-vim*
+< Examples >__________________________________________________________________~
+                                                                *vader-examples*
                                                                      *vader-5-1*
 
- - {8}{.travis.yml}
- - {9}{Build result - success}
- - {10}{Build result - failure}
+ - {7}{Simple .travis.yml}
+     - {8}{Build result}
+ - {9}{Advanced .travis.yml}
+     - Multiple dependencies
+     - Builds Vim from source
+     - {10}{Build result}
 
-          {8} https://github.com/junegunn/seoul256.vim/blob/master/.travis.yml
-          {9} https://travis-ci.org/junegunn/seoul256.vim/builds/23866989
-          {10} https://travis-ci.org/junegunn/seoul256.vim/builds/23866901
+          {7} https://github.com/junegunn/seoul256.vim/blob/master/.travis.yml
+          {8} https://travis-ci.org/junegunn/seoul256.vim/builds/23905890
+          {9} https://github.com/junegunn/vim-oblique/blob/master/.travis.yml
+          {10} https://travis-ci.org/junegunn/vim-oblique/builds/25033116
 
 
                                                                        *vader-6*
-REAL-LIFE EXAMPLES                                    *vader-real-life-examples*
+PROJECTS USING VADER                                *vader-projects-using-vader*
 ==============================================================================
 
  - {11}{vim-emoji}
