@@ -12,6 +12,7 @@ Include (Before/After):                  feature/before-after.vader
 Include (Save/Restore):                  feature/save-restore.vader
 Include (Testing Ruby/Python interface): feature/lang-if.vader
 Include (blocks w/o indentation):        feature/no-indentation.vader
+Include (Helpers):                       feature/helper.vader
 
 * Regressions
 Include (Macro set to linewise when it ends with <CR>): regression/characterwise-macro.vader

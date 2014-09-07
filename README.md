@@ -103,7 +103,19 @@ In Execute block, the following commands are provided.
     - `Save <name>[, ...]`
     - `Restore [<name>, ...]`
 
-And the path of the current .vader file can be accessed via `g:vader_file`.
+The following syntax helper functions are provided:
+
+-   `SyntaxAt`: return a string with the name of the syntax group at the following position:
+
+    - `SyntaxAt()`: current cursor position
+    - `SyntaxAt(col)`: current cursor line, at given column
+    - `SyntaxAt(lnum, col)`: line and column
+
+-   `SyntaxOf(pattern[, nth=1])`: return a string with the name of the syntax group
+    at the first character of the nth match of the given pattern.
+    Return `''` if there was no match.
+
+The path of the current `.vader` file can be accessed via `g:vader_file`.
 
 In addition to plain Vimscript, you can also test Ruby/Python/Perl/Lua interface
 with Execute block as follows:
@@ -219,6 +231,13 @@ Expect ruby (indented and shifted):
     def a
       a = 1
     end
+
+Given c (C file):
+  int i = 0;
+
+Execute (syntax is good):
+  AssertEqual SyntaxAt(2), 'cType'
+  AssertEqual SyntaxOf('0'), 'cNumber'
 ```
 
 Setting up isolated testing environment

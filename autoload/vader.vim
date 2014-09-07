@@ -150,6 +150,8 @@ function! s:prepare()
   command! -nargs=+ AssertEqual    :call vader#assert#equal(<args>)
   command! -nargs=+ AssertNotEqual :call vader#assert#not_equal(<args>)
   command! -nargs=+ AssertThrows   :call vader#assert#throws(<q-args>)
+  let g:SyntaxAt = function('vader#helper#syntax_at')
+  let g:SyntaxOf = function('vader#helper#syntax_of')
 endfunction
 
 function! s:cleanup()
@@ -161,6 +163,8 @@ function! s:cleanup()
   delcommand AssertEqual
   delcommand AssertNotEqual
   delcommand AssertThrows
+  unlet g:SyntaxAt
+  unlet g:SyntaxOf
 endfunction
 
 function! s:comment(case, label)
