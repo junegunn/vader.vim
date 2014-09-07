@@ -1,4 +1,4 @@
-" Copyright (c) 2013 Junegunn Choi
+" Copyright (c) 2014 Junegunn Choi
 "
 " MIT License
 "
@@ -55,26 +55,6 @@ syn region vaderAfter   start=/^After\(\s*(.*)\)\?\s*:/   end=/\(^[^ ^#~=*-]\)\@
 syn match vaderInclude /^Include\(\s*(.*)\)\?\s*:/ contains=vaderMessage
 syn cluster vaderTopLevel contains=vaderGiven,vaderExpect,vaderDo,vaderExpect,vaderBefore,vaderAfter,vaderInclude
 
-let s:ifs = ['lua', 'perl', 'ruby', 'python']
-let s:langs = get(g:, 'vader_types',
-  \ ['lua', 'perl', 'ruby', 'python', 'java', 'c', 'cpp', 'javascript', 'yaml', 'html', 'css', 'clojure', 'sh', 'tex'])
-
-function! s:syn_lang_region(block, lang)
-  execute printf('syn region vader%s start=/^%s\s*%s\s*\((.*)\)\?\s*:/ end=/\(^[^ ^#~=*-]\)\@=/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_%s nextgroup=@vaderTopLevel skipempty', a:block, a:block, a:lang, a:block, a:lang)
-endfunction
-
-for s:lang in filter(copy(s:langs), '!empty(globpath(&rtp, "syntax/".v:val.".vim", 1))')
-  unlet! b:current_syntax
-  execute printf('syn include @%sSnippet syntax/%s.vim', s:lang, s:lang)
-  execute printf('syn region vader_%s start=/^\s\{2,}/ end=/^\S\@=/ contains=@%sSnippet contained', s:lang, s:lang)
-
-  call s:syn_lang_region('Given', s:lang)
-  call s:syn_lang_region('Expect', s:lang)
-  if index(s:ifs, s:lang) >= 0
-    call s:syn_lang_region('Execute', s:lang)
-  endif
-endfor
-
 syn keyword Todo TODO FIXME XXX TBD
 
 hi def link vaderInclude     Repeat
@@ -97,6 +77,8 @@ hi def link vaderSepSingle   Label
 hi def link vaderSepAsterisk Exception
 
 let b:current_syntax = 'vader'
+call vader#syntax#reset()
+call vader#syntax#include(1, '$')
 
 let &isk = s:oisk
 

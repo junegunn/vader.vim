@@ -71,16 +71,6 @@ Given [filetype] [(comment)]:
   [input text]
 ```
 
-Syntax highlighting is enabled for only [a fixed set of
-filetypes](https://github.com/junegunn/vader.vim/blob/master/syntax/vader.vim#L59-L60).
-If the language of your choice is not correctly highlighted, try setting
-`g:vader_types` like so:
-
-```vim
-" Syntax-highlight rust and erlang codes in Given and Expect blocks
-let g:vader_types = ['rust', 'erlang']
-```
-
 #### Do
 
 The content of a Do block is a sequence of normal-mode keystrokes that can

@@ -1,4 +1,4 @@
-" Copyright (c) 2013 Junegunn Choi
+" Copyright (c) 2014 Junegunn Choi
 "
 " MIT License
 "
@@ -37,3 +37,14 @@ vnoremap <buffer><silent> [] <ESC>:execute "normal! gv"<BAR>call search(b:vader_
 
 vnoremap <buffer><silent> ]] <ESC>:execute "normal! gv"<BAR>call search('^[^# ]', 'W')<CR>
 vnoremap <buffer><silent> ][ <ESC>:execute "normal! gv"<BAR>call search(b:vader_eos, 'W')<CR>
+
+augroup vader_syntax
+  autocmd!
+  if exists('##TextChangedI')
+    autocmd TextChangedI <buffer> call vader#syntax#include('.', '.')
+  else
+    autocmd CursorMovedI <buffer> call vader#syntax#include('.', '.')
+  endif
+  " autocmd FileType <buffer> call vader#syntax#include(1, '$')
+augroup END
+
