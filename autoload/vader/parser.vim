@@ -25,14 +25,14 @@ function! vader#parser#parse(fn)
   return s:parse_vader(s:read_vader(a:fn))
 endfunction
 
-function! s:flush_buffer(cases, case, lnum, label, newlabel, buffer, final)
+function! s:flush_buffer(cases, case, lnum, raw, label, newlabel, buffer, final)
   if !empty(a:label)
     let rev = reverse(copy(a:buffer))
     while len(rev) > 0 && empty(rev[0])
       call remove(rev, 0)
     endwhile
 
-    let data = map(reverse(rev), 'strpart(v:val, 2)')
+    let data = map(reverse(rev), (a:case.raw ? 'v:val' : 'strpart(v:val, 2)'))
     let a:case[a:label] = data
     if !empty(a:buffer)
       call remove(a:buffer, 0, -1)
@@ -51,6 +51,7 @@ function! s:flush_buffer(cases, case, lnum, label, newlabel, buffer, final)
       call extend(filter(a:case, '0'), new)
     endif
   endif
+  let a:case.raw = a:raw
 endfunction
 
 function! s:read_vader(fn)
@@ -100,21 +101,20 @@ function! s:parse_vader(lines)
   let newlabel = ''
   let buffer   = []
   let cases    = []
-  let case     = { 'lnum': 1, 'comment': {}, 'pending': 0 }
+  let case     = { 'lnum': 1, 'comment': {}, 'pending': 0, 'raw': 0 }
 
   for [lnum, line] in a:lines
-
     " Comment / separators
-    if line =~ '^[#"=~*^-]'
+    if !case.raw && line =~ '^[#"=~*^-]'
       continue
     endif
 
     let matched = 0
     for l in ['Before', 'After', 'Given', 'Execute', 'Expect', 'Do']
-      let m = matchlist(line, '^'.l.'\s*\(.*\)\s*:')
+      let m = matchlist(line, '^'.l.'\s*\(.*\)\s*\([:;]\)\s*$')
       if !empty(m)
         let newlabel = tolower(l)
-        call s:flush_buffer(cases, case, lnum, label, newlabel, buffer, 0)
+        call s:flush_buffer(cases, case, lnum, m[2] == ';', label, newlabel, buffer, 0)
 
         let label = newlabel
         if !empty(m[1])
@@ -144,14 +144,14 @@ function! s:parse_vader(lines)
     if matched | continue | endif
 
     " Continuation
-    if !empty(line) && line !~ '^  '
+    if !empty(line) && !case.raw && line !~ '^  '
       throw "Syntax error: " . line
     endif
     if !empty(label)
       call add(buffer, line)
     endif
   endfor
-  call s:flush_buffer(cases, case, lnum, label, '', buffer, 1)
+  call s:flush_buffer(cases, case, lnum, case.raw, label, '', buffer, 1)
 
   let ret = []
   let prev = {}

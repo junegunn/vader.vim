@@ -14,14 +14,6 @@ Installation
 
 Use your favorite plugin manager.
 
-- [Pathogen](https://github.com/tpope/vim-pathogen)
-  - `git clone https://github.com/junegunn/vader.vim.git ~/.vim/bundle/vader.vim`
-- [Vundle](https://github.com/gmarik/vundle)
-  1. Add `Bundle 'junegunn/vader.vim'` to .vimrc
-  2. Run `:BundleInstall`
-- [NeoBundle](https://github.com/Shougo/neobundle.vim)
-  1. Add `NeoBundle 'junegunn/vader.vim'` to .vimrc
-  2. Run `:NeoBundleInstall`
 - [vim-plug](https://github.com/junegunn/vim-plug)
   1. Add `Plug 'junegunn/vader.vim'` to .vimrc
   2. Run `:PlugInstall`
@@ -56,6 +48,9 @@ spaces.
     - Vimscript to run before each test case
 - After
     - Vimscript to run after each test case
+
+If you want to skip 2-space indention, end the block label with a semi-colon
+instead of a colon.
 
 ### Basic blocks
 

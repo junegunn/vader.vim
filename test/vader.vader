@@ -28,5 +28,25 @@ Execute (Assertions):
   AssertNotEqual getline(1), getline(3)
   AssertThrows getline()
 
+
+# Without indentation
+Given markdown (markdown without indentation);
+Title
+=====
+- item 1
+- item 2
+- item 3
+
+Do;
+2j
+ddp
+
+Expect markdown (without indentation);
+Title
+=====
+- item 2
+- item 1
+- item 3
+
 Include (again): include/teardown.vader
 
