@@ -37,9 +37,9 @@ syn region vaderTextRaw    start=/\(;$\)\@<=/ end=/\(^\(Given\|Expect\|Do\|Execu
 syn region vaderCommandRaw start=/\(;$\)\@<=/ end=/\(^\(Given\|Expect\|Do\|Execute\|Before\|After\|Include\)\)\@=/ contains=@vimSnippet contained
 
 syn match vaderMessage /(\@<=.*)\@=/ contained contains=Todo
-syn match vaderGivenType /\(Given\s*\)\@<=[^()\s]\+/ contained
-syn match vaderExpectType /\(Expect\s*\)\@<=[^()\s]\+/ contained
-syn match vaderExecuteType /\(Execute\s*\)\@<=[^()\s]\+/ contained
+syn match vaderGivenType /\(Given\s*\)\@<=[^;:()\s]\+/ contained
+syn match vaderExpectType /\(Expect\s*\)\@<=[^;:()\s]\+/ contained
+syn match vaderExecuteType /\(Execute\s*\)\@<=[^;:()\s]\+/ contained
 
 syn match vaderComment /^["#].*/ contains=Todo
 syn match vaderSepCaret /^^.*/ contains=Todo

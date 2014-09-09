@@ -30,7 +30,7 @@ endfunction
 function! vader#syntax#include(l1, l2)
   let lines = filter(getline(a:l1, a:l2), '!empty(v:val) && v:val[0] != " "')
   for line in lines
-    let match = matchlist(line, '^\(Given\|Expect\|Execute\)\s\s*\([^: (]\+\)')
+    let match = matchlist(line, '^\(Given\|Expect\|Execute\)\s\s*\([^:; (]\+\)')
     if len(match) >= 3
       silent! call s:load(match[2])
     endif
@@ -64,6 +64,6 @@ endfunction
 
 function! s:define_syntax_region(block, lang)
   execute printf('syn region vader%s start=/^%s\s*%s\s*\((.*)\)\?\s*:/ end=/\(^[^ ^#~=*-]\)\@=/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_%s nextgroup=@vaderTopLevel skipempty', a:block, a:block, a:lang, a:block, a:lang)
-  execute printf('syn region vader%sRaw start=/^%s\s*%s\s*\((.*)\)\?\s*;/ end=/\(^\(Given\|Expect\|Do\|Execute\|Before\|After\|Include\)\)\@=/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_raw_%s nextgroup=@vaderTopLevel skipempty', a:block, a:block, a:lang, a:block, a:lang)
+  execute printf('syn region vader%sRaw start=/^%s\s\s*%s\s*\((.*)\)\?\s*;/ end=/\(^\(Given\|Expect\|Do\|Execute\|Before\|After\|Include\)\)\@=/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_raw_%s nextgroup=@vaderTopLevel skipempty', a:block, a:block, a:lang, a:block, a:lang)
 endfunction
 
