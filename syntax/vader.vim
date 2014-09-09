@@ -33,8 +33,8 @@ syn include @vimSnippet syntax/vim.vim
 syn region vaderText    start=/^\s\{2,}/ end=/^\S\@=/ contained
 syn region vaderCommand start=/^\s\{2,}/ end=/^\S\@=/ contains=@vimSnippet contained
 
-syn region vaderTextRaw    start=/\(;$\)\@<=/ end=/\(^\(Given\|Expect\|Do\|Execute\|Before\|After\|Include\)\)\@=/ contained
-syn region vaderCommandRaw start=/\(;$\)\@<=/ end=/\(^\(Given\|Expect\|Do\|Execute\|Before\|After\|Include\)\)\@=/ contains=@vimSnippet contained
+syn region vaderTextRaw    start=/\(;$\)\@<=/ end=/\(^\(Given\|Expect\|Do\|Execute\|Before\|After\|Include\).*[:;]\s*$\)\@=/ contained
+syn region vaderCommandRaw start=/\(;$\)\@<=/ end=/\(^\(Given\|Expect\|Do\|Execute\|Before\|After\|Include\).*[:;]\s*$\)\@=/ contains=@vimSnippet contained
 
 syn match vaderMessage /(\@<=.*)\@=/ contained contains=Todo
 syn match vaderGivenType /\(Given\s*\)\@<=[^;:()\s]\+/ contained

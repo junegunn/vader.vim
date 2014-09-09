@@ -52,7 +52,7 @@ function! s:load(type)
   unlet! b:current_syntax
   execute printf('syn include @%sSnippet syntax/%s.vim', a:type, a:type)
   execute printf('syn region vader_%s start=/^\s\{2,}/ end=/^\S\@=/ contains=@%sSnippet contained', a:type, a:type)
-  execute printf('syn region vader_raw_%s start=/\(;$\)\@<=/ end=/\(^\(Given\|Expect\|Do\|Execute\|Before\|After\|Include\)\)\@=/ contains=@%sSnippet contained', a:type, a:type)
+  execute printf('syn region vader_raw_%s start=/\(;$\)\@<=/ end=/\(^\(Given\|Expect\|Do\|Execute\|Before\|After\|Include\).*[:;]\s*$\)\@=/ contains=@%sSnippet contained', a:type, a:type)
 
   call s:define_syntax_region('Given', a:type)
   call s:define_syntax_region('Expect', a:type)
@@ -64,6 +64,6 @@ endfunction
 
 function! s:define_syntax_region(block, lang)
   execute printf('syn region vader%s start=/^%s\s*%s\s*\((.*)\)\?\s*:/ end=/\(^[^ ^#~=*-]\)\@=/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_%s nextgroup=@vaderTopLevel skipempty', a:block, a:block, a:lang, a:block, a:lang)
-  execute printf('syn region vader%sRaw start=/^%s\s\s*%s\s*\((.*)\)\?\s*;/ end=/\(^\(Given\|Expect\|Do\|Execute\|Before\|After\|Include\)\)\@=/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_raw_%s nextgroup=@vaderTopLevel skipempty', a:block, a:block, a:lang, a:block, a:lang)
+  execute printf('syn region vader%sRaw start=/^%s\s\s*%s\s*\((.*)\)\?\s*;/ end=/\(^\(Given\|Expect\|Do\|Execute\|Before\|After\|Include\).*[:;]\s*$\)\@=/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_raw_%s nextgroup=@vaderTopLevel skipempty', a:block, a:block, a:lang, a:block, a:lang)
 endfunction
 
