@@ -32,7 +32,7 @@ function! vader#syntax#include(l1, l2)
   for line in lines
     let match = matchlist(line, '^\(Given\|Expect\|Execute\)\s\+\([^:; (]\+\)')
     if len(match) >= 3
-      call s:load(match[2])
+      silent! call s:load(match[2])
     endif
   endfor
 endfunction
