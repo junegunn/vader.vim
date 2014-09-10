@@ -1,0 +1,48 @@
+# Without indentation
+Given markdown (markdown without indentation);
+Title
+=====
+- item 1
+- item 2
+- item 3
+
+Expect; Do;
+-----------
+
+### Execute:
+
+Before; Okay to have block labels if the line is not in a valid vader syntax
+After: This is the last line
+
+
+Include (To see if it's okay to interleave Include): include/setup.vader
+
+Do;
+2j
+ddp
+Gp
+
+Expect markdown (without indentation);
+Title
+=====
+- item 2
+- item 1
+- item 3
+
+Expect; Do;
+-----------
+
+### Execute:
+
+Before; Okay to have block labels if the line is not in a valid vader syntax
+After: This is the last line
+- item 1
+
+Execute;
+normal! Gyygg"_dGp
+
+Expect;
+
+After: This is the last line
+
+Given:

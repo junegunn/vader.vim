@@ -13,4 +13,5 @@ script: |
   filetype off
   set rtp+=.
   filetype plugin indent on
-  VIMRC) -c 'Vader! example/* test/*' > /dev/null
+  syntax enable
+  VIMRC) -c 'Vader! test/*' > /dev/null

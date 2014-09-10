@@ -21,21 +21,22 @@
 " OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-let b:vader_eos = '\(^.*\n\(^[^# ].*:\)\@=\)\|\%$'
+let b:vader_label = vader#syntax#_head()
+let b:vader_eos = '\(.*\n'.vader#syntax#_head().'\)\|\%$'
 
 setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 let &l:commentstring = '" %s'
 
-nnoremap <buffer><silent> [[ :call search('^[^# ]', 'bW')<CR>
+nnoremap <buffer><silent> [[ :call search(b:vader_label, 'bW')<CR>
 nnoremap <buffer><silent> [] :call search(b:vader_eos, 'bW')<CR>
 
-nnoremap <buffer><silent> ]] :call search('^[^# ]', 'W')<CR>
+nnoremap <buffer><silent> ]] :call search(b:vader_label, 'W')<CR>
 nnoremap <buffer><silent> ][ :call search(b:vader_eos, 'W')<CR>
 
-vnoremap <buffer><silent> [[ <ESC>:execute "normal! gv"<BAR>call search('^[^# ]', 'bW')<CR>
+vnoremap <buffer><silent> [[ <ESC>:execute "normal! gv"<BAR>call search(b:vader_label, 'bW')<CR>
 vnoremap <buffer><silent> [] <ESC>:execute "normal! gv"<BAR>call search(b:vader_eos, 'bW')<CR>
 
-vnoremap <buffer><silent> ]] <ESC>:execute "normal! gv"<BAR>call search('^[^# ]', 'W')<CR>
+vnoremap <buffer><silent> ]] <ESC>:execute "normal! gv"<BAR>call search(b:vader_label, 'W')<CR>
 vnoremap <buffer><silent> ][ <ESC>:execute "normal! gv"<BAR>call search(b:vader_eos, 'W')<CR>
 
 augroup vader_syntax
