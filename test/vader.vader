@@ -6,6 +6,7 @@ Include: include/setup.vader
 ~ Features
 Include (Basic tests 1):                 feature/suite1.vader
 Include (Basic tests 2):                 feature/suite2.vader
+Include (Motions):                       feature/motion.vader
 Include (Different types of comments):   feature/comment.vader
 Include (Before/After):                  feature/before-after.vader
 Include (Save/Restore):                  feature/save-restore.vader
