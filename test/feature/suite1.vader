@@ -2,7 +2,7 @@
 Execute (Assert and AssertEqual command):
   Assert 1 == 1
   AssertEqual 'hey', tolower('HEY')
-  AssertEqual 'suite1.vader', fnamemodify(g:vader_file, ':t')
+  AssertEqual 'vader.vader', fnamemodify(g:vader_file, ':t')
   AssertThrows call reverse('not a list')
 
 Execute (FIXME: AssertThrows expects an exception to be thrown):
