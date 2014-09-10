@@ -111,30 +111,24 @@ function! s:parse_vader(lines)
 
     let matched = 0
     for l in ['Before', 'After', 'Given', 'Execute', 'Expect', 'Do']
-      let m = matchlist(line, '^'.l.'\s*\(.*\)\s*\([:;]\)\s*$')
+      let m = matchlist(line, '^'.l.'\%(\s\+\([^:;(]\+\)\)\?\s*\%((\(.*\))\)\?\s*\([:;]\)\s*$')
       if !empty(m)
         let newlabel = tolower(l)
-        call s:flush_buffer(cases, case, lnum, m[2] == ';', label, newlabel, buffer, 0)
+        call s:flush_buffer(cases, case, lnum, m[3] == ';', label, newlabel, buffer, 0)
 
-        let label = newlabel
-        if !empty(m[1])
-          let args    = matchlist(m[1], '^\(.\{-}\)\?\s*\((\(.*\))\)\?$')
-          let arg     = get(args, 1, '')
-          let comment = get(args, 3, '')
+        let label   = newlabel
+        let arg     = m[1]
+        let comment = m[2]
+        if !empty(arg)
+          if     l == 'Given'   | let case.type    = arg
+          elseif l == 'Execute' | let case.lang_if = arg
+          end
+        endif
+        if !empty(comment)
+          let case.comment[tolower(l)] = comment
           if index(['do', 'execute'], label) >= 0 &&
                 \ comment =~# '\<TODO\>\|\<FIXME\>'
             let case.pending = 1
-          endif
-
-          if !empty(arg)
-            if l == 'Given'
-              let case.type = arg
-            elseif l == 'Execute'
-              let case.lang_if = arg
-            end
-          endif
-          if !empty(comment)
-            let case.comment[tolower(l)] = comment
           endif
         endif
         let matched = 1

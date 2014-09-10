@@ -30,11 +30,15 @@ endfunction
 function! vader#syntax#include(l1, l2)
   let lines = filter(getline(a:l1, a:l2), '!empty(v:val) && v:val[0] != " "')
   for line in lines
-    let match = matchlist(line, '^\(Given\|Expect\|Execute\)\s\s*\([^:; (]\+\)')
+    let match = matchlist(line, '^\(Given\|Expect\|Execute\)\s\+\([^:; (]\+\)')
     if len(match) >= 3
-      silent! call s:load(match[2])
+      call s:load(match[2])
     endif
   endfor
+endfunction
+
+function! vader#syntax#_head()
+  return '\(\(^\(Given\|Expect\|Do\|Execute\|Before\|After\)\(\s\+[^:;(]\+\)\?\s*\((.*)\)\?\s*[:;]\s*$\)\|\(^Include\(\s*(.*)\)\?\s*:\)\)\@='
 endfunction
 
 function! s:load(type)
@@ -52,7 +56,7 @@ function! s:load(type)
   unlet! b:current_syntax
   execute printf('syn include @%sSnippet syntax/%s.vim', a:type, a:type)
   execute printf('syn region vader_%s start=/^\s\{2,}/ end=/^\S\@=/ contains=@%sSnippet contained', a:type, a:type)
-  execute printf('syn region vader_raw_%s start=/\(;$\)\@<=/ end=/\(^\(Given\|Expect\|Do\|Execute\|Before\|After\|Include\).*[:;]\s*$\)\@=/ contains=@%sSnippet contained', a:type, a:type)
+  execute printf('syn region vader_raw_%s start=/\(;\s*$\)\@<=/ end=/%s/ contains=@%sSnippet contained', a:type, vader#syntax#_head(), a:type)
 
   call s:define_syntax_region('Given', a:type)
   call s:define_syntax_region('Expect', a:type)
@@ -63,7 +67,7 @@ function! s:load(type)
 endfunction
 
 function! s:define_syntax_region(block, lang)
-  execute printf('syn region vader%s start=/^%s\s*%s\s*\((.*)\)\?\s*:/ end=/\(^[^ ^#~=*-]\)\@=/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_%s nextgroup=@vaderTopLevel skipempty', a:block, a:block, a:lang, a:block, a:lang)
-  execute printf('syn region vader%sRaw start=/^%s\s\s*%s\s*\((.*)\)\?\s*;/ end=/\(^\(Given\|Expect\|Do\|Execute\|Before\|After\|Include\).*[:;]\s*$\)\@=/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_raw_%s nextgroup=@vaderTopLevel skipempty', a:block, a:block, a:lang, a:block, a:lang)
+  execute printf('syn region vader%s start=/^%s\s\+%s\s*\((.*)\)\?\s*:\s*$/ end=/\(^[^ ^#~=*-]\)\@=/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_%s nextgroup=@vaderTopLevel skipempty', a:block, a:block, a:lang, a:block, a:lang)
+  execute printf('syn region vader%sRaw start=/^%s\s\+%s\s*\((.*)\)\?\s*;\s*$/ end=/%s/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_raw_%s nextgroup=@vaderTopLevel skipempty', a:block, a:block, a:lang, vader#syntax#_head(), a:block, a:lang)
 endfunction
 
