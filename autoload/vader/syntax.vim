@@ -67,7 +67,7 @@ function! s:load(type)
 endfunction
 
 function! s:define_syntax_region(block, lang)
-  execute printf('syn region vader%s start=/^%s\s\+%s\s*\((.*)\)\?\s*:\s*$/ end=/\(^[^ ^#~=*-]\)\@=/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_%s nextgroup=@vaderTopLevel skipempty', a:block, a:block, a:lang, a:block, a:lang)
-  execute printf('syn region vader%sRaw start=/^%s\s\+%s\s*\((.*)\)\?\s*;\s*$/ end=/%s/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_raw_%s nextgroup=@vaderTopLevel skipempty', a:block, a:block, a:lang, vader#syntax#_head(), a:block, a:lang)
+  execute printf('syn region vader%s start=/^%s\s\+%s\s*\((.*)\)\?\s*:\s*$/ end=/\(^[^ ^#~=*-]\)\@=/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_%s nextgroup=@vaderTopLevel skipempty keepend', a:block, a:block, a:lang, a:block, a:lang)
+  execute printf('syn region vader%sRaw start=/^%s\s\+%s\s*\((.*)\)\?\s*;\s*$/ end=/%s/ contains=vader%sType,vaderMessage,@vaderIgnored,vader_raw_%s nextgroup=@vaderTopLevel skipempty keepend', a:block, a:block, a:lang, vader#syntax#_head(), a:block, a:lang)
 endfunction
 
