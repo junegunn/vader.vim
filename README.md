@@ -25,7 +25,7 @@ Running Vader tests
 - `Vader! [file glob ...]`
     - Exit Vim after running the tests with exit status of 0 or 1
         - `vim '+Vader!*' && echo Success || echo Failure`
-          - (You need to pass `--nofork` option when using GVim)
+            - (You need to pass `--nofork` option when using GVim)
     - If the description of `Do` or `Execute` block includes `FIXME` or `TODO`,
       the block is recognized as a pending test case and does not affect the
       exit status.
