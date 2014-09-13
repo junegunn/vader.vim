@@ -46,7 +46,7 @@ function! s:flush_buffer(cases, case, lnum, raw, label, newlabel, buffer, final)
       call add(a:cases, deepcopy(a:case))
       let new = { 'comment': {}, 'lnum': a:lnum, 'pending': 0 }
       if !empty(get(a:case, 'type', ''))
-        let new.type = a:case.type
+        let new.type = a:case.type " To reuse Given block with type
       endif
       call extend(filter(a:case, '0'), new)
     endif
@@ -123,6 +123,8 @@ function! s:parse_vader(lines)
           if     l == 'Given'   | let case.type    = arg
           elseif l == 'Execute' | let case.lang_if = arg
           end
+        elseif l == 'Given'
+          let case.type = ''
         endif
         if !empty(comment)
           let case.comment[tolower(l)] = comment

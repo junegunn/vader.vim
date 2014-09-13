@@ -1,0 +1,14 @@
+Given (plain text):
+Execute (Check filetype):
+  AssertEqual '', &filetype
+
+Given ruby (ruby code):
+Execute (Check filetype):
+  AssertEqual 'ruby', &filetype
+Execute (Check filetype again):
+  AssertEqual 'ruby', &filetype
+
+Given (plain text):
+Execute (Check filetype - should be reset):
+  AssertEqual '', &filetype
+

@@ -104,9 +104,7 @@ endfunction
 
 function! vader#window#prepare(lines, type)
   call s:workbench()
-  if !empty(a:type)
-    execute 'setf '.a:type
-  endif
+  execute 'setlocal filetype='.a:type
 
   %d
   for line in a:lines
