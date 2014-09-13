@@ -1,0 +1,4 @@
+filetype off
+set rtp+=../
+filetype plugin indent on
+syntax enable

@@ -9,9 +9,5 @@ before_script: |
   cd -
 
 script: |
-  /usr/local/bin/vim -Nu <(cat << VIMRC
-  filetype off
-  set rtp+=.
-  filetype plugin indent on
-  syntax enable
-  VIMRC) -c 'Vader! test/*' > /dev/null
+  export PATH="/usr/local/bin:$PATH"
+  ./test/run-tests.sh
