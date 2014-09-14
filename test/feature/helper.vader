@@ -1,0 +1,46 @@
+Given c (C file):
+  int i = 0;
+  char c = 'i';
+
+Execute (SyntaxAt())):
+  call cursor(1, 1)
+  AssertEqual SyntaxAt(), 'cType'
+  call cursor(1, 9)
+  AssertEqual SyntaxAt(), 'cNumber'
+  call cursor(2, 1)
+  AssertEqual SyntaxAt(1), 'cType'
+  call cursor(2, 11)
+  AssertEqual SyntaxAt(11), 'cCharacter'
+
+Execute (SyntaxAt(col))):
+  call cursor(1, 1)
+  AssertEqual SyntaxAt(1), 'cType'
+  AssertEqual SyntaxAt(9), 'cNumber'
+  call cursor(2, 1)
+  AssertEqual SyntaxAt(1), 'cType'
+  AssertEqual SyntaxAt(11), 'cCharacter'
+
+Execute (SyntaxAt(lnum, col))):
+  AssertEqual SyntaxAt(1, 1), 'cType'
+  AssertEqual SyntaxAt(1, 9), 'cNumber'
+  AssertEqual SyntaxAt(2, 1), 'cType'
+  AssertEqual SyntaxAt(2, 11), 'cCharacter'
+
+Execute (SyntaxOf(pattern)):
+  AssertEqual SyntaxOf('i'), 'cType'
+  AssertEqual SyntaxOf('int'), 'cType'
+  AssertEqual SyntaxOf('int i = 0;'), 'cType'
+  AssertEqual SyntaxOf('0'), 'cNumber'
+  AssertEqual SyntaxOf('\(c = ''\)\@<=i'), 'cCharacter'
+
+Execute (SyntaxOf(pattern, count)):
+  AssertEqual SyntaxOf('i', 1), 'cType'
+  AssertEqual SyntaxOf('i', 3), 'cCharacter'
+  AssertEqual SyntaxOf('i', 4), ''
+
+Execute (SyntaxOf does not move cursor):
+  call cursor(2, 1)
+  AssertEqual SyntaxOf('0'), 'cNumber'
+  let pos = getpos('.')
+  AssertEqual pos[1], 2
+  AssertEqual pos[2], 1
