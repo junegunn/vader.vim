@@ -279,6 +279,7 @@ script: |
   set rtp+=.
   set rtp+=after
   filetype plugin indent on
+  syntax enable
   VIMRC) -c 'Vader! test/*' > /dev/null
 ```
 
