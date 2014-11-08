@@ -106,11 +106,11 @@ function! vader#window#prepare(lines, type)
   call s:workbench()
   execute 'setlocal modifiable filetype='.a:type
 
-  %d
+  %d _
   for line in a:lines
     call append(line('$') - 1, line)
   endfor
-  normal! ddgg
+  normal! "_ddgg
 
   let &undolevels = &undolevels " Break undo block
 endfunction
