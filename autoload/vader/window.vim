@@ -104,7 +104,7 @@ endfunction
 
 function! vader#window#prepare(lines, type)
   call s:workbench()
-  execute 'setlocal filetype='.a:type
+  execute 'setlocal modifiable filetype='.a:type
 
   %d
   for line in a:lines
