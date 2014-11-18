@@ -21,8 +21,8 @@
 " OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-function! vader#parser#parse(fn)
-  return s:parse_vader(s:read_vader(a:fn))
+function! vader#parser#parse(fn, line1, line2)
+  return s:parse_vader(s:read_vader(a:fn, a:line1, a:line2), a:line1)
 endfunction
 
 function! s:flush_buffer(cases, case, lnum, raw, label, newlabel, buffer, final)
@@ -54,9 +54,9 @@ function! s:flush_buffer(cases, case, lnum, raw, label, newlabel, buffer, final)
   let a:case.raw = a:raw
 endfunction
 
-function! s:read_vader(fn)
-  let remains   = readfile(a:fn)
-  let lnum      = 1
+function! s:read_vader(fn, line1, line2)
+  let remains   = readfile(a:fn)[a:line1 - 1 : a:line2 - 1]
+  let lnum      = a:line1
   let lines     = []
   let reserved  = 0
   let depth     = 0 " Not a strict depth
@@ -96,12 +96,12 @@ function! s:read_vader(fn)
   return lines
 endfunction
 
-function! s:parse_vader(lines)
+function! s:parse_vader(lines, line1)
   let label    = ''
   let newlabel = ''
   let buffer   = []
   let cases    = []
-  let case     = { 'lnum': 1, 'comment': {}, 'pending': 0, 'raw': 0 }
+  let case     = { 'lnum': a:line1, 'comment': {}, 'pending': 0, 'raw': 0 }
 
   for [lnum, line] in a:lines
     " Comment / separators

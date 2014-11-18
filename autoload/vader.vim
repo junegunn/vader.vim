@@ -28,8 +28,18 @@ let g:loaded_vader = 1
 let s:register = {}
 let s:indent = 2
 
-function! vader#run(bang, ...)
+function! vader#run(bang, ...) range
   let s:error_line = 0
+
+  if a:lastline - a:firstline > 0
+    if a:0 > 0
+      echoerr 'Range and file arguments are mutually exclusive'
+      return
+    endif
+    let [line1, line2] = [a:firstline, a:lastline]
+  else
+    let [line1, line2] = [1, 0]
+  endif
 
   if a:0 == 0
     let patterns = [expand('%')]
@@ -49,7 +59,7 @@ function! vader#run(bang, ...)
       for fn in split(glob(gl), "\n")
         if fnamemodify(fn, ':e') == 'vader'
           let afn = fnamemodify(fn, ':p')
-          let cases = vader#parser#parse(afn)
+          let cases = vader#parser#parse(afn, line1, line2)
           call add(all_cases, [afn, cases])
           let total += len(cases)
         endif
