@@ -25,17 +25,21 @@ let s:quickfix_bfr  = 0
 let s:console_bfr   = 0
 let s:console_tab   = 0
 let s:workbench_tab = 0
+let s:workbench_bfr = 0
 
 function! s:console()
   execute 'normal! '.s:console_tab.'gt'
 endfunction
 
-function! s:workbench()
+function! s:workbench(bfr)
   execute 'normal! '.s:workbench_tab.'gt'
+  if a:bfr
+    execute 'b' s:workbench_bfr
+  endif
 endfunction
 
 function! vader#window#workbench()
-  call s:workbench()
+  call s:workbench(0)
 endfunction
 
 function! vader#window#open()
@@ -60,10 +64,11 @@ function! vader#window#open()
   setlocal noswapfile
   silent f \[Vader-workbench\]
   let s:workbench_tab = tabpagenr()
+  let s:workbench_bfr = bufnr('')
 endfunction
 
 function! vader#window#execute(lines, lang_if)
-  call s:workbench()
+  call s:workbench(1)
   let temp = tempname()
   try
     if empty(a:lang_if)
@@ -81,13 +86,13 @@ function! vader#window#execute(lines, lang_if)
 endfunction
 
 function! vader#window#replay(lines)
-  call s:workbench()
+  call s:workbench(1)
   call setreg('x', substitute(join(a:lines, ''), '\\<[^>]\+>', '\=eval("\"".submatch(0)."\"")', 'g'), 'c')
   normal! @x
 endfunction
 
 function! vader#window#result()
-  call s:workbench()
+  call s:workbench(0)
   return getline(1, line('$'))
 endfunction
 
@@ -103,7 +108,7 @@ function! vader#window#append(message, indent, ...)
 endfunction
 
 function! vader#window#prepare(lines, type)
-  call s:workbench()
+  call s:workbench(1)
   execute 'setlocal modifiable filetype='.a:type
 
   %d _

@@ -1,0 +1,22 @@
+Execute (Create temp file):
+  call system('echo hello > /tmp/hello')
+
+Given (File path):
+  /tmp/hello
+
+Do (Go to file):
+  gf
+
+Expect (Should see the content of the current buffer instead of workbench buffer):
+  hello
+
+Do (Vader should switch back to the workbench buffer):
+  yyp
+
+Expect (Modified workbench buffer):
+  /tmp/hello
+  /tmp/hello
+
+Execute (The buffer shouldn't have been modified):
+  AssertEqual 0, &modified
+
