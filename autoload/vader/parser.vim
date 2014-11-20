@@ -102,6 +102,7 @@ function! s:parse_vader(lines, line1)
   let buffer   = []
   let cases    = []
   let case     = { 'lnum': a:line1, 'comment': {}, 'pending': 0, 'raw': 0 }
+  let lnum     = 0
 
   for [lnum, line] in a:lines
     " Comment / separators
