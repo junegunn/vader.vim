@@ -105,7 +105,7 @@ function! vader#run(bang, ...) range
       execute 'silent !cat '.tmp.' 1>&2'
       call delete(tmp)
       if success + pending == total
-        qall
+        qall!
       else
         cq
       endif
