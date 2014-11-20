@@ -16,6 +16,7 @@ Include (Helpers):                       feature/helper.vader
 
 * Regressions
 Include (Macro set to linewise when it ends with <CR>): regression/characterwise-macro.vader
+Include (gf does not change buffer contents): regression/gf.vader
 
 Include: include/teardown.vader
 
