@@ -67,8 +67,8 @@ function! vader#window#open()
   let s:workbench_bfr = bufnr('')
 endfunction
 
-function! vader#window#execute(lines, lang_if)
-  call s:workbench(1)
+function! vader#window#execute(bfr, lines, lang_if)
+  call s:workbench(a:bfr)
   let temp = tempname()
   try
     if empty(a:lang_if)
@@ -85,8 +85,8 @@ function! vader#window#execute(lines, lang_if)
   endtry
 endfunction
 
-function! vader#window#replay(lines)
-  call s:workbench(1)
+function! vader#window#replay(bfr, lines)
+  call s:workbench(a:bfr)
   call setreg('x', substitute(join(a:lines, ''), '\\<[^>]\+>', '\=eval("\"".submatch(0)."\"")', 'g'), 'c')
   normal! @x
 endfunction

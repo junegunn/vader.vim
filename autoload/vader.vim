@@ -183,12 +183,14 @@ endfunction
 
 function! s:execute(prefix, type, block, lang_if)
   try
-    call vader#window#execute(a:block, a:lang_if)
+    call vader#window#execute(s:switch_back, a:block, a:lang_if)
     return 1
   catch
     call s:append(a:prefix, a:type, v:exception, 1)
     call s:print_throwpoint()
     return 0
+  finally
+    let s:switch_back = 0
   endtry
 endfunction
 
@@ -230,6 +232,7 @@ function! s:run(filename, cases)
     endif
     call vader#window#prepare(given, get(case, 'type', ''))
 
+    let s:switch_back = 1
     if !empty(before)
       let s:indent = 2
       let ok = ok && s:execute(prefix, 'before', before, '')
@@ -242,11 +245,13 @@ function! s:run(filename, cases)
     elseif has_key(case, 'do')
       call s:append(prefix, 'do', s:comment(case, 'do'))
       try
-        call vader#window#replay(case.do)
+        call vader#window#replay(s:switch_back, case.do)
       catch
         call s:append(prefix, 'do', v:exception, 1)
         call s:print_throwpoint()
         let ok = 0
+      finally
+        let s:switch_back = 0
       endtry
     endif
 
