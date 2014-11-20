@@ -109,7 +109,7 @@ endfunction
 
 function! vader#window#prepare(lines, type)
   call s:workbench(1)
-  execute 'setlocal modifiable filetype='.a:type
+  execute 'setlocal modifiable bufhidden=hide filetype='.a:type
 
   %d _
   for line in a:lines
