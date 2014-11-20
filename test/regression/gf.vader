@@ -1,0 +1,9 @@
+Given:
+  vimrc
+
+Do(gf):
+  gf
+
+Execute(check):
+  Assert expand('%:t') == 'vimrc'
+  Assert getline('.') != 'vimrc', "Content has not been changed to Given."
