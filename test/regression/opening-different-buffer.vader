@@ -20,3 +20,8 @@ Expect (Modified workbench buffer):
 Execute (The buffer shouldn't have been modified):
   AssertEqual 0, &modified
 
+Do (Go to file and back):
+  gf\<c-o>
+
+Expect(Should see the Given input):
+  /tmp/hello
