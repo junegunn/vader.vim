@@ -125,7 +125,7 @@ Execute [lang] [(comment)]:
 ```
 
 See Ruby and Python examples
-[here](https://github.com/junegunn/vader.vim/blob/master/test/feature/lang_if.vader).
+[here](https://github.com/junegunn/vader.vim/blob/master/test/feature/lang-if.vader).
 
 #### Expect
 

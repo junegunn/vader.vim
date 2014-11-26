@@ -177,7 +177,7 @@ interface with Execute block as follows:
 <
 See Ruby and Python examples {here}{2}.
 
-{2} https://github.com/junegunn/vader.vim/blob/master/test/feature/lang_if.vader
+{2} https://github.com/junegunn/vader.vim/blob/master/test/feature/lang-if.vader
 
 
 Expect~
