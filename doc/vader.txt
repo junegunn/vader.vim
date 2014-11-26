@@ -1,4 +1,4 @@
-vader.txt	vader	Last change: September 7 2014
+vader.txt	vader	Last change: November 27 2014
 VADER - TABLE OF CONTENTS                                      *vader* *vader-toc*
 ==============================================================================
 
@@ -55,22 +55,11 @@ INSTALLATION                                                *vader-installation*
 
 Use your favorite plugin manager.
 
- - {1}{Pathogen}
-     - `git clone https://github.com/junegunn/vader.vim.git ~/.vim/bundle/vader.vim`
- - {2}{Vundle}
-     1. Add `Bundle 'junegunn/vader.vim'` to .vimrc
-     2. Run `:BundleInstall`
- - {3}{NeoBundle}
-     1. Add `NeoBundle 'junegunn/vader.vim'` to .vimrc
-     2. Run `:NeoBundleInstall`
- - {4}{vim-plug}
-     1. Add `Plug 'junegunn/vader.vim'` to .vimrc
-     2. Run `:PlugInstall`
+ - {vim-plug}{1}
+   1. Add `Plug 'junegunn/vader.vim'` to .vimrc
+   2. Run `:PlugInstall`
 
-                                   {1} https://github.com/tpope/vim-pathogen
-                                   {2} https://github.com/gmarik/vundle
-                                   {3} https://github.com/Shougo/neobundle.vim
-                                   {4} https://github.com/junegunn/vim-plug
+                                      {1} https://github.com/junegunn/vim-plug
 
 
                                                                        *vader-2*
@@ -79,11 +68,13 @@ RUNNING VADER TESTS                                  *vader-running-vader-tests*
 
  - `Vader  [file glob ...]`
  - `Vader! [file glob ...]`
-     - Exit Vim after running the tests with exit status of 0 or 1
-         - `vim '+Vader!*' && echo Success || echo Failure`
-     - If the description of `Do` or `Execute` block includes `FIXME` or `TODO`,
-       the block is recognized as a pending test case and does not affect the
-       exit status.
+   - Exit Vim after running the tests with exit status of 0 or 1
+     - `vim '+Vader!*' && echo Success || echo Failure`
+       - (You need to pass `--nofork` option when using GVim)
+   - If the description of `Do` or `Execute` block includes `FIXME` or `TODO`,
+     the block is recognized as a pending test case and does not affect the
+     exit status.
+
 
                                                                        *vader-3*
 SYNTAX OF .VADER FILE                               *vader-syntax-of-vader-file*
@@ -94,17 +85,20 @@ label, such as `Execute:`, followed by the content of the block indented by 2
 spaces.
 
  - Given
-     - Content to fill the execution buffer
+   - Content to fill the execution buffer
  - Do
-     - Normal-mode keystrokes that can span multiple lines
+   - Normal-mode keystrokes that can span multiple lines
  - Execute
-     - Vimscript to execute
+   - Vimscript to execute
  - Expect
-     - Expected result of the preceding Do/Execute block
+   - Expected result of the preceding Do/Execute block
  - Before
-     - Vimscript to run before each test case
+   - Vimscript to run before each test case
  - After
-     - Vimscript to run after each test case
+   - Vimscript to run after each test case
+
+If you want to skip 2-space indention, end the block label with a semi-colon
+instead of a colon.
 
 
 < Basic blocks >______________________________________________________________~
@@ -117,7 +111,7 @@ Given~
                                                                    *vader-3-1-1*
 
 The content of a Given block is pasted into the "workbench buffer" for the
-subsequent Do/Execute blocks. If `filetype` parameter is given, `&filetype` of
+subsequent Do/Execute blocks. If `filetype` parameter is given, 'filetype' of
 the buffer is set accordingly. It is also used to syntax-highlight the block
 in .vader file.
 >
@@ -131,7 +125,7 @@ Do~
 
 The content of a Do block is a sequence of normal-mode keystrokes that can
 freely span multiple lines. A special key can be written in its name
-surrounded by angle brackets preceded by a backslash (e.g. `\<Enter>`).
+surrounded by angle brackets preceded by a backslash (e.g. \<Enter>).
 
 Do block can be followed by an optional Expect block.
 >
@@ -153,18 +147,27 @@ Execute block can also be followed by an optional Expect block.
 In Execute block, the following commands are provided.
 
  - Assertions
-     - `Assert <boolean expr>, [message]`
-     - `AssertEqual <expected>, <got>`
-     - `AssertNotEqual <unexpected>, <got>`
-     - `AssertThrows <expr>`
+   - Assert <boolean expr>, [message]
+   - AssertEqual <expected>, <got>
+   - AssertNotEqual <unexpected>, <got>
+   - AssertThrows <expr>
  - Other commands
-     - `Log "Message"`
-     - `Save <name>[, ...]`
-     - `Restore [<name>, ...]`
+   - `Log "Message"`
+   - Save <name>[, ...]
+   - Restore [<name>, ...]
 
-                                                                  *g:vader_file*
+The following syntax helper functions are provided:
 
-And the path of the current .vader file can be accessed via `g:vader_file`.
+ - `SyntaxAt`: return a string with the name of the syntax group at the following
+   position:
+   - `SyntaxAt()`: current cursor position
+   - `SyntaxAt(col)`: current cursor line, at given column
+   - `SyntaxAt(lnum, col)`: line and column
+ - `SyntaxOf(pattern[, nth=1])`: return a string with the name of the syntax
+   group at the first character of the nth match of the given pattern. Return
+   `''` if there was no match.
+
+The path of the current `.vader` file can be accessed via `g:vader_file`.
 
 In addition to plain Vimscript, you can also test Ruby/Python/Perl/Lua
 interface with Execute block as follows:
@@ -172,9 +175,9 @@ interface with Execute block as follows:
     Execute [lang] [(comment)]:
       [<lang> code]
 <
-See Ruby and Python examples {5}{here}.
+See Ruby and Python examples {here}{2}.
 
-   {5} https://github.com/junegunn/vader.vim/blob/master/example/lang_if.vader
+{2} https://github.com/junegunn/vader.vim/blob/master/test/feature/lang_if.vader
 
 
 Expect~
@@ -294,6 +297,13 @@ indentation is considered to be a comment and simply ignored.
         def a
           a = 1
         end
+
+    Given c (C file):
+      int i = 0;
+
+    Execute (syntax is good):
+      AssertEqual SyntaxAt(2), 'cType'
+      AssertEqual SyntaxOf('0'), 'cNumber'
 <
 
                                                                        *vader-4*
@@ -312,6 +322,7 @@ as follows:
     set rtp+=~/.vim/bundle/vim-markdown
     set rtp+=~/.vim/bundle/vim-markdown/after
     filetype plugin indent on
+    syntax enable
     EOF) +Vader*
 <
 
@@ -319,7 +330,7 @@ as follows:
 TRAVIS CI INTEGRATION                              *vader-travis-ci-integration*
 ==============================================================================
 
-To make your project tested on {6}{Travis CI}, you need to add `.travis.yml`
+To make your project tested on {Travis CI}{3}, you need to add `.travis.yml`
 to your project root. For most plugins the following example should suffice.
 >
     language: vim
@@ -334,50 +345,51 @@ to your project root. For most plugins the following example should suffice.
       set rtp+=.
       set rtp+=after
       filetype plugin indent on
+      syntax enable
       VIMRC) -c 'Vader! test/*' > /dev/null
 <
 (Note that `vim` is not a valid language for Travis CI. It just sets up Ruby
 execution environment instead as the default.)
 
-                                                     {6} https://travis-ci.org
+                                                     {3} https://travis-ci.org
 
 
 < Examples >__________________________________________________________________~
                                                                 *vader-examples*
                                                                      *vader-5-1*
 
- - {7}{Simple .travis.yml}
-     - {8}{Build result}
- - {9}{Advanced .travis.yml}
-     - Multiple dependencies
-     - Builds Vim from source
-     - {10}{Build result}
+ - {Simple .travis.yml}{4}
+   - {Build result}{5}
+ - {Advanced .travis.yml}{6}
+   - Multiple dependencies
+   - Builds Vim from source
+   - {Build result}{7}
 
-          {7} https://github.com/junegunn/seoul256.vim/blob/master/.travis.yml
-          {8} https://travis-ci.org/junegunn/seoul256.vim/builds/23905890
-          {9} https://github.com/junegunn/vim-oblique/blob/master/.travis.yml
-          {10} https://travis-ci.org/junegunn/vim-oblique/builds/25033116
+          {4} https://github.com/junegunn/seoul256.vim/blob/master/.travis.yml
+          {5} https://travis-ci.org/junegunn/seoul256.vim/builds/23905890
+          {6} https://github.com/junegunn/vim-oblique/blob/master/.travis.yml
+          {7} https://travis-ci.org/junegunn/vim-oblique/builds/25033116
 
 
                                                                        *vader-6*
 PROJECTS USING VADER                                *vader-projects-using-vader*
 ==============================================================================
 
- - {11}{vim-emoji}
- - {12}{seoul256.vim}
- - {13}{vim-easy-align}
- - {14}{vim-sneak}
- - {15}{simplenote.vim}
- - {16}{erlang-motions.vim}
- - {17}{vim-alt-mappings}
+ - {vim-emoji}{8}
+ - {seoul256.vim}{9}
+ - {vim-easy-align}{10}
+ - {vim-sneak}{11}
+ - {simplenote.vim}{12}
+ - {erlang-motions.vim}{13}
+ - {vim-alt-mappings}{14}
 
-              {11} https://github.com/junegunn/vim-emoji/tree/master/test
-              {12} https://github.com/junegunn/seoul256.vim/tree/master/test
-              {13} https://github.com/junegunn/vim-easy-align/tree/master/test
-              {14} https://github.com/justinmk/vim-sneak/tree/master/tests
-              {15} https://github.com/mrtazz/simplenote.vim/tree/master/tests
-              {16} https://github.com/edkolev/erlang-motions.vim
-              {17} https://github.com/bruno-/vim-alt-mappings
+              {8} https://github.com/junegunn/vim-emoji/tree/master/test
+              {9} https://github.com/junegunn/seoul256.vim/tree/master/test
+              {10} https://github.com/junegunn/vim-easy-align/tree/master/test
+              {11} https://github.com/justinmk/vim-sneak/tree/master/tests
+              {12} https://github.com/mrtazz/simplenote.vim/tree/master/tests
+              {13} https://github.com/edkolev/erlang-motions.vim
+              {14} https://github.com/bruno-/vim-alt-mappings
 
 
                                                                        *vader-7*
@@ -410,7 +422,7 @@ know if you find one.
                                         *vader-some-events-may-not-be-triggered*
                                                                      *vader-7-2*
 
-{18}{It is reported} that CursorMoved event is not triggered inside a Do
+{It is reported}{15} that CursorMoved event is not triggered inside a Do
 block. If you need to test a feature that involves autocommands on CursorMoved
 event, you have to manually invoke it in the middle of the block using
 `:doautocmd`.
@@ -419,7 +431,7 @@ event, you have to manually invoke it in the middle of the block using
       jjj
       :doautocmd CursorMoved\<CR>
 <
-                           {18} https://github.com/junegunn/vader.vim/issues/2
+                           {15} https://github.com/junegunn/vader.vim/issues/2
 
 
 < Search history may not be correctly updated >_______________________________~
@@ -474,3 +486,6 @@ LICENSE                                                          *vader-license*
 ==============================================================================
 
 MIT
+
+==============================================================================
+vim:tw=78:sw=2:ts=2:ft=help:norl:nowrap:
