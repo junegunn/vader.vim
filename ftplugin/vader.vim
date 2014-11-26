@@ -49,3 +49,5 @@ augroup vader_syntax
   " autocmd FileType <buffer> call vader#syntax#include(1, '$')
 augroup END
 
+" Integration with dispatch.vim.
+let b:dispatch = ':Vader'
