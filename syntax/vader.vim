@@ -49,12 +49,12 @@ syn match vaderSepSingle /^-.*/ contains=Todo
 syn match vaderSepAsterisk /^\*.*/ contains=Todo
 syn cluster vaderIgnored contains=vaderComment,vaderSepCaret,vaderSepTilde,vaderSepDouble,vaderSepSingle,vaderSepAsterisk
 
-syn region vaderGiven   start=/^Given\(\s*(.*)\)\?\s*:\s*$/   end=/\(^[^ ^#~=*-]\)\@=/ contains=vaderMessage,vaderText,@vaderIgnored nextgroup=@vaderTopLevel skipempty
-syn region vaderExpect  start=/^Expect\(\s*(.*)\)\?\s*:\s*$/  end=/\(^[^ ^#~=*-]\)\@=/ contains=vaderMessage,vaderText,@vaderIgnored nextgroup=@vaderTopLevel skipempty
-syn region vaderDo      start=/^Do\(\s*(.*)\)\?\s*:\s*$/      end=/\(^[^ ^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,@vaderIgnored nextgroup=@vaderTopLevel skipempty
-syn region vaderExecute start=/^Execute\(\s*(.*)\)\?\s*:\s*$/ end=/\(^[^ ^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,@vaderIgnored nextgroup=@vaderTopLevel skipempty
-syn region vaderBefore  start=/^Before\(\s*(.*)\)\?\s*:\s*$/  end=/\(^[^ ^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,@vaderIgnored nextgroup=@vaderTopLevel skipempty
-syn region vaderAfter   start=/^After\(\s*(.*)\)\?\s*:\s*$/   end=/\(^[^ ^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,@vaderIgnored nextgroup=@vaderTopLevel skipempty
+syn region vaderGiven   start=/^Given\(\s*(.*)\)\?\s*:\s*$/   end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderText,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
+syn region vaderExpect  start=/^Expect\(\s*(.*)\)\?\s*:\s*$/  end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderText,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
+syn region vaderDo      start=/^Do\(\s*(.*)\)\?\s*:\s*$/      end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
+syn region vaderExecute start=/^Execute\(\s*(.*)\)\?\s*:\s*$/ end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
+syn region vaderBefore  start=/^Before\(\s*(.*)\)\?\s*:\s*$/  end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
+syn region vaderAfter   start=/^After\(\s*(.*)\)\?\s*:\s*$/   end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
 
 execute printf('syn region vaderGivenRaw   start=/^Given\(\s*(.*)\)\?\s*;\s*$/   end=/%s/ contains=vaderMessage,vaderTextRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
 execute printf('syn region vaderExpectRaw  start=/^Expect\(\s*(.*)\)\?\s*;\s*$/  end=/%s/ contains=vaderMessage,vaderTextRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
