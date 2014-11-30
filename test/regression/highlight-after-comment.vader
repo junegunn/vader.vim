@@ -1,0 +1,16 @@
+* https://github.com/junegunn/vader.vim/pull/44
+Given vader (Vader file with interleaved comments):
+  Execute:
+    echom 'foo'
+  " Vader comment (w/o indentation)
+    echom 'bar'
+    " Vimscript comment
+    echom 'foobar'
+
+Execute (Check syntax):
+  AssertEqual 'vimCommand',     SyntaxAt(2, 3)
+  AssertEqual 'vaderComment',   SyntaxAt(3, 1)
+  AssertEqual 'vaderComment',   SyntaxAt(3, 3)
+  AssertEqual 'vimCommand',     SyntaxAt(4, 3)
+  AssertEqual 'vimLineComment', SyntaxAt(5, 3)
+  AssertEqual 'vimCommand',     SyntaxAt(6, 3)
