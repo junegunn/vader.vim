@@ -294,17 +294,6 @@ execution environment instead as the default.)
     - Builds Vim from source
     - [Build result](https://travis-ci.org/junegunn/vim-oblique/builds/25033116)
 
-Projects using Vader
---------------------
-
-- [vim-emoji](https://github.com/junegunn/vim-emoji/tree/master/test)
-- [seoul256.vim](https://github.com/junegunn/seoul256.vim/tree/master/test)
-- [vim-easy-align](https://github.com/junegunn/vim-easy-align/tree/master/test)
-- [vim-sneak](https://github.com/justinmk/vim-sneak/tree/master/tests)
-- [simplenote.vim](https://github.com/mrtazz/simplenote.vim/tree/master/tests)
-- [erlang-motions.vim](https://github.com/edkolev/erlang-motions.vim)
-- [vim-alt-mappings](https://github.com/bruno-/vim-alt-mappings)
-
 Known issues
 ------------
 
