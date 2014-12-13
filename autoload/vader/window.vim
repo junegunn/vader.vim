@@ -29,6 +29,8 @@ let s:workbench_bfr = 0
 
 function! s:console()
   execute 'normal! '.s:console_tab.'gt'
+  call append(line('$') - 1, s:console_buffered)
+  let s:console_buffered = []
 endfunction
 
 function! s:workbench(bfr)
@@ -56,6 +58,7 @@ function! vader#window#open()
   silent f \[Vader\]
   let s:console_tab = tabpagenr()
   let s:console_bfr = bufnr('')
+  let s:console_buffered = []
   let b:vader_data = {}
   nnoremap <silent> <buffer> <CR> :call <SID>action(line('.'))<CR>
 
@@ -97,14 +100,12 @@ function! vader#window#result()
 endfunction
 
 function! vader#window#append(message, indent, ...)
-  call s:console()
   let message = repeat('  ', a:indent) . a:message
   if get(a:, 1, 1)
     let message = substitute(message, '\s*$', '', '')
   endif
-  let curr = line('$')
-  call append(curr - 1, message)
-  return curr
+  call add(s:console_buffered, message)
+  return len(s:console_buffered)
 endfunction
 
 function! vader#window#prepare(lines, type)
