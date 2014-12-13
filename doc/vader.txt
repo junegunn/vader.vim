@@ -1,4 +1,4 @@
-vader.txt	vader	Last change: November 27 2014
+vader.txt	vader	Last change: December 13 2014
 VADER - TABLE OF CONTENTS                                      *vader* *vader-toc*
 ==============================================================================
 
@@ -147,9 +147,9 @@ Execute block can also be followed by an optional Expect block.
 In Execute block, the following commands are provided.
 
  - Assertions
-   - Assert <boolean expr>, [message]
-   - AssertEqual <expected>, <got>
-   - AssertNotEqual <unexpected>, <got>
+   - Assert <boolean expr>[, message]
+   - AssertEqual <expected>, <got>[, message]
+   - AssertNotEqual <unexpected>, <got>[, message]
    - AssertThrows <expr>
  - Other commands
    - `Log "Message"`
@@ -166,6 +166,8 @@ The following syntax helper functions are provided:
  - `SyntaxOf(pattern[, nth=1])`: return a string with the name of the syntax
    group at the first character of the nth match of the given pattern. Return
    `''` if there was no match.
+
+                                                                  *g:vader_file*
 
 The path of the current `.vader` file can be accessed via `g:vader_file`.
 

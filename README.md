@@ -94,9 +94,9 @@ Execute [(comment)]:
 In Execute block, the following commands are provided.
 
 - Assertions
-    - `Assert <boolean expr>, [message]`
-    - `AssertEqual <expected>, <got>`
-    - `AssertNotEqual <unexpected>, <got>`
+    - `Assert <boolean expr>[, message]`
+    - `AssertEqual <expected>, <got>[, message]`
+    - `AssertNotEqual <unexpected>, <got>[, message]`
     - `AssertThrows <expr>`
 - Other commands
     - `Log "Message"`
