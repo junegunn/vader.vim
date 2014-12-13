@@ -1,0 +1,10 @@
+Before:
+  tabnew
+After:
+  tabclose!
+Execute (buftype in new tabpage):
+  AssertEqual &buftype, ''
+
+# Cleanup
+Before:
+After:

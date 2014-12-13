@@ -27,21 +27,15 @@ let s:console_tab   = 0
 let s:workbench_tab = 0
 let s:workbench_bfr = 0
 
-function! s:console()
+function! s:switch_to_console()
   execute 'normal! '.s:console_tab.'gt'
   call append(line('$') - 1, s:console_buffered)
   let s:console_buffered = []
 endfunction
 
-function! s:workbench(bfr)
+function! s:switch_to_workbench()
   execute 'normal! '.s:workbench_tab.'gt'
-  if a:bfr
-    execute 'b' s:workbench_bfr
-  endif
-endfunction
-
-function! vader#window#workbench()
-  call s:workbench(0)
+  execute 'b' s:workbench_bfr
 endfunction
 
 function! vader#window#open()
@@ -70,8 +64,7 @@ function! vader#window#open()
   let s:workbench_bfr = bufnr('')
 endfunction
 
-function! vader#window#execute(bfr, lines, lang_if)
-  call s:workbench(a:bfr)
+function! vader#window#execute(lines, lang_if)
   let temp = tempname()
   try
     if empty(a:lang_if)
@@ -88,14 +81,12 @@ function! vader#window#execute(bfr, lines, lang_if)
   endtry
 endfunction
 
-function! vader#window#replay(bfr, lines)
-  call s:workbench(a:bfr)
+function! vader#window#replay(lines)
   call setreg('x', substitute(join(a:lines, ''), '\\<[^>]\+>', '\=eval("\"".submatch(0)."\"")', 'g'), 'c')
   normal! @x
 endfunction
 
 function! vader#window#result()
-  call s:workbench(0)
   return getline(1, line('$'))
 endfunction
 
@@ -109,7 +100,7 @@ function! vader#window#append(message, indent, ...)
 endfunction
 
 function! vader#window#prepare(lines, type)
-  call s:workbench(1)
+  call s:switch_to_workbench()
   execute 'setlocal modifiable filetype='.a:type
 
   %d _
@@ -123,7 +114,7 @@ endfunction
 
 function! vader#window#cleanup()
   silent! bd \[Vader-workbench\]
-  call s:console()
+  call s:switch_to_console()
   setlocal nomodifiable
   nnoremap <silent> <buffer> q :tabclose<CR>
   normal! Gzb

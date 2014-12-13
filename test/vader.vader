@@ -17,6 +17,9 @@ Include (Helpers):                       feature/helper.vader
 * Regressions
 Include (Macro set to linewise when it ends with <CR>): regression/characterwise-macro.vader
 Include (Should switch back to workbench buffer): regression/opening-different-buffer.vader
+Include (Should clear filetype on Given block w/o filetype): regression/filetype.vader
+Include (#44 Vader comment starting with " should not break syntax highlighting): regression/highlight-after-comment.vader
+Include (#46 Vader should switch back to workbench buffer only once): regression/buffer-switch-only-once.vader
 
 Include: include/teardown.vader
 
