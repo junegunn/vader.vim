@@ -11,6 +11,12 @@ Execute (FIXME: AssertThrows expects an exception to be thrown):
 Execute (FIXME: Optional message parameter to Assert command):
   Assert 1 == 2, '1 is not equal to 2'
 
+Execute (FIXME: Optional message parameter to AssertEqual):
+  AssertEqual 1, 2, '1 != 2'
+
+Execute (FIXME: Optional message parameter to AssertNotEqual):
+  AssertNotEqual 1, 1, '1 == 2'
+
 Execute (Save global option values before changing them):
   Save &expandtab, &tabstop
   set expandtab shiftwidth=2

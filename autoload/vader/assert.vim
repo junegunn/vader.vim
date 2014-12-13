@@ -50,21 +50,23 @@ function! vader#assert#true(...)
   return 1
 endfunction
 
-function! vader#assert#equal(exp, got)
+function! vader#assert#equal(...)
+  let [exp, got] = a:000[0:1]
   let s:assertions[1] += 1
 
-  if a:exp !=# a:got
-    throw printf("%s should be equal to %s", string(a:got), string(a:exp))
+  if exp !=# got
+    throw get(a:000, 2, printf("%s should be equal to %s", string(got), string(exp)))
   endif
   let s:assertions[0] += 1
   return 1
 endfunction
 
-function! vader#assert#not_equal(exp, got)
+function! vader#assert#not_equal(...)
+  let [exp, got] = a:000[0:1]
   let s:assertions[1] += 1
 
-  if a:exp ==# a:got
-    throw printf("%s should not be equal to %s", string(a:got), string(a:exp))
+  if exp ==# got
+    throw get(a:000, 2, printf("%s should not be equal to %s", string(got), string(exp)))
   endif
   let s:assertions[0] += 1
   return 1
