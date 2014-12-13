@@ -294,6 +294,11 @@ execution environment instead as the default.)
     - Builds Vim from source
     - [Build result](https://travis-ci.org/junegunn/vim-oblique/builds/25033116)
 
+Projects using Vader
+--------------------
+
+See [the wiki page](https://github.com/junegunn/vader.vim/wiki/Projects-using-Vader).
+
 Known issues
 ------------
 

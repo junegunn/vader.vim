@@ -23,11 +23,12 @@ VADER - TABLE OF CONTENTS                                      *vader* *vader-to
     Setting up isolated testing environment                      |vader-4|
     Travis CI integration                                        |vader-5|
       Examples                                                   |vader-5-1|
-    Known issues                                                 |vader-6|
-      feedkeys() cannot be tested                                |vader-6-1|
-      Some events may not be triggered                           |vader-6-2|
-      Search history may not be correctly updated                |vader-6-3|
-    License                                                      |vader-7|
+    Projects using Vader                                         |vader-6|
+    Known issues                                                 |vader-7|
+      feedkeys() cannot be tested                                |vader-7-1|
+      Some events may not be triggered                           |vader-7-2|
+      Search history may not be correctly updated                |vader-7-3|
+    License                                                      |vader-8|
 
 
 VADER.VIM                                                            *vader-vim*
@@ -373,13 +374,22 @@ execution environment instead as the default.)
 
 
                                                                        *vader-6*
+PROJECTS USING VADER                                *vader-projects-using-vader*
+==============================================================================
+
+See {the wiki page}{8}.
+
+           {8} https://github.com/junegunn/vader.vim/wiki/Projects-using-Vader
+
+
+                                                                       *vader-7*
 KNOWN ISSUES                                                *vader-known-issues*
 ==============================================================================
 
 
 < feedkeys() cannot be tested >_______________________________________________~
                                                *vader-feedkeys-cannot-be-tested*
-                                                                     *vader-6-1*
+                                                                     *vader-7-1*
 
 The keystrokes given to the feedkeys() function are consumed only after Vader
 finishes executing the content of the Do/Execute block. Take the following
@@ -400,9 +410,9 @@ know if you find one.
 
 < Some events may not be triggered >__________________________________________~
                                         *vader-some-events-may-not-be-triggered*
-                                                                     *vader-6-2*
+                                                                     *vader-7-2*
 
-{It is reported}{8} that CursorMoved event is not triggered inside a Do block.
+{It is reported}{9} that CursorMoved event is not triggered inside a Do block.
 If you need to test a feature that involves autocommands on CursorMoved event,
 you have to manually invoke it in the middle of the block using `:doautocmd`.
 >
@@ -410,12 +420,12 @@ you have to manually invoke it in the middle of the block using `:doautocmd`.
       jjj
       :doautocmd CursorMoved\<CR>
 <
-                            {8} https://github.com/junegunn/vader.vim/issues/2
+                            {9} https://github.com/junegunn/vader.vim/issues/2
 
 
 < Search history may not be correctly updated >_______________________________~
                              *vader-search-history-may-not-be-correctly-updated*
-                                                                     *vader-6-3*
+                                                                     *vader-7-3*
 
 This is likely a bug of Vim itself. For some reason, search history is not
 correctly updated when searches are performed inside a Do block. The following
@@ -460,7 +470,7 @@ The result is given as follows:
     Elapsed time: 0.366118 sec.
 <
 
-                                                                       *vader-7*
+                                                                       *vader-8*
 LICENSE                                                          *vader-license*
 ==============================================================================
 
