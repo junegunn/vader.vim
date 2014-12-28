@@ -38,7 +38,7 @@ function! vader#syntax#include(l1, l2)
 endfunction
 
 function! vader#syntax#_head()
-  return '\(\(^\(Given\|Expect\|Do\|Execute\|Before\|After\)\(\s\+[^:;(]\+\)\?\s*\((.*)\)\?\s*[:;]\s*$\)\|\(^Include\(\s*(.*)\)\?\s*:\)\)\@='
+  return '\(\(^\(Given\|Expect\|Do\|Execute\|Then\|Before\|After\)\(\s\+[^:;(]\+\)\?\s*\((.*)\)\?\s*[:;]\s*$\)\|\(^Include\(\s*(.*)\)\?\s*:\)\)\@='
 endfunction
 
 function! s:load(type)

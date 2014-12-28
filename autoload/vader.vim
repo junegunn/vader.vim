@@ -100,10 +100,7 @@ function! vader#run(bang, ...) range
       silent version
       redir END
 
-      let tmp = tempname()
-      call writefile(extend(split(ver, '\n'), split(g:vader_report, '\n')), tmp)
-      execute 'silent !cat '.tmp.' 1>&2'
-      call delete(tmp)
+      call s:print_stderr(ver . "\n\n" . g:vader_report)
       if success + pending == total
         qall!
       else
@@ -112,12 +109,26 @@ function! vader#run(bang, ...) range
     elseif !empty(qfl)
       call vader#window#copen()
     endif
+  catch
+    if a:bang
+      call s:print_stderr(v:exception)
+      cq
+    else
+      echoerr v:exception
+    endif
   finally
     call s:cleanup()
   endtry
 endfunction
 
-function s:split_args(arg)
+function! s:print_stderr(output)
+  let tmp = tempname()
+  call writefile(split(a:output, '\n'), tmp)
+  execute 'silent !cat '.tmp.' 1>&2'
+  call delete(tmp)
+endfunction
+
+function! s:split_args(arg)
   let varnames = split(a:arg, ',')
   let names = []
   for varname in varnames
@@ -129,12 +140,12 @@ function s:split_args(arg)
   return names
 endfunction
 
-function vader#log(msg)
+function! vader#log(msg)
   let msg = type(a:msg) == 1 ? a:msg : string(a:msg)
   call vader#window#append('> ' . msg, s:indent)
 endfunction
 
-function vader#save(args)
+function! vader#save(args)
   for varname in s:split_args(a:args)
     if exists(varname)
       let s:register[varname] = eval(varname)
@@ -142,7 +153,7 @@ function vader#save(args)
   endfor
 endfunction
 
-function vader#restore(args)
+function! vader#restore(args)
   let varnames = s:split_args(a:args)
   for varname in empty(varnames) ? keys(s:register) : varnames
     if has_key(s:register, varname)
@@ -201,6 +212,7 @@ function! s:run(filename, cases)
   let given = []
   let before = []
   let after = []
+  let then = []
   let comment = { 'given': '', 'before': '', 'after': '' }
   let total = len(a:cases)
   let just  = len(string(total))
@@ -217,7 +229,7 @@ function! s:run(filename, cases)
     let ok = 1
     let prefix = printf('(%'.just.'d/%'.just.'d)', cnt, total)
 
-    for label in ['given', 'before', 'after']
+    for label in ['given', 'before', 'after', 'then']
       if has_key(case, label)
         execute 'let '.label.' = case[label]'
         let comment[label] = get(case.comment, label, '')
@@ -254,6 +266,11 @@ function! s:run(filename, cases)
       let ok = ok && s:execute(prefix, 'after', after, '')
     endif
 
+    if has_key(case, 'then')
+      call s:append(prefix, 'then', s:comment(case, 'then'))
+      let ok = ok && s:execute(prefix, 'then', then, '')
+    endif
+
     if has_key(case, 'expect')
       let result = vader#window#result()
       let match = case.expect ==# result
@@ -282,7 +299,8 @@ function! s:run(filename, cases)
       let description = join(filter([
             \ comment.given,
             \ get(case.comment, 'do', get(case.comment, 'execute', '')),
-            \ get(case.comment, 'expect', '')], '!empty(v:val)'), ' - ') .
+            \ get(case.comment, 'then', ''),
+            \ get(case.comment, 'expect', '')], '!empty(v:val)'), ' / ') .
             \ ' (#'.s:error_line.')'
       call add(qfl, { 'type': 'E', 'filename': a:filename, 'lnum': case.lnum, 'text': description })
     endif

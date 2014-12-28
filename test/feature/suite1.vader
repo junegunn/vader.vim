@@ -35,6 +35,8 @@ Expect ruby (Expect block content should match the result of previous Do block):
     a = 1
   end
 
+Do (FIXME: Nothing):
+
 Expect ruby (Previous Given block is repeated, thus this should fail):
   def b
     a = 1

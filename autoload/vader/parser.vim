@@ -25,8 +25,15 @@ function! vader#parser#parse(fn, line1, line2)
   return s:parse_vader(s:read_vader(a:fn, a:line1, a:line2), a:line1)
 endfunction
 
-function! s:flush_buffer(cases, case, lnum, raw, label, newlabel, buffer, final)
-  if !empty(a:label)
+function! s:flush_buffer(cases, case, fn, lnum, raw, label, newlabel, buffer, final)
+  let is_validation = index(['then', 'expect'], a:newlabel) >= 0
+  let fpos = a:fn.':'.a:lnum
+
+  if empty(a:label)
+    if is_validation
+      echoerr 'Expect/Then should not appear before Do/Execute ('.fpos.')'
+    endif
+  else
     let rev = reverse(copy(a:buffer))
     while len(rev) > 0 && empty(rev[0])
       call remove(rev, 0)
@@ -38,11 +45,19 @@ function! s:flush_buffer(cases, case, lnum, raw, label, newlabel, buffer, final)
       call remove(a:buffer, 0, -1)
     endif
 
-    let filled = has_key(a:case, 'do') || has_key(a:case, 'execute')
+    let fulfilled = has_key(a:case, 'do') || has_key(a:case, 'execute')
+    if is_validation
+      if !fulfilled
+        echoerr 'Expect/Then should not appear before Do/Execute ('.fpos.')'
+      endif
+      if has_key(a:case, a:newlabel)
+        echoerr 'Expect/Then should appear only once for each Do/Execute ('.fpos.')'
+      endif
+    endif
+
     if a:final ||
-     \ a:label == 'expect' ||
      \ a:newlabel == 'given' ||
-     \ index(['before', 'after', 'do', 'execute'], a:newlabel) >= 0 && filled
+     \ index(['before', 'after', 'do', 'execute'], a:newlabel) >= 0 && fulfilled
       call add(a:cases, deepcopy(a:case))
       let new = { 'comment': {}, 'lnum': a:lnum, 'pending': 0 }
       if !empty(get(a:case, 'type', ''))
@@ -83,7 +98,7 @@ function! s:read_vader(fn, line1, line2)
       continue
     end
 
-    call add(lines, [lnum, line])
+    call add(lines, [a:fn, lnum, line])
     if reserved > 0
       let reserved -= 1
     end
@@ -104,18 +119,18 @@ function! s:parse_vader(lines, line1)
   let case     = { 'lnum': a:line1, 'comment': {}, 'pending': 0, 'raw': 0 }
   let lnum     = 0
 
-  for [lnum, line] in a:lines
+  for [fn, lnum, line] in a:lines
     " Comment / separators
     if !case.raw && line =~ '^[#"=~*^-]'
       continue
     endif
 
     let matched = 0
-    for l in ['Before', 'After', 'Given', 'Execute', 'Expect', 'Do']
+    for l in ['Before', 'After', 'Given', 'Execute', 'Expect', 'Do', 'Then']
       let m = matchlist(line, '^'.l.'\%(\s\+\([^:;(]\+\)\)\?\s*\%((\(.*\))\)\?\s*\([:;]\)\s*$')
       if !empty(m)
         let newlabel = tolower(l)
-        call s:flush_buffer(cases, case, lnum, m[3] == ';', label, newlabel, buffer, 0)
+        call s:flush_buffer(cases, case, fn, lnum, m[3] == ';', label, newlabel, buffer, 0)
 
         let label   = newlabel
         let arg     = m[1]
@@ -148,7 +163,7 @@ function! s:parse_vader(lines, line1)
       call add(buffer, line)
     endif
   endfor
-  call s:flush_buffer(cases, case, lnum, case.raw, label, '', buffer, 1)
+  call s:flush_buffer(cases, case, fn, lnum, case.raw, label, '', buffer, 1)
 
   let ret = []
   let prev = {}

@@ -52,6 +52,7 @@ syn cluster vaderIgnored contains=vaderComment,vaderSepCaret,vaderSepTilde,vader
 syn region vaderGiven   start=/^Given\(\s*(.*)\)\?\s*:\s*$/   end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderText,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
 syn region vaderExpect  start=/^Expect\(\s*(.*)\)\?\s*:\s*$/  end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderText,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
 syn region vaderDo      start=/^Do\(\s*(.*)\)\?\s*:\s*$/      end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
+syn region vaderThen    start=/^Then\(\s*(.*)\)\?\s*:\s*$/    end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
 syn region vaderExecute start=/^Execute\(\s*(.*)\)\?\s*:\s*$/ end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
 syn region vaderBefore  start=/^Before\(\s*(.*)\)\?\s*:\s*$/  end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
 syn region vaderAfter   start=/^After\(\s*(.*)\)\?\s*:\s*$/   end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
@@ -59,12 +60,13 @@ syn region vaderAfter   start=/^After\(\s*(.*)\)\?\s*:\s*$/   end=/\(^[^ "^#~=*-
 execute printf('syn region vaderGivenRaw   start=/^Given\(\s*(.*)\)\?\s*;\s*$/   end=/%s/ contains=vaderMessage,vaderTextRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
 execute printf('syn region vaderExpectRaw  start=/^Expect\(\s*(.*)\)\?\s*;\s*$/  end=/%s/ contains=vaderMessage,vaderTextRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
 execute printf('syn region vaderDoRaw      start=/^Do\(\s*(.*)\)\?\s*;\s*$/      end=/%s/ contains=vaderMessage,vaderCommandRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
+execute printf('syn region vaderThenRaw    start=/^Then\(\s*(.*)\)\?\s*;\s*$/    end=/%s/ contains=vaderMessage,vaderCommandRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
 execute printf('syn region vaderExecuteRaw start=/^Execute\(\s*(.*)\)\?\s*;\s*$/ end=/%s/ contains=vaderMessage,vaderCommandRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
 execute printf('syn region vaderBeforeRaw  start=/^Before\(\s*(.*)\)\?\s*;\s*$/  end=/%s/ contains=vaderMessage,vaderCommandRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
 execute printf('syn region vaderAfterRaw   start=/^After\(\s*(.*)\)\?\s*;\s*$/   end=/%s/ contains=vaderMessage,vaderCommandRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
 
 syn match vaderInclude /^Include\(\s*(.*)\)\?\s*:/ contains=vaderMessage
-syn cluster vaderTopLevel contains=vaderGiven,vaderExpect,vaderDo,vaderExpect,vaderBefore,vaderAfter,vaderExpectRaw,vaderDoRaw,vaderExpectRaw,vaderBeforeRaw,vaderAfterRaw,vaderInclude
+syn cluster vaderTopLevel contains=vaderGiven,vaderExpect,vaderDo,vaderText,vaderExpect,vaderBefore,vaderAfter,vaderExpectRaw,vaderDoRaw,vaderThenRaw,vaderExpectRaw,vaderBeforeRaw,vaderAfterRaw,vaderInclude
 
 syn keyword Todo TODO FIXME XXX TBD
 
@@ -77,6 +79,8 @@ hi def link vaderAfter       Special
 hi def link vaderAfterRaw    Special
 hi def link vaderDo          PreProc
 hi def link vaderDoRaw       PreProc
+hi def link vaderThen        Conditional
+hi def link vaderThenRaw     Conditional
 hi def link vaderExecute     Statement
 hi def link vaderExecuteRaw  Statement
 hi def link vaderExecuteType Identifier
