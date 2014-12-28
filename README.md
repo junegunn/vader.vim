@@ -43,6 +43,8 @@ spaces.
     - Normal-mode keystrokes that can span multiple lines
 - Execute
     - Vimscript to execute
+- Then
+    - Vimscript to run after Do or Execute block. Used for assertions.
 - Expect
     - Expected result of the preceding Do/Execute block
 - Before
@@ -126,6 +128,16 @@ Execute [lang] [(comment)]:
 
 See Ruby and Python examples
 [here](https://github.com/junegunn/vader.vim/blob/master/test/feature/lang-if.vader).
+
+#### Then
+
+A Then block containing Vimscript can follow a Do or an Execute block. Mostly
+used for assertions. Can be used in conjunction with an Expect block.
+
+```
+Then [(comment)]:
+  [vimscript]
+```
 
 #### Expect
 

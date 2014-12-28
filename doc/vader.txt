@@ -1,10 +1,10 @@
-vader.txt	vader	Last change: December 13 2014
+vader.txt	vader	Last change: December 28 2014
 VADER - TABLE OF CONTENTS                                      *vader* *vader-toc*
 ==============================================================================
 
   vader.vim
-      Vader test cases                                           |vader-0-1|
-      Vader result                                               |vader-0-2|
+      Vader test cases
+      Vader result
     Installation                                                 |vader-1|
     Running Vader tests                                          |vader-2|
     Syntax of .vader file                                        |vader-3|
@@ -12,7 +12,8 @@ VADER - TABLE OF CONTENTS                                      *vader* *vader-to
         Given                                                    |vader-3-1-1|
         Do                                                       |vader-3-1-2|
         Execute                                                  |vader-3-1-3|
-        Expect                                                   |vader-3-1-4|
+        Then                                                     |vader-3-1-4|
+        Expect                                                   |vader-3-1-5|
       Hooks                                                      |vader-3-2|
         Before                                                   |vader-3-2-1|
         After                                                    |vader-3-2-2|
@@ -39,13 +40,13 @@ I use Vader to test Vimscript.
 
 < Vader test cases >__________________________________________________________~
                                                               *vader-test-cases*
-                                                                     *vader-0-1*
+
 https://raw.github.com/junegunn/i/master/vader.png
 
 
 < Vader result >______________________________________________________________~
                                                                   *vader-result*
-                                                                     *vader-0-2*
+
 https://raw.github.com/junegunn/i/master/vader-result.png
 
 
@@ -90,6 +91,8 @@ spaces.
    - Normal-mode keystrokes that can span multiple lines
  - Execute
    - Vimscript to execute
+ - Then
+   - Vimscript to run after Do or Execute block. Used for assertions.
  - Expect
    - Expected result of the preceding Do/Execute block
  - Before
@@ -182,9 +185,20 @@ See Ruby and Python examples {here}{2}.
 {2} https://github.com/junegunn/vader.vim/blob/master/test/feature/lang-if.vader
 
 
+Then~
+                                                                    *vader-then*
+                                                                   *vader-3-1-4*
+
+A Then block containing Vimscript can follow a Do or an Execute block. Mostly
+used for assertions. Can be used in conjunction with an Expect block.
+>
+    Then [(comment)]:
+      [vimscript]
+<
+
 Expect~
                                                                   *vader-expect*
-                                                                   *vader-3-1-4*
+                                                                   *vader-3-1-5*
 
 If an Expect block follows an Execute block or a Do block, the result of the
 preceding block is compared to the content of the Expect block. Comparison is
