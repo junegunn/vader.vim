@@ -1,4 +1,4 @@
-" Copyright (c) 2013 Junegunn Choi
+" Copyright (c) 2015 Junegunn Choi
 "
 " MIT License
 "
@@ -32,8 +32,8 @@ function! vader#run(bang, ...) range
   let s:error_line = 0
 
   if a:lastline - a:firstline > 0
-    if a:0 > 0
-      echoerr 'Range and file arguments are mutually exclusive'
+    if a:0 > 1
+      echoerr "You can't apply range on multiple files"
       return
     endif
     let [line1, line2] = [a:firstline, a:lastline]

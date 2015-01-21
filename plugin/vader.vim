@@ -1,4 +1,4 @@
-" Copyright (c) 2013 Junegunn Choi
+" Copyright (c) 2015 Junegunn Choi
 "
 " MIT License
 "
@@ -25,4 +25,12 @@ if exists(":Vader")
   finish
 endif
 
-command! -bang -nargs=* -range -complete=file Vader <line1>,<line2>call vader#run('<bang>' == '!', <f-args>)
+function s:vader(...) range
+  if a:lastline - a:firstline > 0 && a:0 > 1
+    echoerr 'Range and file arguments are mutually exclusive'
+    return
+  endif
+  execute printf("%d,%dcall vader#run(%s)", a:firstline, a:lastline, string(a:000)[1:-2])
+endfunction
+
+command! -bang -nargs=* -range -complete=file Vader <line1>,<line2>call s:vader(<bang>0, <f-args>)
