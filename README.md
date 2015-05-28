@@ -260,7 +260,7 @@ the test. The simplest way to achieve this is to start Vim with a mini
 .vimrc as follows:
 
 ```sh
-HOME=/dev/null vim -Nu <(cat << EOF
+vim -Nu <(cat << EOF
 filetype off
 set rtp+=~/.vim/bundle/vader.vim
 set rtp+=~/.vim/bundle/vim-markdown
@@ -284,7 +284,7 @@ before_script: |
   git clone https://github.com/junegunn/vader.vim.git
 
 script: |
-  HOME=/dev/null vim -Nu <(cat << VIMRC
+  vim -Nu <(cat << VIMRC
   filetype off
   set rtp+=vader.vim
   set rtp+=.
