@@ -71,9 +71,19 @@ function! vader#run(bang, ...) range
     call vader#window#append(
     \ printf("Starting Vader: %d suite(s), %d case(s)", len(all_cases), total), 0)
 
+    let tap_report = []
+    call add(tap_report, "1..".total)
+
+    let pos = 1
     for pair in all_cases
       let [fn, case] = pair
       let [cs, cp, ct, lqfl] = s:run(fn, case)
+      call add(tap_report, (cs ? "" : "not " ) . "ok " . pos . " - " .
+               \ get(case[0].comment, 'given',
+               \ get(case[0].comment, 'expect',
+               \ get(case[0].comment, 'then')
+               \ )))
+      let pos += 1
       let success += cs
       let pending += cp
       call extend(qfl, lqfl)
@@ -101,6 +111,9 @@ function! vader#run(bang, ...) range
       redir END
 
       call s:print_stderr(ver . "\n\n" . g:vader_report)
+      
+      call s:print_tofile(join(tap_report, "\n"), "tapreport.log")
+
       if success + pending == total
         qall!
       else
@@ -122,9 +135,13 @@ function! vader#run(bang, ...) range
 endfunction
 
 function! s:print_stderr(output)
+   call s:print_tofile(a:output, '&2')
+endfunction
+
+function! s:print_tofile(output, file)
   let tmp = tempname()
   call writefile(split(a:output, '\n'), tmp)
-  execute 'silent !cat '.tmp.' 1>&2'
+  execute 'silent !cat '.tmp.' 1>'.a:file
   call delete(tmp)
 endfunction
 
