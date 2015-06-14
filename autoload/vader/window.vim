@@ -82,8 +82,26 @@ function! vader#window#execute(lines, lang_if)
 endfunction
 
 function! vader#window#replay(lines)
-  call setreg('x', substitute(join(a:lines, ''), '\\<[^>]\+>', '\=eval("\"".submatch(0)."\"")', 'g'), 'c')
+  call setreg('x', substitute(join(a:lines, ''), '\\<[^>]\+>', '\=EvalSpecial(submatch(0))', 'g'), 'c')
   normal! @x
+endfunction
+
+function! EvalSpecial(key)
+  if (a:key == "\\<Leader>")
+    if(exists("mapleader"))
+      return g:mapleader
+    else
+      throw "Leader is not defined"
+    endif
+  elseif (a:key == "\\<LocalLeader>")
+    if(exists("maplocalleader"))
+      return g:maplocalleader
+    else
+      throw "LocalLeader is not defined"
+    endif
+  else
+    return eval("\"".a:key."\"")
+  endif
 endfunction
 
 function! vader#window#result()
