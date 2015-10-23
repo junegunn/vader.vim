@@ -28,6 +28,19 @@ let g:loaded_vader = 1
 let s:register = {}
 let s:indent = 2
 
+function! s:set(var, default)
+  if !exists(a:var)
+    if type(a:default)
+      execute 'let' a:var '=' string(a:default)
+    else
+      execute 'let' a:var '=' a:default
+    endif
+  endif
+endfunction
+
+call s:set('g:vader_show_version', 1)
+
+
 function! vader#run(bang, ...) range
   let s:error_line = 0
 
@@ -96,11 +109,14 @@ function! vader#run(bang, ...) range
     call setqflist(qfl)
 
     if a:bang
-      redir => ver
-      silent version
-      redir END
+      if g:vader_show_version == 1
+        redir => ver
+        silent version
+        redir END
+        call s:print_stderr(ver . "\n\n")
+      endif
+        $call s:print_stderr(g:vader_report)
 
-      call s:print_stderr(ver . "\n\n" . g:vader_report)
       if success + pending == total
         qall!
       else
