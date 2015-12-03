@@ -40,7 +40,7 @@ endfunction
 
 function! vader#window#close()
   silent! bd \[Vader\]
-  silent! bd \[Vader-workbench\]
+  silent! bw! \[Vader-workbench\]
   if bufexists(s:quickfix_bfr)
     execute "silent! bd ".s:quickfix_bfr
   endif
