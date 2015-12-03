@@ -34,3 +34,4 @@ function s:vader(...) range
 endfunction
 
 command! -bang -nargs=* -range -complete=file Vader <line1>,<line2>call s:vader(<bang>0, <f-args>)
+command VaderClose call vader#window#close()

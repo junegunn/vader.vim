@@ -38,13 +38,16 @@ function! s:switch_to_workbench()
   execute 'b' s:workbench_bfr
 endfunction
 
-function! vader#window#open()
+function! vader#window#close()
   silent! bd \[Vader\]
-  silent! bd \[Vader-workbench\]
+  silent! bw! \[Vader-workbench\]
   if bufexists(s:quickfix_bfr)
     execute "silent! bd ".s:quickfix_bfr
   endif
+endfunction
 
+function! vader#window#open()
+  call vader#window#close()
   tabnew
   setlocal buftype=nofile
   setlocal noswapfile
