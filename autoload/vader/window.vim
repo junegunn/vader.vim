@@ -39,8 +39,8 @@ function! s:switch_to_workbench()
 endfunction
 
 function! vader#window#open()
-  silent! bd \[Vader\]
-  silent! bd \[Vader-workbench\]
+  execute 'silent! bd' s:console_bfr
+  execute 'silent! bd' s:workbench_bfr
   if bufexists(s:quickfix_bfr)
     execute "silent! bd ".s:quickfix_bfr
   endif
@@ -113,7 +113,7 @@ function! vader#window#prepare(lines, type)
 endfunction
 
 function! vader#window#cleanup()
-  silent! bd \[Vader-workbench\]
+  execute 'silent! bd' s:workbench_bfr
   call s:switch_to_console()
   setlocal nomodifiable
   nnoremap <silent> <buffer> q :tabclose<CR>
