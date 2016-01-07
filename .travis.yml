@@ -1,13 +1,15 @@
 language: vim
 
-before_script: |
-  hg clone https://code.google.com/p/vim/
-  cd vim
-  ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp
-  make
-  sudo make install
-  cd -
+before_script:
+  - git clone https://github.com/vim/vim
+  - cd vim
+  - ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp
+  - make -j4
+  - sudo make install
+  - cd -
 
-script: |
-  export PATH="/usr/local/bin:$PATH"
-  ./test/run-tests.sh
+script:
+  - export PATH="/usr/local/bin:$PATH"
+  - export LD_LIBRARY_PATH=/usr/local/rvm/rubies/ruby-2.2.3/lib
+  - vim --version
+  - ./test/run-tests.sh
