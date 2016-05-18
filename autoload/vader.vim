@@ -122,10 +122,15 @@ function! vader#run(bang, ...) range
 endfunction
 
 function! s:print_stderr(output)
-  let tmp = tempname()
-  call writefile(split(a:output, '\n'), tmp)
-  execute 'silent !cat '.tmp.' 1>&2'
-  call delete(tmp)
+  let output_file = expand("$VADER_OUTPUT_FILE")
+  if len(output_file)
+    call writefile(split(a:output, '\n'), output_file, 'a')
+  else
+    let tmp = tempname()
+    call writefile(split(a:output, '\n'), tmp)
+    execute 'silent !cat '.tmp.' 1>&2'
+    call delete(tmp)
+  endif
 endfunction
 
 function! s:split_args(arg)
