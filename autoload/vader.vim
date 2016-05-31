@@ -123,9 +123,8 @@ endfunction
 
 function! s:print_stderr(output)
   let lines = split(a:output, '\n')
-  let dest = filter([$VADER_OUTPUT_FILE, '/dev/stderr'], 'filewritable(v:val)')
-  if len(dest)
-    call writefile(lines, dest[0], 'a')
+  if filewritable($VADER_OUTPUT_FILE)
+    call writefile(lines, $VADER_OUTPUT_FILE, 'a')
   else
     let tmp = tempname()
     call writefile(lines, tmp)
