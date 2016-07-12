@@ -268,7 +268,7 @@ function! s:run(filename, cases)
 
     if !empty(after)
       let s:indent = 2
-      let ok = ok && s:execute(prefix, 'after', after, '')
+      let ok = s:execute(prefix, 'after', after, '') && ok
     endif
 
     if has_key(case, 'then')
