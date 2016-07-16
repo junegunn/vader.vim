@@ -6,6 +6,12 @@ Execute (Initialize vars):
 
 Execute (Save vars - comma-separated list of optionally-quoted names):
   Save g:abc, 'g:def', "g:xyz", $ENVVAR, &number
+  Save g:undefined
+  Save $PREVIOUSLY_UNDEFINED
+
+Execute (Set previously undefined vars):
+  let g:undefined = 1
+  let $PREVIOUSLY_UNDEFINED = 1
 
 Execute (Unlet vars):
   unlet g:abc
@@ -31,6 +37,15 @@ Execute (Restore everything):
   AssertEqual 3, g:xyz
   AssertEqual 4, $ENVVAR
   AssertEqual !number, &number
+
+Execute (g:undefined should not exist):
+  Assert !exists('g:undefined')
+  AssertEqual $PREVIOUSLY_UNDEFINED, ''
+
+Execute (Restore everthing again):
+  let g:xyz = 5
+  Restore
+  AssertEqual 3, g:xyz
 
 Execute (Cleanup):
   unlet g:abc
