@@ -25,6 +25,7 @@ let b:vader_label = vader#syntax#_head()
 let b:vader_eos = '\(.*\n'.vader#syntax#_head().'\)\|\%$'
 
 setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+setlocal iskeyword+=#
 let &l:commentstring = '" %s'
 
 nnoremap <buffer><silent> [[ :call search(b:vader_label, 'bW')<CR>
