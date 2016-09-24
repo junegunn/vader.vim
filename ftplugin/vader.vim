@@ -21,6 +21,14 @@
 " OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+" Only do this when not done yet for this buffer
+if exists('b:did_ftplugin')
+  finish
+endif
+
+let s:save_cpo = &cpo
+set cpo-=C
+
 let b:vader_label = vader#syntax#_head()
 let b:vader_eos = '\(.*\n'.vader#syntax#_head().'\)\|\%$'
 
@@ -50,3 +58,8 @@ augroup vader_syntax
   " autocmd FileType <buffer> call vader#syntax#include(1, '$')
 augroup END
 
+let b:undo_ftplugin = 'setl sw< ts< sts< et< cms< isk<'
+      \ . ' | exe "au! vader_syntax * <buffer>"'
+      \ . ' | unlet b:vader_label b:vader_eos'
+
+let &cpo = s:save_cpo
