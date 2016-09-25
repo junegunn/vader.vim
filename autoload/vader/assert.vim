@@ -79,6 +79,8 @@ function! vader#assert#throws(exp)
   try
     execute a:exp
   catch
+    let g:vader_exception = v:exception
+    let g:vader_throwpoint = v:throwpoint
     let ok = 1
   endtry
 

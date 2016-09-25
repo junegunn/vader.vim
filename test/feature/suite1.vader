@@ -3,7 +3,18 @@ Execute (Assert and AssertEqual command):
   Assert 1 == 1
   AssertEqual 'hey', tolower('HEY')
   AssertEqual 'vader.vader', fnamemodify(g:vader_file, ':t')
+
+Execute (AssertThrows):
+  function! VaderThrows()
+    echoerr 'Error from VaderThrows'
+  endfunction
+  command! VaderThrows call VaderThrows()
   AssertThrows call reverse('not a list')
+  AssertEqual g:vader_exception, 'Vim(call):E686: Argument of reverse() must be a List'
+  AssertEqual g:vader_throwpoint, 'function vader#assert#throws, line 5'
+  AssertThrows VaderThrows
+  AssertEqual g:vader_exception, 'Vim(echoerr):Error from VaderThrows'
+  AssertEqual g:vader_throwpoint, 'function vader#assert#throws[5]..VaderThrows, line 1'
 
 Execute (FIXME: AssertThrows expects an exception to be thrown):
   AssertThrows call reverse([1, 2, 3])

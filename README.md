@@ -99,7 +99,9 @@ In Execute block, the following commands are provided.
     - `Assert <boolean expr>[, message]`
     - `AssertEqual <expected>, <got>[, message]`
     - `AssertNotEqual <unexpected>, <got>[, message]`
-    - `AssertThrows <expr>`
+    - `AssertThrows <command>`
+        - This will set `g:vader_exception` (from `v:exception`) and
+          `g:vader_throwpoint` (from `v:throwpoint`).
 - Other commands
     - `Log "Message"`
     - `Save <name>[, ...]`

@@ -22,4 +22,4 @@ Execute (Assertions):
   AssertEqual getline(1), getline(1)
   AssertNotEqual getline(1), getline(3)
   AssertThrows getline()
-
+  AssertEqual g:vader_exception, "Vim:E492: Not an editor command: getline()"
