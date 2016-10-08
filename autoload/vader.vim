@@ -26,6 +26,7 @@ if exists("g:loaded_vader")
 endif
 let g:loaded_vader = 1
 let s:register = {}
+let s:register_undefined = []
 let s:indent = 2
 
 function! vader#run(bang, ...) range
@@ -154,6 +155,8 @@ function! vader#save(args)
   for varname in s:split_args(a:args)
     if exists(varname)
       let s:register[varname] = eval(varname)
+    else
+      let s:register_undefined += [varname]
     endif
   endfor
 endfunction
@@ -163,6 +166,15 @@ function! vader#restore(args)
   for varname in empty(varnames) ? keys(s:register) : varnames
     if has_key(s:register, varname)
       execute printf("let %s = s:register['%s']", varname, varname)
+    endif
+  endfor
+  let undefined = empty(varnames) ? s:register_undefined
+        \ : filter(copy(varnames), 'index(s:register_undefined, v:val) != -1')
+  for varname in undefined
+    if varname[0] ==# '$'
+      execute printf('let %s = ""', varname)
+    else
+      execute printf('unlet! %s', varname)
     endif
   endfor
 endfunction
@@ -181,6 +193,7 @@ endfunction
 
 function! s:cleanup()
   let s:register = {}
+  let s:register_undefined = []
   delcommand Log
   delcommand Save
   delcommand Restore
