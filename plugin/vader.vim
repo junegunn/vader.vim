@@ -21,9 +21,10 @@
 " OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-if exists(":Vader")
+if exists('g:loaded_vader') || &compatible
   finish
 endif
+let g:loaded_vader = 1
 
 function s:vader(...) range
   if a:lastline - a:firstline > 0 && a:0 > 1
