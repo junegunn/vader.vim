@@ -53,16 +53,22 @@ function! vader#run(bang, ...) range
     let [success, pending, total] = [0, 0, 0]
 
     for gl in patterns
-      for fn in split(glob(gl), "\n")
-        if fnamemodify(fn, ':e') == 'vader'
-          let afn = fnamemodify(fn, ':p')
-          let cases = vader#parser#parse(afn, line1, line2)
-          call add(all_cases, [afn, cases])
-          let total += len(cases)
-        endif
+      if filereadable(gl)
+        let files = [gl]
+      else
+        let files = filter(split(glob(gl), "\n"),
+              \ "fnamemodify(v:val, ':e') ==# 'vader'")
+      endif
+      for fn in files
+        let afn = fnamemodify(fn, ':p')
+        let cases = vader#parser#parse(afn, line1, line2)
+        call add(all_cases, [afn, cases])
+        let total += len(cases)
       endfor
     endfor
-    if empty(all_cases) | return | endif
+    if empty(all_cases)
+      throw 'Vader: no tests found for patterns ('.join(patterns).')'
+    endif
 
     call vader#window#open()
     call vader#window#append(
