@@ -26,7 +26,7 @@ if exists('g:loaded_vader') || &compatible
 endif
 let g:loaded_vader = 1
 
-function s:vader(...) range
+function! s:vader(...) range
   if a:lastline - a:firstline > 0 && a:0 > 1
     echoerr 'Range and file arguments are mutually exclusive'
     return
