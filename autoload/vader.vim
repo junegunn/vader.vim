@@ -281,11 +281,6 @@ function! s:run(filename, cases)
       endtry
     endif
 
-    if !empty(after)
-      let s:indent = 2
-      let ok = s:execute(prefix, 'after', after, '') && ok
-    endif
-
     if has_key(case, 'then')
       call s:append(prefix, 'then', s:comment(case, 'then'))
       let ok = ok && s:execute(prefix, 'then', then, '')
@@ -310,6 +305,11 @@ function! s:run(filename, cases)
         endfor
         call vader#window#set_data(begin, end, data)
       endif
+    endif
+
+    if !empty(after)
+      let s:indent = 2
+      let ok = s:execute(prefix, 'after', after, '') && ok
     endif
 
     if ok
