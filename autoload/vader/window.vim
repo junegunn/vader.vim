@@ -45,6 +45,7 @@ function! vader#window#open()
     execute "silent! bd ".s:quickfix_bfr
   endif
 
+  let s:prev_winid = exists('*win_getid') ? win_getid() : 0
   tabnew
   setlocal buftype=nofile
   setlocal noswapfile
@@ -55,6 +56,17 @@ function! vader#window#open()
   let s:console_buffered = []
   let b:vader_data = {}
   nnoremap <silent> <buffer> <CR> :call <SID>action(line('.'))<CR>
+  if s:prev_winid
+    augroup vader/return
+      autocmd!
+      autocmd BufHidden <buffer>
+            \  let [s:t, s:w] = win_id2tabwin(s:prev_winid)
+            \| if s:t
+              \| execute printf('tabnext %d | %dwincmd w', s:t, s:w)
+            \| endif
+            \| autocmd! vader/return
+    augroup END
+  endif
 
   tabnew
   setlocal buftype=nofile
