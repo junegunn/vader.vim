@@ -47,8 +47,7 @@ function! vader#window#open()
 
   let s:prev_winid = exists('*win_getid') ? win_getid() : 0
   tabnew
-  setlocal buftype=nofile
-  setlocal noswapfile
+  setlocal buftype=nofile noswapfile nospell
   setf vader-result
   silent f \[Vader\]
   let s:console_tab = tabpagenr()
