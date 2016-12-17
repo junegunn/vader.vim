@@ -38,10 +38,10 @@ function! vader#run(bang, ...) range
     let [line1, line2] = [1, 0]
   endif
 
-  if a:0 == 0
+  let options = { 'exitfirst': index(a:000, '-x') >= 0 }
+  let patterns = filter(copy(a:000), "v:val !=# '-x'")
+  if empty(patterns)
     let patterns = [expand('%')]
-  else
-    let patterns = a:000
   endif
 
   call vader#assert#reset()
@@ -76,7 +76,7 @@ function! vader#run(bang, ...) range
 
     for pair in all_cases
       let [fn, case] = pair
-      let [cs, cp, ct, lqfl] = s:run(fn, case)
+      let [cs, cp, ct, lqfl] = s:run(fn, case, options)
       let success += cs
       let pending += cp
       call extend(qfl, lqfl)
@@ -228,7 +228,7 @@ function! s:print_throwpoint()
   endif
 endfunction
 
-function! s:run(filename, cases)
+function! s:run(filename, cases, options)
   let given = []
   let before = []
   let after = []
@@ -239,6 +239,7 @@ function! s:run(filename, cases)
   let cnt = 0
   let pending = 0
   let success = 0
+  let exitfirst = get(a:options, 'exitfirst', 0)
   let qfl = []
   let g:vader_file = a:filename
 
@@ -323,6 +324,10 @@ function! s:run(filename, cases)
             \ get(case.comment, 'expect', '')], '!empty(v:val)'), ' / ') .
             \ ' (#'.s:error_line.')'
       call add(qfl, { 'type': 'E', 'filename': a:filename, 'lnum': case.lnum, 'text': description })
+      if exitfirst && !case.pending
+        call vader#window#append('Stopping after first failure.', 2)
+        break
+      endif
     endif
   endfor
 
