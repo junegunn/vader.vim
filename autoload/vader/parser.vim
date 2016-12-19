@@ -157,7 +157,7 @@ function! s:parse_vader(lines, line1)
 
     " Continuation
     if !empty(line) && !case.raw && line !~ '^  '
-      throw "Syntax error: " . line
+      throw 'Syntax error (line does not start with two spaces): ' . line
     endif
     if !empty(label)
       call add(buffer, line)
