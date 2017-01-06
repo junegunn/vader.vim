@@ -71,17 +71,22 @@ function! vader#window#execute(lines, lang_if)
   let temp = tempname()
   try
     if empty(a:lang_if)
-      let lines = a:lines
+      let lines = copy(a:lines)
     else
       let lines = copy(a:lines)
       call insert(lines, a:lang_if . ' << __VADER__LANG__IF__')
       call add(lines, '__VADER__LANG__IF__')
     endif
+    call insert(lines, 'function! s:vader_wrapper()')
+    call extend(lines, ['endfunction', 'call s:vader_wrapper()'])
     call writefile(lines, temp)
     execute 'source '.temp
+  catch
+    return [[v:exception, v:throwpoint], lines]
   finally
     call delete(temp)
   endtry
+  return [[], lines]
 endfunction
 
 function! vader#window#replay(lines)
