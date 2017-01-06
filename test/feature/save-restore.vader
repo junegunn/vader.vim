@@ -35,7 +35,7 @@ Execute (Restore everything):
   let number = &number
   Restore
   AssertEqual 3, g:xyz
-  AssertEqual 4, $ENVVAR
+  AssertEqual '4', $ENVVAR
   AssertEqual !number, &number
 
 Execute (g:undefined should not exist):
