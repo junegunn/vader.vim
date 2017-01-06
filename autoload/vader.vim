@@ -297,15 +297,71 @@ function! s:comment(case, label)
   return get(a:case.comment, a:label, '')
 endfunction
 
+function! s:print_source(lines, linenr, prefix)
+  let log_lines = []
+  let i = a:linenr
+  while i > -1
+    let line = a:lines[i]
+    call insert(log_lines, a:prefix.i.': '.line)
+    " Include previous wrapped lines (starting with backslash).
+    if line !~# '\v^\s*\\'
+      break
+    endif
+    let i -= 1
+  endwhile
+  for l in log_lines
+    Log l
+  endfor
+endfunction
+
 function! s:execute(prefix, type, block, lang_if)
-  try
-    call vader#window#execute(a:block, a:lang_if)
+  let [error, lines] = vader#window#execute(a:block, a:lang_if)
+  if empty(error)
     return 1
-  catch
-    call s:append(a:prefix, a:type, v:exception, 1)
+  endif
+
+  " Get line number from wrapper function or throwpoint.
+  let linenr = matchstr(error[1], '\v^function \<SNR\>\d+_vader_wrapper\[\zs\d+\ze\]\.\.')
+  if empty(linenr)
+    " Happens with e.g. 'Vim(finish):E168: :finish used outside of a sourced file'
+    let linenr = matchstr(error[1], '\v, line \zs\d+\ze')
+  else
+    let tb_entries = reverse(split(error[1], '\.\.'))[0:-2]
+    call filter(tb_entries, "v:val !~# '\\vvader#assert#[^,]+, line \\d+$'")
+  endif
+
+  if empty(linenr)
+    call s:append(a:prefix, a:type, error[0], 1)
+
+    " XXX: debug, remove.
+    if v:throwpoint =~# 'vader#assert'
+      throw 'ERROR: unexpected throwpoint: '.v:throwpoint
+    endif
     call s:print_throwpoint()
-    return 0
-  endtry
+  else
+    call s:append(a:prefix, a:type, error[0], 1)
+
+    if exists('tb_entries')
+      for tb_entry in tb_entries
+        let func_line = split(tb_entry, '\v[\[\]]')
+        if len(func_line) == 2
+          let [f, l] = func_line
+        else
+          let [f, l] = split(tb_entry, ', line ')
+        endif
+
+        redir => func
+        exe 'function '.f
+        redir END
+        Log 'in '.tb_entry
+        let source_without_linenrs = map(split(func, "\n"), "substitute(v:val, '\\v^\\d+\\s+', '', '')")
+        call s:print_source(source_without_linenrs, l, '  ')
+      endfor
+    endif
+
+    call s:print_source(lines, linenr, '')
+  endif
+  return 0
 endfunction
 
 function! s:print_throwpoint()
