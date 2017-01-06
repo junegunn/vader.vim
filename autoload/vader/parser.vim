@@ -59,7 +59,7 @@ function! s:flush_buffer(cases, case, fn, lnum, raw, label, newlabel, buffer, fi
      \ a:newlabel == 'given' ||
      \ index(['before', 'after', 'do', 'execute'], a:newlabel) >= 0 && fulfilled
       call add(a:cases, deepcopy(a:case))
-      let new = { 'comment': {}, 'lnum': a:lnum, 'pending': 0 }
+      let new = { 'comment': {}, 'lnum': a:lnum, 'pending': 0, 'fpos': {} }
       if !empty(get(a:case, 'type', ''))
         let new.type = a:case.type " To reuse Given block with type
       endif
@@ -116,7 +116,7 @@ function! s:parse_vader(lines, line1)
   let newlabel = ''
   let buffer   = []
   let cases    = []
-  let case     = { 'lnum': a:line1, 'comment': {}, 'pending': 0, 'raw': 0 }
+  let case     = { 'lnum': a:line1, 'comment': {}, 'pending': 0, 'raw': 0, 'fpos': {} }
 
   if empty(a:lines)
     return []
@@ -124,8 +124,16 @@ function! s:parse_vader(lines, line1)
 
   for [fn, lnum, line] in a:lines
     " Comment / separators
+    " Keep them to maintain line numbers for Execute, but escape/comment them
+    " for s:flush_buffer.
     if !case.raw && line =~ '^[#"=~*^-]'
-      continue
+      if index(['execute', 'then', 'before', 'after'], label) == -1
+        continue
+      endif
+      if line[0] != '"'
+        let line = '" '.line
+      endif
+      let line = '" '.line
     endif
 
     let matched = 0
@@ -134,6 +142,7 @@ function! s:parse_vader(lines, line1)
       if !empty(m)
         let newlabel = tolower(l)
         call s:flush_buffer(cases, case, fn, lnum, m[3] == ';', label, newlabel, buffer, 0)
+        let case.fpos[newlabel] = [fn, lnum]
 
         let label   = newlabel
         let arg     = m[1]
@@ -159,7 +168,7 @@ function! s:parse_vader(lines, line1)
     if matched | continue | endif
 
     " Continuation
-    if !empty(line) && !case.raw && line !~ '^  '
+    if !empty(line) && line[0] != '"' && !case.raw && line !~ '^  '
       throw 'Syntax error (line does not start with two spaces): ' . line
     endif
     if !empty(label)
