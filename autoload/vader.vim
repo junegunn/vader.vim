@@ -113,11 +113,12 @@ function! vader#run(bang, ...) range
       call vader#window#copen()
     endif
   catch
+    let error = 'Vader error: '.v:exception.' (in '.v:throwpoint.')'
     if a:bang
-      call s:print_stderr(v:exception)
+      call s:print_stderr(error)
       cq
     else
-      echoerr v:exception
+      echoerr error
     endif
   finally
     call s:cleanup()
