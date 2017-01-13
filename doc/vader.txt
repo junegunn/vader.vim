@@ -24,12 +24,13 @@ VADER - TABLE OF CONTENTS                                      *vader* *vader-to
     Setting up isolated testing environment                      |vader-4|
     Travis CI integration                                        |vader-5|
       Examples                                                   |vader-5-1|
-    Projects using Vader                                         |vader-6|
-    Known issues                                                 |vader-7|
-      feedkeys() cannot be tested                                |vader-7-1|
-      Some events may not be triggered                           |vader-7-2|
-      Search history may not be correctly updated                |vader-7-3|
-    License                                                      |vader-8|
+    Settings                                                     |vader-6|
+    Projects using Vader                                         |vader-7|
+    Known issues                                                 |vader-8|
+      feedkeys() cannot be tested                                |vader-8-1|
+      Some events may not be triggered                           |vader-8-2|
+      Search history may not be correctly updated                |vader-8-3|
+    License                                                      |vader-9|
 
 
 VADER.VIM                                                            *vader-vim*
@@ -390,7 +391,16 @@ execution environment instead as the default.)
 
 
                                                                        *vader-6*
-PROJECTS USING VADER                                *vader-projects-using-vader*
+SETTINGS                                                        *vader-settings*
+==============================================================================
+
+Vader behavior can be customized by setting these variables in your `vimrc`:
+
+* `let g:vader_settings_showquickfix = 0`: Will not show the quickfix window
+when tests fail. Default: `1`
+
+                                                                       *vader-7*
+PROJECTS USING VADER                               *vader-projects-using-vader*
 ==============================================================================
 
 See {the wiki page}{8}.
@@ -398,14 +408,14 @@ See {the wiki page}{8}.
            {8} https://github.com/junegunn/vader.vim/wiki/Projects-using-Vader
 
 
-                                                                       *vader-7*
+                                                                       *vader-8*
 KNOWN ISSUES                                                *vader-known-issues*
 ==============================================================================
 
 
 < feedkeys() cannot be tested >_______________________________________________~
-                                               *vader-feedkeys-cannot-be-tested*
-                                                                     *vader-7-1*
+                                              *vader-feedkeys-cannot-be-tested*
+                                                                     *vader-8-1*
 
 The keystrokes given to the feedkeys() function are consumed only after Vader
 finishes executing the content of the Do/Execute block. Take the following
@@ -425,8 +435,8 @@ know if you find one.
 
 
 < Some events may not be triggered >__________________________________________~
-                                        *vader-some-events-may-not-be-triggered*
-                                                                     *vader-7-2*
+                                       *vader-some-events-may-not-be-triggered*
+                                                                     *vader-8-2*
 
 {It is reported}{9} that CursorMoved event is not triggered inside a Do block.
 If you need to test a feature that involves autocommands on CursorMoved event,
@@ -440,8 +450,8 @@ you have to manually invoke it in the middle of the block using `:doautocmd`.
 
 
 < Search history may not be correctly updated >_______________________________~
-                             *vader-search-history-may-not-be-correctly-updated*
-                                                                     *vader-7-3*
+                            *vader-search-history-may-not-be-correctly-updated*
+                                                                     *vader-8-3*
 
 This is likely a bug of Vim itself. For some reason, search history is not
 correctly updated when searches are performed inside a Do block. The following
@@ -486,7 +496,7 @@ The result is given as follows:
     Elapsed time: 0.366118 sec.
 <
 
-                                                                       *vader-8*
+                                                                       *vader-9*
 LICENSE                                                          *vader-license*
 ==============================================================================
 
