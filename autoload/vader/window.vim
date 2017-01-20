@@ -55,17 +55,6 @@ function! vader#window#open()
   let s:console_buffered = []
   let b:vader_data = {}
   nnoremap <silent> <buffer> <CR> :call <SID>action(line('.'))<CR>
-  if s:prev_winid
-    augroup vader/return
-      autocmd!
-      autocmd BufHidden <buffer>
-            \  let [s:t, s:w] = win_id2tabwin(s:prev_winid)
-            \| if s:t
-              \| execute printf('tabnext %d | %dwincmd w', s:t, s:w)
-            \| endif
-            \| autocmd! vader/return
-    augroup END
-  endif
 
   tabnew
   setlocal buftype=nofile
@@ -128,7 +117,7 @@ function! vader#window#cleanup()
   execute 'silent! bd' s:workbench_bfr
   call s:switch_to_console()
   setlocal nomodifiable
-  nnoremap <silent> <buffer> q :tabclose<CR>
+  nnoremap <silent> <buffer> q :call <SID>quit()<CR><CR>
   normal! Gzb
 endfunction
 
@@ -138,7 +127,7 @@ function! vader#window#copen()
   1wincmd w
   normal! Gzb
   2wincmd w
-  nnoremap <silent> <buffer> q :tabclose<CR>
+  nnoremap <silent> <buffer> q :call <SID>quit()<CR><CR>
   nnoremap <silent> <buffer> <CR> :call <SID>move()<CR><CR>
 endfunction
 
@@ -198,4 +187,15 @@ function! s:move()
     let &scrolloff = scrolloff
     execute wq . 'wincmd w'
   endif
+endfunction
+
+function! s:quit()
+  if s:prev_winid
+    let [s:t, s:w] = win_id2tabwin(s:prev_winid)
+    if s:t
+      execute printf('tabnext %d | %dwincmd w | %dtabclose', s:t, s:w, s:console_tab)
+      return
+    endif
+  endif
+  tabclose
 endfunction
