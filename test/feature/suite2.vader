@@ -28,3 +28,10 @@ Expect (Comparison is case-sensitive):
   some string
   MORE string
   even more string
+
+Execute (Comparison to 0 is done correctly):
+  AssertEqual 0, 0
+  AssertThrow vader#assert#equal(0, 'a string')
+  AssertThrow vader#assert#equal('a string', 0)
+  AssertNotEqual 'a string', 0
+  AssertNotEqual 0, 'a string'

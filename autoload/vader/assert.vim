@@ -53,8 +53,13 @@ endfunction
 function! vader#assert#equal(...)
   let [exp, got] = a:000[0:1]
   let s:assertions[1] += 1
+  if exp is 0 || got is 0
+      let l:comparison = exp isnot# got
+  else
+      let l:comparison =  exp !=# got
+  endif
 
-  if exp !=# got
+  if l:comparison
     throw get(a:000, 2, printf("%s should be equal to %s", string(got), string(exp)))
   endif
   let s:assertions[0] += 1
@@ -65,7 +70,13 @@ function! vader#assert#not_equal(...)
   let [exp, got] = a:000[0:1]
   let s:assertions[1] += 1
 
-  if exp ==# got
+  if exp is 0 || got is 0
+      let l:comparison = exp is# got
+  else
+      let l:comparison =  exp ==# got
+  endif
+
+  if l:comparison
     throw get(a:000, 2, printf("%s should not be equal to %s", string(got), string(exp)))
   endif
   let s:assertions[0] += 1
