@@ -35,7 +35,7 @@ endfunction
 
 function! s:switch_to_workbench()
   execute 'normal! '.s:workbench_tab.'gt'
-  execute 'b' s:workbench_bfr
+  execute 'b!' s:workbench_bfr
 endfunction
 
 function! vader#window#open()
