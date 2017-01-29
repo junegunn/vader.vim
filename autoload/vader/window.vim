@@ -95,6 +95,10 @@ function! vader#window#append(message, indent, ...)
   if get(a:, 1, 1)
     let message = substitute(message, '\s*$', '', '')
   endif
+  if !exists('s:console_buffered')
+    echom 'Vader:' message
+    return 0
+  endif
   call add(s:console_buffered, message)
   return len(s:console_buffered)
 endfunction
