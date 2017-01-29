@@ -24,6 +24,16 @@
 
 let s:assertions = [0, 0]
 
+let s:type_names = {
+      \ 0: 'Number',
+      \ 1: 'String',
+      \ 2: 'Funcref',
+      \ 3: 'List',
+      \ 4: 'Dictionary',
+      \ 5: 'Float',
+      \ 6: 'Boolean',
+      \ 7: 'Null' }
+
 function! vader#assert#reset()
   let s:assertions = [0, 0]
 endfunction
@@ -50,10 +60,20 @@ function! vader#assert#true(...)
   return 1
 endfunction
 
+function! s:check_types(...)
+  let [exp, got] = a:000[0:1]
+  if type(exp) !=# type(got)
+    throw get(a:000, 2, printf("type mismatch: %s (%s) should be equal to %s (%s)",
+          \ string(got), get(s:type_names, type(got), type(got)),
+          \ string(exp), get(s:type_names, type(exp), type(exp))))
+  endif
+endfunction
+
 function! vader#assert#equal(...)
   let [exp, got] = a:000[0:1]
   let s:assertions[1] += 1
 
+  call s:check_types(exp, got)
   if exp !=# got
     throw get(a:000, 2, printf("%s should be equal to %s", string(got), string(exp)))
   endif
@@ -65,6 +85,7 @@ function! vader#assert#not_equal(...)
   let [exp, got] = a:000[0:1]
   let s:assertions[1] += 1
 
+  call s:check_types(exp, got)
   if exp ==# got
     throw get(a:000, 2, printf("%s should not be equal to %s", string(got), string(exp)))
   endif
