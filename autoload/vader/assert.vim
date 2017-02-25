@@ -75,7 +75,11 @@ function! vader#assert#equal(...)
 
   call s:check_types(exp, got)
   if exp !=# got
-    throw get(a:000, 2, printf("%s should be equal to %s", string(got), string(exp)))
+    let type = type(exp)
+    let msg = (type == type({}) || type == type([]))
+          \ ? printf("Unequal %ss\n      %%s should be equal to \n      %%s", get(s:type_names, type))
+          \ : "%s should be equal to %s"
+    throw get(a:000, 2, printf(msg, string(got), string(exp)))
   endif
   let s:assertions[0] += 1
   return 1
