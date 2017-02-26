@@ -61,37 +61,37 @@ function! vader#assert#true(...)
 endfunction
 
 function! s:check_types(...)
-  let [exp, got] = a:000[0:1]
-  if type(exp) !=# type(got)
+  let [Exp, Got] = a:000[0:1]
+  if type(Exp) !=# type(Got)
     throw get(a:000, 2, printf("type mismatch: %s (%s) should be equal to %s (%s)",
-          \ string(got), get(s:type_names, type(got), type(got)),
-          \ string(exp), get(s:type_names, type(exp), type(exp))))
+          \ string(Got), get(s:type_names, type(Got), type(Got)),
+          \ string(Exp), get(s:type_names, type(Exp), type(Exp))))
   endif
 endfunction
 
 function! vader#assert#equal(...)
-  let [exp, got] = a:000[0:1]
+  let [Exp, Got] = a:000[0:1]
   let s:assertions[1] += 1
 
-  call s:check_types(exp, got)
-  if exp !=# got
-    let type = type(exp)
+  call s:check_types(Exp, Got)
+  if Exp !=# Got
+    let type = type(Exp)
     let msg = (type == type({}) || type == type([]))
           \ ? printf("Unequal %ss\n      %%s should be equal to \n      %%s", get(s:type_names, type))
           \ : "%s should be equal to %s"
-    throw get(a:000, 2, printf(msg, string(got), string(exp)))
+    throw get(a:000, 2, printf(msg, string(Got), string(Exp)))
   endif
   let s:assertions[0] += 1
   return 1
 endfunction
 
 function! vader#assert#not_equal(...)
-  let [exp, got] = a:000[0:1]
+  let [Exp, Got] = a:000[0:1]
   let s:assertions[1] += 1
 
-  call s:check_types(exp, got)
-  if exp ==# got
-    throw get(a:000, 2, printf("%s should not be equal to %s", string(got), string(exp)))
+  call s:check_types(Exp, Got)
+  if Exp ==# Got
+    throw get(a:000, 2, printf("%s should not be equal to %s", string(Got), string(Exp)))
   endif
   let s:assertions[0] += 1
   return 1
