@@ -16,6 +16,14 @@ Execute (AssertThrows):
   AssertEqual g:vader_exception, 'Vim(echoerr):Error from VaderThrows'
   AssertEqual g:vader_throwpoint, 'function vader#assert#throws[5]..VaderThrows, line 1'
 
+Execute (AssertEqual handles funcrefs):
+  function! F1()
+  endfunction
+  function! F2()
+  endfunction
+  AssertEqual function('F1'), function('F1')
+  AssertNotEqual function('F1'), function('F2')
+
 Execute (FIXME: AssertThrows expects an exception to be thrown):
   AssertThrows call reverse([1, 2, 3])
 
