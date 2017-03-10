@@ -44,3 +44,12 @@ Execute (SyntaxOf does not move cursor):
   let pos = getpos('.')
   AssertEqual pos[1], 2
   AssertEqual pos[2], 1
+
+Execute (Helpers can access script-local var):
+  let s:foo = 1
+  AssertEqual s:foo, 1
+
+  function! s:foo()
+    return 2
+  endfunction
+  Assert s:foo() == 2, 'function s:foo should be callable'
