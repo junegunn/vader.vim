@@ -14,6 +14,7 @@ Include (Testing Ruby/Python interface): feature/lang-if.vader
 Include (blocks w/o indentation):        feature/no-indentation.vader
 Include (Helpers):                       feature/helper.vader
 Include (Units):                         feature/units.vader
+Include (Error locations):               feature/error-location.vader
 
 * Regressions
 Include (Macro set to linewise when it ends with <CR>): regression/characterwise-macro.vader
