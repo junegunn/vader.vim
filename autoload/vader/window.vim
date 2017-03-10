@@ -70,14 +70,30 @@ endfunction
 function! vader#window#execute(lines, lang_if)
   let temp = tempname()
   try
+    let lines = [
+          \ 'command! -nargs=+ Log            :call vader#log(<args>)',
+          \ 'command! -nargs=+ Save           :call vader#save(<q-args>)',
+          \ 'command! -nargs=* Restore        :call vader#restore(<q-args>)',
+          \ 'command! -nargs=+ Assert         :call vader#assert#true(<args>)',
+          \ 'command! -nargs=+ AssertEqual    :call vader#assert#equal(<args>)',
+          \ 'command! -nargs=+ AssertNotEqual :call vader#assert#not_equal(<args>)',
+          \ 'command! -nargs=+ AssertThrows   :call vader#assert#throws(<q-args>)',
+          \ 'function! SyntaxAt(...) abort',
+          \ "  return call('vader#helper#syntax_at', a:000)",
+          \ 'endfunction',
+          \ 'function! SyntaxOf(...) abort',
+          \ "  return call('vader#helper#syntax_of', a:000)",
+          \ 'endfunction',
+          \ ]
+
+    call add(lines, 'function! s:vader_wrapper()')
     if empty(a:lang_if)
-      let lines = copy(a:lines)
+      call extend(lines, copy(a:lines))
     else
-      let lines = copy(a:lines)
-      call insert(lines, a:lang_if . ' << __VADER__LANG__IF__')
+      call add(lines, a:lang_if . ' << __VADER__LANG__IF__')
+      call extend(lines, copy(a:lines))
       call add(lines, '__VADER__LANG__IF__')
     endif
-    call insert(lines, 'function! s:vader_wrapper()')
     call extend(lines, ['endfunction', 'call s:vader_wrapper()'])
     call writefile(lines, temp)
     execute 'source '.temp

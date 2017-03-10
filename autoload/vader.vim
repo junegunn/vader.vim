@@ -59,7 +59,6 @@ function! vader#run(bang, ...) range
   endif
 
   call vader#assert#reset()
-  call s:prepare()
   try
     let all_cases = []
     let qfl = []
@@ -267,34 +266,20 @@ function! vader#restore(args)
   endfor
 endfunction
 
-function! s:prepare()
-  command! -nargs=+ Log            :call vader#log(<args>)
-  command! -nargs=+ Save           :call vader#save(<q-args>)
-  command! -nargs=* Restore        :call vader#restore(<q-args>)
-  command! -nargs=+ Assert         :call vader#assert#true(<args>)
-  command! -nargs=+ AssertEqual    :call vader#assert#equal(<args>)
-  command! -nargs=+ AssertNotEqual :call vader#assert#not_equal(<args>)
-  command! -nargs=+ AssertThrows   :call vader#assert#throws(<q-args>)
-  function! SyntaxAt(...) abort
-    return call('vader#helper#syntax_at', a:000)
-  endfunction
-  function! SyntaxOf(...) abort
-    return call('vader#helper#syntax_of', a:000)
-  endfunction
-endfunction
-
 function! s:cleanup()
   let s:register = {}
   let s:register_undefined = []
-  delcommand Log
-  delcommand Save
-  delcommand Restore
-  delcommand Assert
-  delcommand AssertEqual
-  delcommand AssertNotEqual
-  delcommand AssertThrows
-  unlet g:SyntaxAt
-  unlet g:SyntaxOf
+  if exists(':Log') == 2
+    delcommand Log
+    delcommand Save
+    delcommand Restore
+    delcommand Assert
+    delcommand AssertEqual
+    delcommand AssertNotEqual
+    delcommand AssertThrows
+    delfunction SyntaxAt
+    delfunction SyntaxOf
+  endif
 endfunction
 
 function! s:comment(case, label)
@@ -353,9 +338,9 @@ function! s:execute(prefix, type, block, fpos, lang_if)
   call filter(tb_entries, "v:val !~# '\\vvader#assert#[^,]+, line \\d+$'")
   for tb_entry in tb_entries
     let [source, _, f] = s:get_source_linenr_from_tb_entry(tb_entry)
-    Log 'in '.f
+    call vader#log('in '.f)
     if len(source)
-      Log '  '.source
+      call vader#log('  '.source)
     endif
   endfor
   let tb_first = substitute(tb_first, '^function ', '', '')
@@ -372,7 +357,7 @@ endfunction
 
 function! s:print_throwpoint()
   if v:throwpoint !~ 'vader#assert'
-    Log v:throwpoint
+    call vader#log(v:throwpoint)
   endif
 endfunction
 
