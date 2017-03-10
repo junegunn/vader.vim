@@ -275,8 +275,12 @@ function! s:prepare()
   command! -nargs=+ AssertEqual    :call vader#assert#equal(<args>)
   command! -nargs=+ AssertNotEqual :call vader#assert#not_equal(<args>)
   command! -nargs=+ AssertThrows   :call vader#assert#throws(<q-args>)
-  let g:SyntaxAt = function('vader#helper#syntax_at')
-  let g:SyntaxOf = function('vader#helper#syntax_of')
+  function! SyntaxAt(...) abort
+    return call('vader#helper#syntax_at', a:000)
+  endfunction
+  function! SyntaxOf(...) abort
+    return call('vader#helper#syntax_of', a:000)
+  endfunction
 endfunction
 
 function! s:cleanup()
