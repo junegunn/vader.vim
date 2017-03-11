@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 
-# Do not "cd" to any existing "test" dir from CDPATH!
-unset CDPATH
+# Use privileged mode to discard CDPATH, -e to exit on errors.
+set -ep
+cd "$( dirname "${BASH_SOURCE[0]}" )"
 
 : "${TEST_VIM:=vim}"
 
-cd "$( dirname "${BASH_SOURCE[0]}" )" && $TEST_VIM -Nu vimrc -c 'Vader! *' > /dev/null
+$TEST_VIM -Nu vimrc -c 'Vader! *' > /dev/null
+
+if hash tmux 2>/dev/null; then
+  integration/run.sh
+else
+  echo 'Skipping integration tests: tmux not found.' >&2
+fi
