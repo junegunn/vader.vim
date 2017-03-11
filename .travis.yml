@@ -22,7 +22,7 @@ install:
   - |
     if [ "$ENV" = "testnvim" ]; then
       eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
-      rvm use 2.2.3 --install --binary --fuzzy
+      rvm default
       gem install neovim
     fi
 
