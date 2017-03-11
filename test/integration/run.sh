@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# This runs tests agains Vader running inside a tmux session.
+# This runs tests against Vader running inside a tmux session.
 
-# Use priviledged mode to discard CDPATH, -e to exit on errors.
+# Use privileged mode to discard CDPATH, -e to exit on errors.
 set -ep
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
