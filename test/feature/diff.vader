@@ -1,0 +1,41 @@
+Execute (Recursive comparison / diff description):
+  runtime autoload/vader/assert.vim
+
+  AssertEqual vader#assert#diff({}, {}), ''
+  AssertEqual vader#assert#diff({'left': 1}, {}),
+  \ '{} should be equal to {''left'': 1} (only in expected: left)'
+
+  AssertEqual vader#assert#diff({'left': 1}, {'right': 2}),
+  \ '{''right'': 2} should be equal to {''left'': 1} '.
+  \ '(only in expected: left; only in gotten: right)'
+
+  AssertEqual vader#assert#diff({'a': '1'}, {'a': 1}),
+  \ '{''a'': 1} should be equal to {''a'': ''1''} '.
+  \ '(diff: a (1 / ''1''))'
+
+  AssertEqual vader#assert#diff([1, 2], [2, 1]),
+  \ '[2, 1] should be equal to [1, 2] '.
+  \ '(diff at index 0: 2 should be equal to 1)'
+
+  AssertEqual vader#assert#diff([1, 2, []], [1, 2]),
+  \ '[1, 2] should be equal to [1, 2, []] '.
+  \ '(different lengths)'
+
+  AssertEqual vader#assert#diff(['1'], [1]),
+  \ '[1] should be equal to [''1''] '.
+  \ '(diff at index 0: type mismatch: 1 (Number) should be equal to ''1'' (String))'
+
+  AssertEqual vader#assert#diff([1, 2], {}),
+  \ 'type mismatch: {} (Dictionary) should be equal to [1, 2] (List)'
+
+  let l1 = [{'lnum': 1, 'bufnr': 1, 'col': 0}, {'lnum': 6, 'bufnr': 1, 'col': 0}]
+  let l2 = [{'lnum': 2, 'bufnr': 4, 'col': 0, 'more': 1}, {'lnum': 7, 'bufnr': 4, 'col': 0}]
+  AssertEqual vader#assert#diff(l1, l2),
+  \ string(l2).' should be equal to '.string(l1).' '.
+  \ "(diff at index 0: unequal dicts: only in gotten: more; diff: lnum (2 / 1), bufnr (4 / 1))"
+
+  AssertEqual vader#assert#diff([{1: 2}], [{3: 4}]),
+  \ '[{''3'': 4}] should be equal to [{''1'': 2}] (diff at index 0: unequal dicts: only in expected: 1; only in gotten: 3)'
+
+  AssertEqual vader#assert#diff([{1: 2}], [{3: 4}, 2]),
+  \ '[{''3'': 4}, 2] should be equal to [{''1'': 2}] (different lengths)'
