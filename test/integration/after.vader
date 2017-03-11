@@ -1,0 +1,9 @@
+Execute (Setup for After):
+  function! After()
+    " Throws via function, which has no source information.
+    throw 'Error from After()'
+  endfunction
+
+After:
+  "   throw 'Error from After'
+  call After()

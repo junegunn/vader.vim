@@ -1,0 +1,58 @@
+Execute (Assertion failure with first case):
+  Assert 0, 'this should be reported for line 2'
+
+" Integration tests.
+" This suite is being run interactively through tmux (via ./run.sh), and
+" AssertAfterVaderRun is used for assertions.
+Execute (Setup):
+  function! ReportErrors(errors) abort
+    if !empty(a:errors)
+      echohl ErrorMsg
+      for error in a:errors
+        echom 'error: '.error
+      endfor
+      echohl None
+    endif
+    return a:errors
+  endfunction
+
+  function! AssertAfterVaderRun() abort
+    let errors = []
+
+    if tabpagenr('$') != 2
+      call add(errors, 'There should be two tab pages')
+    endif
+
+    let qflist = getqflist()
+    let expected = [
+        \ {'lnum': 2, 'bufnr': 1, 'col': 0, 'valid': 1, 'vcol': 0, 'nr': 0,
+        \  'type': 'E', 'pattern': '', 'text': 'Assertion failure with first case (#4)'},
+        \ {'lnum': 2, 'bufnr': 4, 'col': 0, 'valid': 1, 'vcol': 0, 'nr': 0, 
+        \  'type': 'E', 'pattern': '', 'text': 'Assertion error (#8)'},
+        \ {'lnum': 7, 'bufnr': 4, 'col': 0, 'valid': 1, 'vcol': 0, 'nr': 0,
+        \  'type': 'E', 'pattern': '', 'text': 'AssertEqual (#11)'},
+        \ {'lnum': 9, 'bufnr': 5, 'col': 0, 'valid': 1, 'vcol': 0, 'nr': 0,
+        \  'type': 'E', 'pattern': '', 'text': 'Success with failure in After (#15)'}
+        \ ]
+    let diff = vader#assert#diff(expected, qflist)
+    if !empty(diff)
+"     if expected != qflist
+"       call add(errors, 'Unexpected qflist: '.string(qflist).' (expected: '.string(expected).')')
+      call add(errors, 'Unexpected qflist: '.diff)
+    endif
+
+    call assert_equal(2, winnr('$'), 'There are two windows')
+    call assert_equal('qf', &filetype, 'Quickfix list is focused')
+    call assert_equal(2, winnr(), 'Focus is in window 2')
+    norm! 4gg
+    exe "norm! \<cr>"
+    call assert_equal(3, winnr('$'), 'There are three windows')
+    call assert_equal(2, winnr(), 'Focus is in window 2')
+    call assert_equal('after.vader', bufname('%'))
+    call assert_equal([9, 3], getpos('.')[1:-2])
+
+    return ReportErrors(errors + v:errors)
+  endfunction
+
+
+Include: errors.vader
