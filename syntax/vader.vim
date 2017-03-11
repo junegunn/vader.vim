@@ -28,7 +28,7 @@ endif
 let s:oisk = &isk
 
 syn clear
-syn include @vimSnippet syntax/vim.vim
+syn include @vimSnippet syntax/vim.vim syntax/vim/*.vim
 
 syn region vaderText    start=/^\s\{2,}/ end=/^\S\@=/ contained
 syn region vaderCommand start=/^\s\{2,}/ end=/^\S\@=/ contains=@vimSnippet contained
