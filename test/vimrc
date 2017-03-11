@@ -3,3 +3,5 @@ set rtp+=../
 filetype plugin indent on
 syntax enable
 set nomore
+set noswapfile
+set viminfo=
