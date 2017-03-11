@@ -6,10 +6,19 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"
 
 : "${TEST_VIM:=vim}"
 
-$TEST_VIM -Nu vimrc -c 'Vader! *' > /dev/null
+ret=0
+
+echo '• Running vader tests..'
+if ! $TEST_VIM -Nu vimrc -c 'Vader! *' > /dev/null; then
+  ret=1
+fi
 
 if hash tmux 2>/dev/null; then
-  integration/run.sh
+  echo '• Running integration tests..'
+  if ! integration/run.sh; then
+    (( ret+= 2 ))
+  fi
 else
-  echo 'Skipping integration tests: tmux not found.' >&2
+  echo '• Skipping integration tests: tmux not found.'
 fi
+exit $ret

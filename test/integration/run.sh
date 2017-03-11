@@ -13,7 +13,12 @@ else
   : "${TMUX_ATTACH_ON_ERROR:=1}"
 fi
 : "${TEST_VIM:=vim -X}"
-: "${TEST_VIM_COMMAND:=env HOME=$PWD $TEST_VIM -Nu ../vimrc -i viminfo}"
+
+# Remove --headless for Neovim.
+TEST_VIM=${TEST_VIM/ --headless/}
+
+: "${TEST_VIM_COMMAND:=env HOME=$PWD $TEST_VIM -Nu ../vimrc}"
+# echo "TEST_VIM_COMMAND=$TEST_VIM_COMMAND" >&2
 
 tmux='tmux -L vader_tests'
 
