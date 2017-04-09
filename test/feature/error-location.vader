@@ -40,3 +40,16 @@ Execute (Thrown from line 3):
   AssertThrows throw "testexception"
   let m = matchlist(g:vader_throwpoint, '\Vfunction <SNR>\d\+_vader_wrapper[\(\d\+\)]..vader#assert#throws, line 5')
   AssertEqual m[1], '3', 'Thrown from line 3'
+
+Execute (Error in scoped function cannot get source, but continues):
+  let obj = {}
+  function! obj.fn()
+    echo doesnotexist
+  endfunction
+  try
+    call obj.fn()
+  catch
+    AssertEqual v:exception, 'Vim(echo):E121: Undefined variable: doesnotexist'
+  endtry
+  let m = matchlist(g:vader_throwpoint, '\Vfunction <SNR>\d\+_vader_wrapper[\(\d\+\)]..vader#assert#throws, line 5')
+  AssertEqual m[1], '3', 'Thrown from line 3'
