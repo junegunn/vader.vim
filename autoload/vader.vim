@@ -302,13 +302,17 @@ function! s:get_source_linenr_from_tb_entry(tb_entry)
   if f =~# '\v^\d+$'
     let f = '{'.f.'}'
   endif
-  if exists('*execute')
-    let func = execute('function '.f)
-  else
-    redir => func
-      silent exe 'function '.f
-    redir END
-  endif
+  try
+    if exists('*execute')
+      let func = execute('function '.f)
+    else
+      redir => func
+        silent exe 'function '.f
+      redir END
+    endif
+  catch /^Vim\%((\a\+)\)\=:E123/
+    return ['', l, f]
+  endtry
 
   let source = map(filter(split(func, "\n"), "v:val =~# '\\v^".l."[^0-9]'"), "substitute(v:val, '\\v^\\d+\\s+', '', '')")
   if len(source) != 1
@@ -337,10 +341,14 @@ function! s:execute(prefix, type, block, fpos, lang_if)
   let tb_first = remove(tb_entries, -1)
   call filter(tb_entries, "v:val !~# '\\vvader#assert#[^,]+, line \\d+$'")
   for tb_entry in tb_entries
-    let [source, _, f] = s:get_source_linenr_from_tb_entry(tb_entry)
-    call vader#log('in '.f)
-    if len(source)
-      call vader#log('  '.source)
+    let [source, l, f] = s:get_source_linenr_from_tb_entry(tb_entry)
+    if l
+      call vader#log('in '.f.' (line '.l.')')
+      if len(source)
+        call vader#log('  '.source)
+      endif
+    else
+      call vader#log('in '.f)
     endif
   endfor
   let tb_first = substitute(tb_first, '^function ', '', '')
