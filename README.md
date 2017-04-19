@@ -46,11 +46,11 @@ spaces.
 - Then
     - Vimscript to run after Do or Execute block. Used for assertions.
 - Expect
-    - Expected result of the preceding Do/Execute block
+    - Expected result of the preceding Do/Execute block.
 - Before
-    - Vimscript to run before each test case
+    - Vimscript to run before each test case.
 - After
-    - Vimscript to run after each test case
+    - Vimscript to run after each test case, but before `Then`.
 
 If you want to skip 2-space indention, end the block label with a semi-colon
 instead of a colon.
