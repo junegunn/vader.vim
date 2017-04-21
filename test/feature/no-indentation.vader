@@ -15,7 +15,7 @@ Before; Okay to have block labels if the line is not in a valid vader syntax
 After: This is the last line
 
 
-Include (To see if it's okay to interleave Include): include/setup.vader
+Include (To see if it's okay to interleave Include): ../include/setup.vader
 
 Do;
 2j
