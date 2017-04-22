@@ -109,7 +109,7 @@ function! vader#run(bang, ...) range
       else
         cq
       endif
-    elseif !empty(qfl)
+    elseif !empty(qfl) && get(g:, 'vader_settings_showquickfix', 1)
       call vader#window#copen()
     endif
   catch

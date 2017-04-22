@@ -308,6 +308,13 @@ execution environment instead as the default.)
     - Builds Vim from source
     - [Build result](https://travis-ci.org/junegunn/vim-oblique/builds/25033116)
 
+Settings
+--------
+
+Vader behavior can be customized by setting these variables in your `vimrc`:
+
+* `let g:vader_settings_quickfix = 0`: Will not show the quickfix window when tests fail. Default: `1`
+
 Projects using Vader
 --------------------
 
