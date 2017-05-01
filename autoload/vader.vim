@@ -42,7 +42,7 @@ function! vader#run(bang, ...) range
         \ 'exitfirst': index(a:000, '-x') >= 0,
         \ 'quiet': index(a:000, '-q') >= 0,
         \ }
-  let patterns = filter(copy(a:000), "v:val !=# '-x'")
+  let patterns = filter(copy(a:000), "index(['-x', '-q'], v:val) == -1")
   if empty(patterns)
     let patterns = [expand('%')]
   endif
