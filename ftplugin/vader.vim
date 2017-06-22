@@ -35,6 +35,7 @@ let b:vader_eos = '\(.*\n'.vader#syntax#_head().'\)\|\%$'
 setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 setlocal iskeyword+=#
 let &l:commentstring = '" %s'
+let &l:comments      = 'sO:" -,mO:"  ,eO:"",:"'
 
 nnoremap <buffer><silent> [[ :call search(b:vader_label, 'bW')<CR>
 nnoremap <buffer><silent> [] :call search(b:vader_eos, 'bW')<CR>
