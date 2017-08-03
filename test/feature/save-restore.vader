@@ -2,12 +2,22 @@ Execute (Initialize vars):
   let g:abc   = 1
   let g:def   = 2
   let g:xyz   = 3
+  let g:dict  = {'a': {'b': 'c'}}
   let $ENVVAR = 4
 
 Execute (Save vars - comma-separated list of optionally-quoted names):
-  Save g:abc, 'g:def', "g:xyz", $ENVVAR, &number
+  Save g:abc, 'g:def', "g:xyz", $ENVVAR, &number, g:dict
   Save g:undefined
   Save $PREVIOUSLY_UNDEFINED
+
+Execute (Save/Restore vars by value):
+  let g:dict.a.b = 'x'
+  Restore g:dict
+  Assert g:dict == {'a': {'b': 'c'}}, 'Save returns a copy'
+
+  let g:dict.a.b = 'x'
+  Restore g:dict
+  Assert g:dict == {'a': {'b': 'c'}}, 'First Restore returns a copy'
 
 Execute (Set previously undefined vars):
   let g:undefined = 1

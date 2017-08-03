@@ -157,7 +157,7 @@ endfunction
 function! vader#save(args)
   for varname in s:split_args(a:args)
     if exists(varname)
-      let s:register[varname] = eval(varname)
+      let s:register[varname] = deepcopy(eval(varname))
     else
       let s:register_undefined += [varname]
     endif
@@ -168,7 +168,7 @@ function! vader#restore(args)
   let varnames = s:split_args(a:args)
   for varname in empty(varnames) ? keys(s:register) : varnames
     if has_key(s:register, varname)
-      execute printf("let %s = s:register['%s']", varname, varname)
+      execute printf("let %s = deepcopy(s:register['%s'])", varname, varname)
     endif
   endfor
   let undefined = empty(varnames) ? s:register_undefined
