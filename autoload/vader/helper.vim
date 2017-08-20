@@ -1,4 +1,5 @@
 function! vader#helper#syntax_at(...)
+  syntax sync fromstart
   if a:0 < 2
     let l:pos = getpos('.')
     let l:cur_lnum = pos[1]
