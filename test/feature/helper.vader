@@ -2,7 +2,7 @@ Given c (C file):
   int i = 0;
   char c = 'i';
 
-Execute (SyntaxAt())):
+Execute (SyntaxAt()):
   call cursor(1, 1)
   AssertEqual SyntaxAt(), 'cType'
   call cursor(1, 9)
@@ -12,7 +12,7 @@ Execute (SyntaxAt())):
   call cursor(2, 11)
   AssertEqual SyntaxAt(11), 'cCharacter'
 
-Execute (SyntaxAt(col))):
+Execute (SyntaxAt(col)):
   call cursor(1, 1)
   AssertEqual SyntaxAt(1), 'cType'
   AssertEqual SyntaxAt(9), 'cNumber'
@@ -20,7 +20,7 @@ Execute (SyntaxAt(col))):
   AssertEqual SyntaxAt(1), 'cType'
   AssertEqual SyntaxAt(11), 'cCharacter'
 
-Execute (SyntaxAt(lnum, col))):
+Execute (SyntaxAt(lnum, col)):
   AssertEqual SyntaxAt(1, 1), 'cType'
   AssertEqual SyntaxAt(1, 9), 'cNumber'
   AssertEqual SyntaxAt(2, 1), 'cType'

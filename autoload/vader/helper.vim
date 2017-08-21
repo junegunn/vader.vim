@@ -15,6 +15,7 @@ function! vader#helper#syntax_at(...)
     let l:lnum = a:1
     let l:col = a:2
   endif
+  call map(synstack(l:lnum, l:col), 'synIDattr(v:val, "name")')
   return synIDattr(synID(l:lnum, l:col, 1), 'name')
 endfunction
 
