@@ -127,7 +127,7 @@ endfunction
 
 function! s:print_stderr(output)
   let lines = split(a:output, '\n')
-  if filewritable($VADER_OUTPUT_FILE)
+  if !empty($VADER_OUTPUT_FILE)
     call writefile(lines, $VADER_OUTPUT_FILE, 'a')
   else
     let tmp = tempname()
