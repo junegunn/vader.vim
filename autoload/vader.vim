@@ -84,6 +84,9 @@ function! vader#run(bang, ...) range
             \ printf('Success/Total: %s/%s%s',
             \     cs, ct, cp > 0 ? (' ('.cp.' pending)') : ''),
             \ 1)
+      if options.exitfirst && (cs + cp) < ct
+        break
+      endif
     endfor
 
     let stats = vader#assert#stat()
