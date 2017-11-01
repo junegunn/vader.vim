@@ -59,7 +59,7 @@ function! s:flush_buffer(cases, case, fn, lnum, raw, label, newlabel, buffer, fi
      \ a:newlabel == 'given' ||
      \ index(['before', 'after', 'do', 'execute'], a:newlabel) >= 0 && fulfilled
       call add(a:cases, deepcopy(a:case))
-      let new = { 'comment': {}, 'lnum': a:lnum, 'pending': 0 }
+      let new = { 'comment': {}, 'lnum': a:lnum, 'pending': 0, 'fpos': {} }
       if !empty(get(a:case, 'type', ''))
         let new.type = a:case.type " To reuse Given block with type
       endif
@@ -81,9 +81,9 @@ function! s:read_vader(fn, line1, line2)
     let line = remove(remains, 0)
     let m = matchlist(line, '^Include\(\s*(.*)\s*\)\?:\s*\(.\{-}\)\s*$')
     if !empty(m)
-      let file = findfile(m[2], fnamemodify(a:fn, ':h'))
-      if empty(file)
-        echoerr "Cannot find ".m[2]
+      let file = fnamemodify(a:fn, ':h').'/'.m[2]
+      if !filereadable(file)
+        echoerr 'Cannot find '.m[2].' ('.file.')'
       endif
       if reserved > 0
         let depth += 1
@@ -92,9 +92,8 @@ function! s:read_vader(fn, line1, line2)
         endif
         let reserved -= 1
       endif
-      let included = readfile(file)
-      let reserved += len(included)
-      call extend(remains, included, 0)
+      call extend(lines, s:read_vader(file, 1, 0))
+      let lnum += 1
       continue
     end
 
@@ -116,12 +115,20 @@ function! s:parse_vader(lines, line1)
   let newlabel = ''
   let buffer   = []
   let cases    = []
-  let case     = { 'lnum': a:line1, 'comment': {}, 'pending': 0, 'raw': 0 }
+  let case     = { 'lnum': a:line1, 'comment': {}, 'pending': 0, 'raw': 0, 'fpos': {} }
 
   for [fn, lnum, line] in a:lines
     " Comment / separators
+    " Keep them to maintain line numbers for Execute, but escape/comment them
+    " for s:flush_buffer.
     if !case.raw && line =~ '^[#"=~*^-]'
-      continue
+      if index(['execute', 'then', 'before', 'after'], label) == -1
+        continue
+      endif
+      if line[0] != '"'
+        let line = '" '.line
+      endif
+      let line = '" '.line
     endif
 
     let matched = 0
@@ -130,6 +137,7 @@ function! s:parse_vader(lines, line1)
       if !empty(m)
         let newlabel = tolower(l)
         call s:flush_buffer(cases, case, fn, lnum, m[3] == ';', label, newlabel, buffer, 0)
+        let case.fpos[newlabel] = [fn, lnum]
 
         let label   = newlabel
         let arg     = m[1]
@@ -155,7 +163,7 @@ function! s:parse_vader(lines, line1)
     if matched | continue | endif
 
     " Continuation
-    if !empty(line) && !case.raw && line !~ '^  '
+    if !empty(line) && line[0] != '"' && !case.raw && line !~ '^  '
       throw 'Syntax error (line does not start with two spaces): ' . line
     endif
     if !empty(label)

@@ -1,0 +1,12 @@
+Execute (Assertion error):
+  Assert 0
+
+Execute (AssertEqual):
+" Vader comment
+  " Vim comment
+  AssertEqual 'foo', 'bar', 'foo should be equal to bar'
+
+Include: after.vader
+
+Execute (Success with failure in After):
+  Assert 1

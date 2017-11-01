@@ -1,7 +1,6 @@
 filetype off
-set rtp+=../
+let &runtimepath .= ','.expand('<sfile>:p:h:h')
 filetype plugin indent on
 syntax enable
 set nomore
 set noswapfile
-set viminfo=

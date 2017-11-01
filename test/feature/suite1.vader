@@ -11,10 +11,10 @@ Execute (AssertThrows):
   command! VaderThrows call VaderThrows()
   AssertThrows call reverse('not a list')
   AssertEqual g:vader_exception, 'Vim(call):E686: Argument of reverse() must be a List'
-  AssertEqual g:vader_throwpoint, 'function vader#assert#throws, line 5'
+  Assert g:vader_throwpoint =~# '\Vfunction <SNR>\d\+_vader_wrapper[5]..vader#assert#throws, line 5', g:vader_throwpoint
   AssertThrows VaderThrows
   AssertEqual g:vader_exception, 'Vim(echoerr):Error from VaderThrows'
-  AssertEqual g:vader_throwpoint, 'function vader#assert#throws[5]..VaderThrows, line 1'
+  Assert g:vader_throwpoint =~# '\Vfunction <SNR>\d\+_vader_wrapper[8]..vader#assert#throws[5]..VaderThrows, line 1', g:vader_throwpoint
 
 Execute (AssertEqual handles funcrefs):
   function! F1()

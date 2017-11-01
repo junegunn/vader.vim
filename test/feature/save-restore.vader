@@ -49,10 +49,11 @@ Execute (Restore everything):
   AssertEqual !number, &number
 
 Execute (g:undefined should not exist):
+  Assert !exists('number')
   Assert !exists('g:undefined')
   AssertEqual $PREVIOUSLY_UNDEFINED, ''
 
-Execute (Restore everthing again):
+Execute (Restore everything again):
   let g:xyz = 5
   Restore
   AssertEqual 3, g:xyz
@@ -61,4 +62,3 @@ Execute (Cleanup):
   unlet g:abc
   unlet g:def
   unlet g:xyz
-  unlet number

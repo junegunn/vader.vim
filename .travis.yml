@@ -1,17 +1,31 @@
-language: ruby
-rvm:
-  - 2.2.3
+sudo: true
+services:
+  - docker
+language: python
 
-before_script:
-  - git clone https://github.com/vim/vim
-  - cd vim
-  - ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp
-  - make -j4
-  - sudo make install
-  - cd -
+env:
+  matrix:
+    - ENV=testnvim
+    - ENV=docker_test MAKE_ARGS=DOCKER_VIM=vim73
+    - ENV=docker_test MAKE_ARGS=DOCKER_VIM=vim74-trusty
+    - ENV=docker_test MAKE_ARGS=DOCKER_VIM=vim74-xenial
+    - ENV=docker_test MAKE_ARGS=DOCKER_VIM=vim8069
+    - ENV=docker_test MAKE_ARGS=DOCKER_VIM=vim-master
+
+matrix:
+  allow_failures:
+    # Does not have Ruby currently (https://github.com/tweekmonster/vim-testbed/pull/23#issuecomment-285870332).
+    - env: ENV=docker_test MAKE_ARGS=DOCKER_VIM=vim73
+  fast_finish: true
+
+install:
+  - |
+    if [ "$ENV" = "testnvim" ]; then
+      eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
+      rvm default
+      gem install neovim
+      pip install neovim
+    fi
 
 script:
-  - export PATH="/usr/local/bin:$PATH"
-  - export LD_LIBRARY_PATH=~/.rvm/rubies/ruby-2.2.3/lib
-  - vim --version
-  - ./test/run-tests.sh
+  - make $ENV $MAKE_ARGS
