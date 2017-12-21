@@ -53,15 +53,49 @@ function! vader#run(bang, ...) range
     let [success, pending, total] = [0, 0, 0]
 
     for gl in patterns
-      if filereadable(gl)
-        let files = [gl]
+      let m = matchlist(gl, '\v^(.*):(\d+)$')
+      if empty(m)
+        let fname = gl
+        let lnum = 0
       else
-        let files = filter(split(glob(gl), "\n"),
+        let fname = fnamemodify(m[1], ':p')
+        let options['fpos'] = [fname, m[2]]
+        let lnum = m[2]
+      endif
+
+      if filereadable(fname)
+        let files = [fname]
+      else
+        let files = filter(split(glob(fname), "\n"),
               \ "fnamemodify(v:val, ':e') ==# 'vader'")
       endif
       for fn in files
         let afn = fnamemodify(fn, ':p')
         let cases = vader#parser#parse(afn, line1, line2)
+
+        " Find the test case ("execute" or "do") for the given line number.
+        if lnum
+          let single_case = deepcopy(cases)
+          call filter(single_case, "has_key(v:val.fpos, 'execute')")
+          call filter(single_case, 'v:val.fpos.execute[0] ==# fname && v:val.fpos.execute[1] <= lnum')
+          if empty(single_case)
+            continue
+          else
+            let single_case = deepcopy(single_case[-1])
+            let before_cases = cases[0 : index(cases, single_case)-1]
+
+            " Copy given/before/after/then from previous tests, for
+            " s:parse_vader.
+            for case in before_cases
+              for label in ['given', 'before', 'after', 'then']
+                if has_key(case, label)
+                  let single_case[label] = case[label]
+                endif
+              endfor
+            endfor
+            let cases = [single_case]
+          endif
+        endif
         call add(all_cases, [afn, cases])
         let total += len(cases)
       endfor
