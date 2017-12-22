@@ -21,60 +21,66 @@
 " OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-let s:register = {}
-let s:register_undefined = []
-let s:indent = 2
-
-function! vader#run(bang, ...) range
-  let s:error_line = 0
-
-  if a:lastline - a:firstline > 0
-    if a:0 > 1
-      echoerr "You can't apply range on multiple files"
-      return
+function! s:glob_patterns(patterns)
+  let all_files = []
+  for pattern in a:patterns
+    if filereadable(pattern)
+      call add(all_files, pattern)
+    else
+      call extend(all_files, filter(split(glob(pattern), "\n"),
+                                  \ "fnamemodify(v:val, ':e') ==# 'vader'"))
     endif
-    let [line1, line2] = [a:firstline, a:lastline]
-  else
-    let [line1, line2] = [1, 0]
-  endif
+  endfor
+  return all_files
+endfunction
 
-  let options = { 'exitfirst': index(a:000, '-x') >= 0 }
-  let patterns = filter(copy(a:000), "v:val !=# '-x'")
+function! s:collect_cases(files, line1, line2)
+  let all_cases = []
+  let total = 0
+  for fn in s:glob_patterns(a:files)
+    let afn = fnamemodify(fn, ':p')
+    let cases = vader#parser#parse(afn, a:line1, a:line2)
+    call add(all_cases, [afn, cases])
+    let total += len(cases)
+  endfor
+  return [all_cases, total]
+endfunction
+
+function! s:init_state()
+  let s:register = {}
+  let s:register_undefined = []
+  let s:indent = 2
+  let s:error_line = 0
+  call vader#assert#reset()
+  call s:define_commands()
+endfunction
+
+function! vader#run(bang, count, line1, line2, args)
+  let [line1, line2] = a:count && a:line2 >= a:line1 ? [a:line1, a:line2] : [1, 0]
+  let options = { 'exitfirst': index(a:args, '-x') >= 0 }
+  let patterns = filter(copy(a:args), "v:val !=# '-x'")
   if empty(patterns)
     let patterns = [expand('%')]
+  elseif line2
+    echoerr 'Range and file arguments are mutually exclusive'
+    return
   endif
 
-  call vader#assert#reset()
-  call s:prepare()
   try
-    let all_cases = []
-    let qfl = []
-    let st  = reltime()
-    let [success, pending, total] = [0, 0, 0]
+    let started_at = reltime()
 
-    for gl in patterns
-      if filereadable(gl)
-        let files = [gl]
-      else
-        let files = filter(split(glob(gl), "\n"),
-              \ "fnamemodify(v:val, ':e') ==# 'vader'")
-      endif
-      for fn in files
-        let afn = fnamemodify(fn, ':p')
-        let cases = vader#parser#parse(afn, line1, line2)
-        call add(all_cases, [afn, cases])
-        let total += len(cases)
-      endfor
-    endfor
-    if empty(all_cases)
+    let [cases, total] = s:collect_cases(s:glob_patterns(patterns), line1, line2)
+    if empty(cases)
       throw 'Vader: no tests found for patterns ('.join(patterns).')'
     endif
 
+    call s:init_state()
     call vader#window#open()
     call vader#window#append(
-    \ printf("Starting Vader: %d suite(s), %d case(s)", len(all_cases), total), 0)
+    \ printf("Starting Vader: %d suite(s), %d case(s)", len(cases), total), 0)
 
-    for pair in all_cases
+    let [success, pending, qfl] = [0, 0, []]
+    for pair in cases
       let [fn, case] = pair
       let [cs, cp, ct, lqfl] = s:run(fn, case, options)
       let success += cs
@@ -94,7 +100,7 @@ function! vader#run(bang, ...) range
           \ success, total, (pending > 0 ? pending . ' pending, ' : ''),
           \ stats[0], stats[1]), 0)
     call vader#window#append('Elapsed time: '.
-          \ substitute(reltimestr(reltime(st)), '^\s*', '', '') .' sec.', 0)
+          \ substitute(reltimestr(reltime(started_at)), '^\s*', '', '') .' sec.', 0)
     call vader#window#cleanup()
 
     let g:vader_report = join(getline(1, '$'), "\n")
@@ -102,11 +108,7 @@ function! vader#run(bang, ...) range
     call setqflist(qfl)
 
     if a:bang
-      redir => ver
-      silent version
-      redir END
-
-      call s:print_stderr(ver . "\n\n" . g:vader_report)
+      call s:print_stderr(s:vim_version() . "\n\n" . g:vader_report)
       if success + pending == total
         qall!
       else
@@ -124,8 +126,15 @@ function! vader#run(bang, ...) range
       echoerr error
     endif
   finally
-    call s:cleanup()
+    call s:undefine_commands()
   endtry
+endfunction
+
+function! s:vim_version()
+  redir => ver
+  silent version
+  redir END
+  return ver
 endfunction
 
 function! s:print_stderr(output)
@@ -185,7 +194,7 @@ function! vader#restore(args)
   endfor
 endfunction
 
-function! s:prepare()
+function! s:define_commands()
   command! -nargs=+ Log            :call vader#log(<args>)
   command! -nargs=+ Save           :call vader#save(<q-args>)
   command! -nargs=* Restore        :call vader#restore(<q-args>)
@@ -197,9 +206,7 @@ function! s:prepare()
   let g:SyntaxOf = function('vader#helper#syntax_of')
 endfunction
 
-function! s:cleanup()
-  let s:register = {}
-  let s:register_undefined = []
+function! s:undefine_commands()
   delcommand Log
   delcommand Save
   delcommand Restore
