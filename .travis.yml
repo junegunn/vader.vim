@@ -4,7 +4,7 @@ rvm:
   - 2.2.3
 
 install:
-  - git clone https://github.com/vim/vim
+  - git clone --depth=1 https://github.com/vim/vim
   - cd vim
   - ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp --prefix /tmp/vim
   - make
