@@ -4,6 +4,7 @@ rvm:
   - 2.2.3
 
 install:
+  - pip install --user covimerage
   - git clone --depth=1 https://github.com/vim/vim
   - cd vim
   - ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp --prefix /tmp/vim
@@ -15,4 +16,8 @@ install:
 script:
   - export LD_LIBRARY_PATH=~/.rvm/rubies/ruby-2.2.3/lib
   - vim --version
-  - ./test/run-tests.sh
+  - VADER_TEST_VIM="covimerage run --source $PWD --data-file $PWD/.coverage.covimerage vim" ./test/run-tests.sh
+
+after_success:
+  - covimerage -vv xml
+  - bash <(curl -s https://codecov.io/bash) -X search -X gcov -X coveragepy -f coverage.xml
