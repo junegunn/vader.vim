@@ -1,17 +1,18 @@
+sudo: false
 language: ruby
 rvm:
   - 2.2.3
 
-before_script:
+install:
   - git clone https://github.com/vim/vim
   - cd vim
-  - ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp
-  - make -j4
-  - sudo make install
+  - ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp --prefix /tmp/vim
+  - make
+  - make install
   - cd -
+  - PATH=/tmp/vim/bin:$PATH
 
 script:
-  - export PATH="/usr/local/bin:$PATH"
   - export LD_LIBRARY_PATH=~/.rvm/rubies/ruby-2.2.3/lib
   - vim --version
   - ./test/run-tests.sh
