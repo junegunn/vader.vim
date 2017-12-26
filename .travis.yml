@@ -11,17 +11,18 @@ matrix:
 install:
   - pip install --user covimerage
   - |
+    pushd /tmp
     if [ "$TESTVIM" = vim ]; then
       git clone --depth=1 https://github.com/vim/vim
       cd vim
       ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp --prefix /tmp/vim
       make
       make install
-      cd -
       PATH=/tmp/vim/bin:$PATH
     else
-      (cd /tmp && eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64")
+      eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
     fi
+    popd
 
 script:
   - export LD_LIBRARY_PATH=~/.rvm/rubies/ruby-2.2.3/lib
