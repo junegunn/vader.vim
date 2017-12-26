@@ -1,12 +1,10 @@
 sudo: false
 language: ruby
-
-addons:
-  apt:
-    packages:
-      - ruby-dev
+rvm:
+  - 2.4.1
 
 install:
+  - export LD_LIBRARY_PATH=~/.rvm/rubies/ruby-2.4.1/lib
   - git clone --depth=1 https://github.com/vim/vim
   - cd vim
   - ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp --prefix /tmp/vim
