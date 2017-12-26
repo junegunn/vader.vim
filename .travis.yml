@@ -22,6 +22,7 @@ install:
       PATH=/tmp/vim/bin:$PATH
     else
       eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
+      gem install neovim
       export VADER_OUTPUT_FILE=/dev/stderr
     fi
     popd
