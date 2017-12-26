@@ -1,7 +1,7 @@
 sudo: false
 language: ruby
 rvm:
-  - 2.2.3
+  - 2.4.1
 
 install:
   - git clone --depth=1 https://github.com/vim/vim
@@ -13,6 +13,6 @@ install:
   - PATH=/tmp/vim/bin:$PATH
 
 script:
-  - export LD_LIBRARY_PATH=~/.rvm/rubies/ruby-2.2.3/lib
+  - export LD_LIBRARY_PATH=~/.rvm/rubies/ruby-2.4.1/lib
   - vim --version
   - ./test/run-tests.sh
