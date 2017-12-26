@@ -34,5 +34,5 @@ script:
   - VADER_TEST_VIM="covimerage run --source $PWD --data-file $PWD/.coverage.covimerage $TESTVIM" ./test/run-tests.sh
 
 after_success:
-  - covimerage -vv xml
+  - covimerage -vv xml --omit '_neovim/*'
   - bash <(curl -s https://codecov.io/bash) -X search -X gcov -X coveragepy -f coverage.xml -F $TESTVIM
