@@ -77,6 +77,12 @@ function! vader#window#execute(lines, lang_if)
       call insert(lines, a:lang_if . ' << __VADER__LANG__IF__')
       call add(lines, '__VADER__LANG__IF__')
     endif
+
+    " Copy all local variables to the global scope so that Vim generates
+    " profiling information for it.
+    " Works around https://github.com/vim/vim/issues/2350.
+    call extend(lines, ['if v:profiling | if !exists("g:vader_locals") | let g:vader_locals = [] | endif | call extend(g:vader_locals, items(l:)) | endif'])
+
     call writefile(lines, temp)
     execute 'source '.temp
   finally
