@@ -26,6 +26,7 @@ Expect (Contents of wrapped function):
   9  for l in split(func, '\n')[1:-2]
   10   call append(line('$'), l)
   11 endfor
+  12 if v:profiling | if !exists("g:vader_locals") | let g:vader_locals = [] | endif | call extend(g:vader_locals, items(l:)) | endif
 
 Then (Thrown from line 3):
 # Vader comment
