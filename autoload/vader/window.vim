@@ -29,6 +29,9 @@ let s:workbench_bfr = 0
 
 function! s:switch_to_console()
   execute 'normal! '.s:console_tab.'gt'
+  if tabpagenr() != s:console_tab
+    call vader#window#append(printf('Vader warning: could not change to console tab (%d)', s:console_tab), 0)
+  endif
   call append(line('$') - 1, s:console_buffered)
   let s:console_buffered = []
 endfunction
