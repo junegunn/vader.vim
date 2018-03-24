@@ -24,6 +24,8 @@
 let s:register = {}
 let s:register_undefined = []
 let s:indent = 2
+" Fallback to 'type' (on Windows).
+let s:cat = executable('cat') ? 'cat' : 'type'
 
 function! vader#run(bang, ...) range
   let s:error_line = 0
@@ -135,7 +137,7 @@ function! s:print_stderr(output)
   else
     let tmp = tempname()
     call writefile(lines, tmp)
-    execute 'silent !cat '.tmp.' 1>&2'
+    execute printf('silent !%s %s 1>&2', s:cat, tmp)
     call delete(tmp)
   endif
 endfunction
