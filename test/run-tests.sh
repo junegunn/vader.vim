@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-# Do not "cd" to any existing "test" dir from CDPATH!
-unset CDPATH
+# Use privileged mode, to e.g. ignore $CDPATH.
+set -p
 
-cd "$( dirname "${BASH_SOURCE[0]}" )" && vim -Nu vimrc -c 'Vader! *' > /dev/null
+cd "$( dirname "${BASH_SOURCE[0]}" )" || exit
+
+: "${VADER_TEST_VIM:=vim}"
+eval "$VADER_TEST_VIM -Nu vimrc -c 'Vader! *'"

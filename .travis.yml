@@ -3,16 +3,36 @@ language: ruby
 rvm:
   - 2.2.3
 
+matrix:
+  include:
+    - env: TESTVIM=vim
+    - env: TESTVIM=nvim
+
 install:
-  - git clone --depth=1 https://github.com/vim/vim
-  - cd vim
-  - ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp --prefix /tmp/vim
-  - make
-  - make install
-  - cd -
-  - PATH=/tmp/vim/bin:$PATH
+  - pip install --user covimerage
+  - |
+    set -e
+    pushd /tmp
+    if [ "$TESTVIM" = vim ]; then
+      git clone --depth=1 https://github.com/vim/vim
+      cd vim
+      ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp --prefix /tmp/vim
+      make
+      make install
+      PATH=/tmp/vim/bin:$PATH
+    else
+      eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
+      gem install neovim
+      pip install --user neovim
+      export VADER_OUTPUT_FILE=/dev/stderr
+    fi
+    popd
 
 script:
   - export LD_LIBRARY_PATH=~/.rvm/rubies/ruby-2.2.3/lib
-  - vim --version
-  - ./test/run-tests.sh
+  - $TESTVIM --version
+  - VADER_TEST_VIM="covimerage run --source $PWD --data-file $PWD/.coverage.covimerage $TESTVIM" ./test/run-tests.sh
+
+after_success:
+  - covimerage -vv xml --omit '_neovim/*'
+  - bash <(curl -s https://codecov.io/bash) -X search -X gcov -X coveragepy -f coverage.xml -F $TESTVIM
