@@ -29,6 +29,7 @@ VADER - TABLE OF CONTENTS                                      *vader* *vader-to
       feedkeys() cannot be tested                                |vader-7-1|
       Some events may not be triggered                           |vader-7-2|
       Search history may not be correctly updated                |vader-7-3|
+      AssertThrows causes undefined variable error               |vader-7-4|
     License                                                      |vader-8|
 
 
@@ -404,7 +405,6 @@ See {the wiki page}{8}.
 KNOWN ISSUES                                                *vader-known-issues*
 ==============================================================================
 
-
 < feedkeys() cannot be tested >_______________________________________________~
                                                *vader-feedkeys-cannot-be-tested*
                                                                      *vader-7-1*
@@ -487,6 +487,32 @@ The result is given as follows:
     Success/Total: 2/3 (assertions: 0/1)
     Elapsed time: 0.366118 sec.
 <
+< AssertThrows causes undefined variable error >______________________________~
+                                              *vader-AssertThrows-undefined-var*
+                                                                     *vader-7-4*
+When using AssertThrows with functions that take arguments with an unqualified x,
+you will get an undefined variable error.
+
+      AssertThrows call F(x)
+      Log g:vader_exception
+      :Vader %
+      Vim(call):E121: Undefined variable: x
+
+This is because the local scope hides the global scope inside a function body.
+The solution to this problem is to explicitly prefix the arguments with g:.
+
+Note if you don't prefix x with g:, AssertThrows will cause a false positive:
+
+      Execute(False positive):
+        let x = 1
+
+        function! X(args)
+          " No throwing.
+        endfunction
+
+        AssertThrows call X(x)
+
+The X function throws nothing but passes the AssertThrows.
 
                                                                        *vader-8*
 LICENSE                                                          *vader-license*

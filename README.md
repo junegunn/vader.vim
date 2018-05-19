@@ -399,6 +399,36 @@ Success/Total: 2/3 (assertions: 0/1)
 Elapsed time: 0.366118 sec.
 ```
 
+### AssertThrows causes undefined variable error
+
+When using ``AssertThrows`` with functions that take arguments with an unqualified ``x``,
+you will get an undefined variable error.
+
+```vim
+      AssertThrows call F(x)
+      Log g:vader_exception
+      :Vader %
+      Vim(call):E121: Undefined variable: x
+```
+
+This is because the local scope hides the global scope inside a function body.
+The solution to this problem is to explicitly prefix the arguments with ``g:``.
+
+Note if you don't prefix ``x`` with ``g:``, ``AssertThrows`` will cause a false positive:
+
+```vim
+      Execute(False positive):
+        let x = 1
+
+        function! X(args)
+          " No throwing.
+        endfunction
+
+        AssertThrows call X(x)
+```
+
+The ``X`` function throws nothing but passes the ``AssertThrows``.
+
 License
 -------
 
