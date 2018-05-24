@@ -1,0 +1,11 @@
+" vim:ft=vim
+" Explain the false positive caused by the 'Undefined Sam' problem.
+
+Execute(A non-throwing function that takes arguments can pass 'AssertThrows');
+let x = 1
+
+function! X(args)
+  " No throwing.
+endfunction
+
+AssertThrows call X(x)
