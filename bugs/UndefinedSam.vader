@@ -1,0 +1,16 @@
+Execute(Undefined sam):
+  function! F(x)
+    throw 'Hello'
+  endfunction
+
+  let sam = {}
+  AssertThrows call F(sam)
+  Log g:vader_exception
+
+Execute(Works fine with literal value):
+  function! F(x)
+    throw 'Hello'
+  endfunction
+
+  AssertThrows call F(1)
+  Log g:vader_exception

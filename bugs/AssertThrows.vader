@@ -1,0 +1,4 @@
+Execute(Let's throw something):
+  AssertThrow throw 'Note the Throw, not Throws'
+  AssertE 1, 2
+  " AssertThrows throw 'This time, it is a Throws'

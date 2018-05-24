@@ -1,0 +1,31 @@
+Before:
+  function! F(x)
+    throw 'Hello'
+  endfunction
+
+  function! X(x)
+    " No throwing.
+  endfunction
+
+Execute(Repeat the Undefined variable problem):
+  let sam = {}
+  AssertThrows call F(sam)
+  Assert g:vader_exception =~# 'E121: Undefined variable: sam'
+
+Execute(AssertThrows works fine with literal value):
+  AssertThrows call F(1)
+  Assert g:vader_exception is# 'Hello'
+
+Execute(A non-throwing function that takes arguments can pass 'AssertThrows'):
+  let x = 1
+  AssertThrows call X(x), 'This message never show up'
+
+Execute(Prefix the arguments with g: solve the problem):
+  let x = 1
+  AssertThrows call F(g:x)
+  Assert g:vader_exception is# 'Hello'
+  try
+     AssertThrows call X(g:x)
+  catch
+    Assert v:exception is# 'Exception expected but not raised: call X(g:x)'
+  endtry

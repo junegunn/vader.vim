@@ -1,0 +1,9 @@
+Execute(Undefined sam):
+  function! F(x)
+    throw 'Hello'
+  endfunction
+
+  let sam = {}
+  AssertThrows call F(sam)
+  Log g:vader_throwpoint
+

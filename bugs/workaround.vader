@@ -1,0 +1,11 @@
+Execute(Work around the 'Undefined Sam');
+  function! F(x)
+    throw 'Hello'
+  endfunction
+
+  let sam = {}
+  try
+    call F(sam)
+  catch
+    Assert v:exception =~# 'Hello'
+  endtry
