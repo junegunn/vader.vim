@@ -40,8 +40,11 @@ function! vader#run(bang, ...) range
     let [line1, line2] = [1, 0]
   endif
 
-  let options = { 'exitfirst': index(a:000, '-x') >= 0 }
-  let patterns = filter(copy(a:000), "v:val !=# '-x'")
+  let options = {
+        \ 'exitfirst': index(a:000, '-x') >= 0,
+        \ 'quiet': index(a:000, '-q') >= 0,
+        \ }
+  let patterns = filter(copy(a:000), "index(['-x', '-q'], v:val) == -1")
   if empty(patterns)
     let patterns = [expand('%')]
   endif
@@ -104,11 +107,14 @@ function! vader#run(bang, ...) range
     call setqflist(qfl)
 
     if a:bang
-      redir => ver
-      silent version
-      redir END
+      if !options.quiet
+        redir => ver
+        silent version
+        redir END
+        call s:print_stderr(ver . "\n\n")
+      endif
 
-      call s:print_stderr(ver . "\n\n" . g:vader_report)
+      call s:print_stderr(g:vader_report)
       if success + pending == total
         qall!
       else
