@@ -27,6 +27,9 @@ let s:console_tab   = 0
 let s:workbench_tab = 0
 let s:workbench_bfr = 0
 
+" Used in tests.
+let g:vader#window#_s = s:
+
 function! s:switch_to_console()
   execute 'normal! '.s:console_tab.'gt'
   if tabpagenr() != s:console_tab
