@@ -54,3 +54,35 @@ Execute (Error in scoped function cannot get source, but continues):
   endtry
   let m = matchlist(g:vader_throwpoint, '\Vfunction <SNR>\d\+_vader_wrapper[\(\d\+\)]..vader#assert#throws, line 5')
   AssertEqual m[1], '3', 'Thrown from line 3'
+
+Execute (TODO: Error in Execute):
+  Assert 0, 'Assertion error in Execute'
+
+Execute (Validate error in Execute):
+  AssertEqual g:vader#window#_s.console_buffered[-2],
+  \ printf('      > %s:59: Assert 0, ''Assertion error in Execute''', g:vader_current_file)
+
+Execute (TODO: Error in Execute (via file)):
+  let g:vader_test_include_file = substitute(g:vader_current_file, '\.vader$', '-include.vim', '')
+  let g:vader_test_throw = 'custom_error'
+  execute 'source ' . g:vader_test_include_file
+
+Execute (Validate error in Execute (via file)):
+  let error = g:vader#window#_s.console_buffered[-2]
+  Assert error =~# '\v^ +\(\d+/\d+\) \[EXECUTE\] \(X\) Error: custom_error'
+  Assert stridx(error, printf(' (in %s, line 6)', g:vader_test_include_file)) != -1
+
+Execute (TODO: Error in Execute (via another file)):
+  unlet g:vader_test_throw
+  call VaderTestIncludedFunction('custom error')
+
+Execute (Validate error in Execute (via another file)):
+  let tb = g:vader#window#_s.console_buffered[-4:-2]
+  AssertEqual tb, [
+  \ '      > in VaderTestIncludedFunction (line 1)',
+  \ '      >   throw a:error',
+  \ printf('      > %s:77: call VaderTestIncludedFunction(''custom error'')', g:vader_current_file),
+  \ ]
+
+Execute (Cleanup):
+  unlet g:vader_test_include_file
