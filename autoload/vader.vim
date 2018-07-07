@@ -332,7 +332,6 @@ function! s:execute(prefix, type, block, fpos, lang_if)
   let match_prefix = matchstr(error[1], '\v^function \zs\<SNR\>\d+_vader_wrapper')
   if empty(match_prefix)
     call s:append(a:prefix, a:type, 'Error: '.error[0]. ' (in '.error[1].')', 1)
-    call s:print_throwpoint()
     return [0, []]
   endif
 
@@ -362,12 +361,6 @@ function! s:execute(prefix, type, block, fpos, lang_if)
   endif
 
   return [0, errpos]
-endfunction
-
-function! s:print_throwpoint()
-  if v:throwpoint !~ 'vader#assert'
-    call vader#log(v:throwpoint)
-  endif
 endfunction
 
 function! s:run(filename, cases, options)
@@ -421,7 +414,9 @@ function! s:run(filename, cases, options)
         call vader#window#replay(case.do)
       catch
         call s:append(prefix, 'do', v:exception, 1)
-        call s:print_throwpoint()
+        if v:throwpoint !~ 'vader#assert'
+          call vader#log(v:throwpoint)
+        endif
         let ok = 0
         let errpos = case.fpos.do
       endtry
