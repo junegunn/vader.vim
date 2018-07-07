@@ -63,15 +63,17 @@ Execute (Validate error in Execute):
   \ printf('      > %s:59: Assert 0, ''Assertion error in Execute''', g:vader_current_file)
 
 Execute (TODO: Error in Execute (via file)):
-  execute 'source ' . g:vader_current_file
+  let g:vader_test_include_file = substitute(g:vader_current_file, '\.vader$', '-include.vim', '')
+  let g:vader_test_throw = 'custom_error'
+  execute 'source ' . g:vader_test_include_file
 
 Execute (Validate error in Execute (via file)):
   let error = g:vader#window#_s.console_buffered[-2]
-  Assert error =~# '\v^ +\(\d+/\d+\) \[EXECUTE\] \(X\) Error: Vim:E492: Not an editor command: Given:'
-  Assert stridx(error, printf(' (in %s, line 1)', g:vader_current_file)) != -1
+  Assert error =~# '\v^ +\(\d+/\d+\) \[EXECUTE\] \(X\) Error: custom_error'
+  Assert stridx(error, printf(' (in %s, line 6)', g:vader_test_include_file)) != -1
 
 Execute (TODO: Error in Execute (via another file)):
-  execute 'source ' . substitute(g:vader_current_file, '\.vader$', '-include.vim', '')
+  unlet g:vader_test_throw
   call VaderTestIncludedFunction('custom error')
 
 Execute (Validate error in Execute (via another file)):
@@ -79,5 +81,8 @@ Execute (Validate error in Execute (via another file)):
   AssertEqual tb, [
   \ '      > in VaderTestIncludedFunction (line 1)',
   \ '      >   throw a:error',
-  \ printf('      > %s:75: call VaderTestIncludedFunction(''custom error'')', g:vader_current_file),
+  \ printf('      > %s:77: call VaderTestIncludedFunction(''custom error'')', g:vader_current_file),
   \ ]
+
+Execute (Cleanup):
+  unlet g:vader_test_include_file
