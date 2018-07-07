@@ -114,6 +114,11 @@ function! vader#run(bang, ...) range
         call s:print_stderr(ver . "\n\n")
       endif
 
+      " Ensure there is a newline before "Starting Vader:".
+      " Both Vim and Neovim seem to not care much about the trailing newlines
+      " from the version output, and it is required in quiet mode anyway.
+      echom ''
+
       call s:print_stderr(g:vader_report)
       if success + pending == total
         qall!
