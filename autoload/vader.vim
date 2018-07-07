@@ -322,6 +322,7 @@ function! s:run(filename, cases, options)
 
     if !empty(after)
       let s:indent = 2
+      let g:vader_case_ok = ok
       let ok = s:execute(prefix, 'after', after, '') && ok
     endif
 
