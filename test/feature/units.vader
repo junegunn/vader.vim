@@ -1,0 +1,6 @@
+Execute (vader#assert#equal checks types):
+  AssertThrows call vader#assert#equal({}, {1: 'a'})
+  AssertEqual g:vader_exception, "Unequal Dictionaries\n      {'1': 'a'} should be equal to\n      {}"
+
+  AssertThrows call vader#assert#equal([], [1])
+  AssertEqual g:vader_exception, "Unequal Lists\n      [1] should be equal to\n      []"
