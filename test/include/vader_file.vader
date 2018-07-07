@@ -1,2 +1,0 @@
-Execute (g:vader_file matches included file):
-  AssertEqual 'vader_file.vader', fnamemodify(g:vader_file, ':t')

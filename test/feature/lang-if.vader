@@ -9,7 +9,7 @@ Execute ruby (Ruby code):
 Expect:
   Hello
   Hello
-  lang-if.vader
+  vader.vader
 
 Execute python (Python code):
   import os
@@ -22,4 +22,4 @@ Expect:
   Hello
   Hello
   Hello
-  lang-if.vader
+  vader.vader
