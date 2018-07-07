@@ -322,6 +322,7 @@ function! s:get_source_linenr_from_tb_entry(tb_entry)
 endfunction
 
 function! s:execute(prefix, type, block, fpos, lang_if)
+  let g:vader_current_file = a:fpos[0]
   let [error, lines] = vader#window#execute(a:block, a:lang_if)
   if empty(error)
     return [1, []]
