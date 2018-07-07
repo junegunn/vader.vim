@@ -2,7 +2,12 @@
 Execute (Assert and AssertEqual command):
   Assert 1 == 1
   AssertEqual 'hey', tolower('HEY')
-  AssertEqual 'vader.vader', fnamemodify(g:vader_file, ':t')
+
+Execute (g:vader_file in suite1.vader):
+  AssertEqual 'suite1.vader', fnamemodify(g:vader_file, ':t')
+
+# Test g:vader_file with explicit Include
+Include: ../include/vader_file.vader
 
 Execute (AssertThrows):
   function! VaderThrows()
