@@ -118,6 +118,10 @@ function! s:parse_vader(lines, line1)
   let cases    = []
   let case     = { 'lnum': a:line1, 'comment': {}, 'pending': 0, 'raw': 0 }
 
+  if empty(a:lines)
+    return []
+  endif
+
   for [fn, lnum, line] in a:lines
     " Comment / separators
     if !case.raw && line =~ '^[#"=~*^-]'
