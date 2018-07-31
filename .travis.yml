@@ -31,7 +31,7 @@ install:
 script:
   - export LD_LIBRARY_PATH=~/.rvm/rubies/ruby-2.2.3/lib
   - $TESTVIM --version
-  - VADER_TEST_VIM="covimerage run --source $PWD --data-file $PWD/.coverage.covimerage $TESTVIM" ./test/run-tests.sh
+  - VADER_TEST_VIM="covimerage run --source $PWD --data-file $PWD/.coverage_covimerage $TESTVIM" ./test/run-tests.sh
 
 after_success:
   - covimerage -vv xml --omit '_neovim/*'
