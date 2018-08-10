@@ -49,6 +49,13 @@ function! vader#run(bang, ...) range
     let patterns = [expand('%')]
   endif
 
+  if a:bang && !options.quiet
+    redir => ver
+    silent version
+    redir END
+    call vader#print_stderr(ver . "\n\n")
+  endif
+
   call vader#assert#reset()
   call s:prepare()
   try
@@ -115,13 +122,6 @@ function! vader#run(bang, ...) range
     call setqflist(qfl)
 
     if a:bang
-      if !options.quiet
-        redir => ver
-        silent version
-        redir END
-        call vader#print_stderr(ver . "\n\n")
-      endif
-
       call vader#print_stderr(g:vader_report)
       if successful
         qall!
