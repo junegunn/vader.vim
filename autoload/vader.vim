@@ -149,10 +149,11 @@ function! vader#print_stderr(output) abort
   if !empty($VADER_OUTPUT_FILE)
     call writefile(lines, $VADER_OUTPUT_FILE, 'a')
   else
-    let tmp = tempname()
-    call writefile(lines, tmp)
-    execute printf('silent !%s %s 1>&2', s:cat, tmp)
-    call delete(tmp)
+    if !exists('s:tmpfile')
+      let s:tmpfile = tempname()
+    endif
+    call writefile(lines, s:tmpfile)
+    execute printf('silent !%s %s 1>&2', s:cat, s:tmpfile)
   endif
 endfunction
 
