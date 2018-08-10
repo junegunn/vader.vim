@@ -157,6 +157,32 @@ function! vader#print_stderr(output) abort
   endif
 endfunction
 
+" Overwrite vader#print_stderr with specialized version for Neovim.
+" v:stderr is available since Neovim v0.3.0.
+if has('nvim')
+  if !empty($VADER_ECHO_MESSAGES)
+    if $VADER_ECHO_MESSAGES ==# 'stdout'
+      let s:nvim_channel = stdioopen({})
+      function! vader#print_stderr(output) abort
+        call chansend(s:nvim_channel, a:output)
+      endfunction
+    else
+      function! vader#print_stderr(output) abort
+        call chansend(v:stderr, a:output)
+      endfunction
+    endif
+  elseif exists('v:stderr')
+    function! vader#print_stderr(output) abort
+      call chansend(v:stderr, a:output)
+    endfunction
+  elseif exists('*nvim_list_uis') && !empty(nvim_list_uis())
+    " --headless is used (detected with Neovim v0.3.0+)
+    function! vader#print_stderr(output) abort
+      echon a:output
+    endfunction
+  endif
+endif
+
 function! s:split_args(arg)
   let varnames = split(a:arg, ',')
   let names = []
