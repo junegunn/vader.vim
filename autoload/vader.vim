@@ -119,10 +119,10 @@ function! vader#run(bang, ...) range
         redir => ver
         silent version
         redir END
-        call s:print_stderr(ver . "\n\n")
+        call vader#print_stderr(ver . "\n\n")
       endif
 
-      call s:print_stderr(g:vader_report)
+      call vader#print_stderr(g:vader_report)
       if successful
         qall!
       else
@@ -134,7 +134,7 @@ function! vader#run(bang, ...) range
   catch
     let error = 'Vader error: '.v:exception.' (in '.v:throwpoint.')'
     if a:bang
-      call s:print_stderr(error)
+      call vader#print_stderr(error)
       cq
     else
       echoerr error
@@ -144,7 +144,7 @@ function! vader#run(bang, ...) range
   endtry
 endfunction
 
-function! s:print_stderr(output)
+function! vader#print_stderr(output) abort
   let lines = split(a:output, '\n')
   if !empty($VADER_OUTPUT_FILE)
     call writefile(lines, $VADER_OUTPUT_FILE, 'a')
