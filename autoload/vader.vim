@@ -30,6 +30,8 @@ let s:cat = executable('cat') ? 'cat' : 'type'
 function! vader#run(bang, ...) range
   let s:error_line = 0
 
+  let g:vader_bang = a:bang
+
   if a:lastline - a:firstline > 0
     if a:0 > 1
       echoerr "You can't apply range on multiple files"
@@ -117,19 +119,20 @@ function! vader#run(bang, ...) range
           \ substitute(reltimestr(reltime(st)), '^\s*', '', '') .' sec.', 0)
     call vader#window#cleanup()
 
-    let g:vader_report = join(getline(1, '$'), "\n")
-    let g:vader_errors = qfl
-    call setqflist(qfl)
-
     if a:bang
-      call vader#print_stderr(g:vader_report)
       if successful
         qall!
       else
         cq
       endif
-    elseif !empty(qfl)
-      call vader#window#copen()
+    else
+      let g:vader_report = join(getline(1, '$'), "\n")
+      let g:vader_errors = qfl
+      call setqflist(qfl)
+
+      if !empty(qfl)
+        call vader#window#copen()
+      endif
     endif
   catch
     let error = 'Vader error: '.v:exception.' (in '.v:throwpoint.')'
@@ -148,6 +151,12 @@ function! vader#print_stderr(output) abort
   let lines = split(a:output, '\n')
   if !empty($VADER_OUTPUT_FILE)
     call writefile(lines, $VADER_OUTPUT_FILE, 'a')
+  elseif has('nvim')
+    if exists('v:stderr')
+      call chansend(v:stderr, a:output)
+    else
+      call writefile(lines, '/dev/stderr', 'a')
+    endif
   else
     if !exists('s:tmpfile')
       let s:tmpfile = tempname()
@@ -156,32 +165,6 @@ function! vader#print_stderr(output) abort
     execute printf('silent !%s %s 1>&2', s:cat, s:tmpfile)
   endif
 endfunction
-
-" Overwrite vader#print_stderr with specialized version for Neovim.
-" v:stderr is available since Neovim v0.3.0.
-if has('nvim')
-  if !empty($VADER_ECHO_MESSAGES)
-    if $VADER_ECHO_MESSAGES ==# 'stdout'
-      let s:nvim_channel = stdioopen({})
-      function! vader#print_stderr(output) abort
-        call chansend(s:nvim_channel, a:output)
-      endfunction
-    else
-      function! vader#print_stderr(output) abort
-        call chansend(v:stderr, a:output)
-      endfunction
-    endif
-  elseif exists('v:stderr')
-    function! vader#print_stderr(output) abort
-      call chansend(v:stderr, a:output)
-    endfunction
-  elseif exists('*nvim_list_uis') && !empty(nvim_list_uis())
-    " --headless is used (detected with Neovim v0.3.0+)
-    function! vader#print_stderr(output) abort
-      echon a:output
-    endfunction
-  endif
-endif
 
 function! s:split_args(arg)
   let varnames = split(a:arg, ',')
