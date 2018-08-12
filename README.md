@@ -29,8 +29,9 @@ Running Vader tests
     - If the description of `Do` or `Execute` block includes `FIXME` or `TODO`,
       the block is recognized as a pending test case and does not affect the
       exit status.
-    - If the environment variable `VADER_OUTPUT_FILE` is set, the test results
-      will be written to it as well
+    - You can use the environment variable `VADER_OUTPUT_FILE` to configure a
+      file to write test results into.  This is useful with Neovim, where
+      you need VADER_OUTPUT_FILE=/dev/stderr to write output to stderr.
 
 Syntax of .vader file
 ---------------------
