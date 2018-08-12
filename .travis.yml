@@ -7,6 +7,7 @@ matrix:
   include:
     - env: TESTVIM=vim
     - env: TESTVIM=nvim
+    - env: TESTVIM=nvim VADER_OUTPUT_FILE=/dev/stderr
 
 install:
   - pip install --user covimerage
@@ -25,7 +26,6 @@ install:
       TRAVIS_BUILD_DIR=/tmp eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
       gem install neovim
       pip install --user neovim
-      export VADER_OUTPUT_FILE=/dev/stderr
     fi
     popd
 
