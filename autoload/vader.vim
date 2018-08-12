@@ -147,6 +147,8 @@ function! vader#run(bang, ...) range
   endtry
 endfunction
 
+let s:stderr_buffer = []
+
 function! vader#print_stderr(output) abort
   let lines = split(a:output, '\n')
   if !empty($VADER_OUTPUT_FILE)
@@ -157,13 +159,27 @@ function! vader#print_stderr(output) abort
     else
       call writefile(lines, '/dev/stderr', 'a')
     endif
+  elseif mode(1) ==# 'ce' || mode(1) ==# 'cv'  " -es (silent ex mode)
+    for line in lines
+      verbose echon line."\n"
+    endfor
   else
-    if !exists('s:tmpfile')
-      let s:tmpfile = tempname()
+    " Cannot output single lines reliably in this case.
+    if empty(s:stderr_buffer)
+      let msg = printf('Vader note: cannot print to stderr reliably/directly.  Please consider using %s''s -es/-Es option.', has('nvim') ? 'Neovim' : 'Vim')
+      call add(s:stderr_buffer, msg)
+      augroup vader_exit
+        autocmd VimLeave * call s:output_stderr_buffer()
+      augroup END
     endif
-    call writefile(lines, s:tmpfile)
-    execute printf('silent !%s %s 1>&2', s:cat, s:tmpfile)
+    call extend(s:stderr_buffer, lines)
   endif
+endfunction
+
+function! s:output_stderr_buffer() abort
+  let s:tmpfile = tempname()
+  call writefile(s:stderr_buffer, s:tmpfile)
+  execute printf('silent !%s %s 1>&2', s:cat, s:tmpfile)
 endfunction
 
 function! s:split_args(arg)
