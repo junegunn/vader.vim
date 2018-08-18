@@ -75,6 +75,7 @@ let s:tempscript = tempname()
 function! vader#window#execute(lines, lang_if)
   try
     let lines = [
+          \ 'scriptencoding utf-8',
           \ 'command! -nargs=+ Log            :call vader#log(<args>)',
           \ 'command! -nargs=+ Save           :call vader#save(<q-args>)',
           \ 'command! -nargs=* Restore        :call vader#restore(<q-args>)',
