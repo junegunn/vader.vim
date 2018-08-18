@@ -147,40 +147,54 @@ function! vader#run(bang, ...) range
   endtry
 endfunction
 
-let s:stderr_buffer = []
-
-function! vader#print_stderr(output) abort
-  let lines = split(a:output, '\n')
-  if !empty($VADER_OUTPUT_FILE)
+" Define vader#print_stderr based on available features / used options.
+" This is done a) for performance reasons, but b) mainly because `mode()`
+" might be e.g. "ic" during tests, and we need to detect the initial usage of
+" "-es" / "-Es".
+if !empty($VADER_OUTPUT_FILE)
+  function! vader#print_stderr(output) abort
+    let lines = split(a:output, '\n')
     call writefile(lines, $VADER_OUTPUT_FILE, 'a')
-  elseif has('nvim')
-    if exists('v:stderr')
+  endfunction
+elseif has('nvim')
+  if exists('v:stderr')
+    function! vader#print_stderr(output) abort
       call chansend(v:stderr, a:output)
-    else
+    endfunction
+  else
+    function! vader#print_stderr(output) abort
+      let lines = split(a:output, '\n')
       call writefile(lines, '/dev/stderr', 'a')
-    endif
-  elseif mode(1) ==# 'ce' || mode(1) ==# 'cv'  " -es (silent ex mode)
+    endfunction
+  endif
+elseif mode(1) ==# 'ce' || mode(1) ==# 'cv'  " -es (silent ex mode)
+  function! vader#print_stderr(output) abort
+    let lines = split(a:output, '\n')
     for line in lines
       verbose echon line."\n"
     endfor
-  else
-    " Cannot output single lines reliably in this case.
-    if empty(s:stderr_buffer)
-      let msg = printf('Vader note: cannot print to stderr reliably/directly.  Please consider using %s''s -es/-Es option.', has('nvim') ? 'Neovim' : 'Vim')
-      call add(s:stderr_buffer, msg)
-      augroup vader_exit
-        autocmd VimLeave * call s:output_stderr_buffer()
-      augroup END
-    endif
-    call extend(s:stderr_buffer, lines)
-  endif
-endfunction
+  endfunction
+else
+  " Cannot output single lines reliably in this case.
+  let s:stderr_buffer = [
+        \ printf('Vader note: cannot print to stderr reliably/directly.  Please consider using %s''s -es/-Es option (mode=%s).',
+            \ has('nvim') ? 'Neovim' : 'Vim',
+            \ mode(1))]
+  function! s:output_stderr_buffer() abort
+    let s:tmpfile = tempname()
+    call writefile(s:stderr_buffer, s:tmpfile)
+    execute printf('silent !%s %s 1>&2', s:cat, s:tmpfile)
+    let s:stderr_buffer = []
+  endfunction
+  augroup vader_exit
+    autocmd VimLeave * call s:output_stderr_buffer()
+  augroup END
 
-function! s:output_stderr_buffer() abort
-  let s:tmpfile = tempname()
-  call writefile(s:stderr_buffer, s:tmpfile)
-  execute printf('silent !%s %s 1>&2', s:cat, s:tmpfile)
-endfunction
+  function! vader#print_stderr(output) abort
+    let lines = split(a:output, '\n')
+    call extend(s:stderr_buffer, lines)
+  endfunction
+endif
 
 function! s:split_args(arg)
   let varnames = split(a:arg, ',')
