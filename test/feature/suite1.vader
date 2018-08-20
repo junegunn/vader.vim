@@ -28,6 +28,15 @@ Execute (AssertEqual handles funcrefs):
   AssertEqual function('F1'), function('F1')
   AssertNotEqual function('F1'), function('F2')
 
+Execute (AssertEqual handles script-local variables):
+  let s:vader_test_foo = 42
+  AssertEqual s:vader_test_foo, 42
+
+Execute (Script-local variables are not kept across Execute blocks):
+  " NOTE: this appears to not be the case in Docker for some reason.
+  " (see 809e10c, "vader#window#execute: use a single tempfile", reverted).
+  Assert !has_key(s:, 'vader_test_foo')
+
 Execute (FIXME: AssertThrows expects an exception to be thrown):
   AssertThrows call reverse([1, 2, 3])
 
