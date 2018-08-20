@@ -70,9 +70,8 @@ function! vader#window#open()
   let s:workbench_bfr = bufnr('')
 endfunction
 
-let s:tempscript = tempname()
-
 function! vader#window#execute(lines, lang_if)
+  let temp = tempname()
   try
     let lines = [
           \ 'scriptencoding utf-8',
@@ -106,10 +105,12 @@ function! vader#window#execute(lines, lang_if)
     call extend(lines, ['if v:profiling | if !exists("g:vader_locals") | let g:vader_locals = [] | endif | call extend(g:vader_locals, items(l:)) | endif'])
 
     call extend(lines, ['endfunction', 'call s:vader_wrapper()'])
-    call writefile(lines, s:tempscript)
-    execute 'source '.s:tempscript
+    call writefile(lines, temp)
+    execute 'source '.temp
   catch
     return [[v:exception, v:throwpoint], lines]
+  finally
+    call delete(temp)
   endtry
   return [[], lines]
 endfunction
