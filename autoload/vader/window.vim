@@ -109,8 +109,6 @@ function! vader#window#execute(lines, lang_if)
     execute 'source '.temp
   catch
     return [[v:exception, v:throwpoint], lines]
-  finally
-    call delete(temp)
   endtry
   return [[], lines]
 endfunction
