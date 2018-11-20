@@ -122,6 +122,19 @@ function! vader#run(bang, ...) range
       if successful
         qall!
       else
+        " TODO: not with -x ?!
+        " TODO: only first line?  (for unequal lists etc)
+        call s:print_stderr(printf('=== Failure summary: %d errors ===', len(qfl)))
+        let i = 0
+        for entry in qfl
+          let i += 1
+          let text = entry.text
+          if stridx(text, "\n") > -1
+            let indent = repeat(' ', len(string(i)) + 2)
+            let text = substitute(text, "\n", '\n'.indent, 'g')
+          endif
+          call s:print_stderr(printf('%d. %s:%d: %s', i, entry.filename, entry.lnum, text))
+        endfor
         cq
       endif
     else
@@ -308,14 +321,14 @@ function! s:execute(prefix, type, block, fpos, lang_if)
   let g:vader_current_file = a:fpos[0]
   let [error, lines] = vader#window#execute(a:block, a:lang_if)
   if empty(error)
-    return [1, []]
+    return ['', []]
   endif
 
   " Get line number from wrapper function or throwpoint.
   let match_prefix = matchstr(error[1], '\v^function \zs\<SNR\>\d+_vader_wrapper')
   if empty(match_prefix)
     call s:append(a:prefix, a:type, 'Error: '.error[0]. ' (in '.error[1].')', 1)
-    return [0, []]
+    return [error[0], []]
   endif
 
   call s:append(a:prefix, a:type, error[0], 1)
@@ -346,7 +359,7 @@ function! s:execute(prefix, type, block, fpos, lang_if)
     call vader#log(errpos[0].':'.(errpos[1]))
   endif
 
-  return [0, errpos]
+  return [error[0], errpos]
 endfunction
 
 function! s:run(filename, cases, options)
@@ -368,7 +381,7 @@ function! s:run(filename, cases, options)
 
   for case in a:cases
     let cnt += 1
-    let ok = 1
+    let error = ''
     let prefix = printf('(%'.just.'d/%'.just.'d)', cnt, total)
 
     for label in ['given', 'before', 'after', 'then']
@@ -385,14 +398,14 @@ function! s:run(filename, cases, options)
 
     if !empty(before)
       let s:indent = 2
-      let [ok, errpos] = s:execute(prefix, 'before', before.lines, before.fpos, '')
+      let [error, errpos] = s:execute(prefix, 'before', before.lines, before.fpos, '')
     endif
 
     let s:indent = 3
     if has_key(case, 'execute')
       call s:append(prefix, 'execute', s:comment(case, 'execute'))
-      if ok
-        let [ok, errpos] = s:execute(prefix, 'execute', case.execute, case.fpos.execute, get(case, 'lang_if', ''))
+      if empty(error)
+        let [error, errpos] = s:execute(prefix, 'execute', case.execute, case.fpos.execute, get(case, 'lang_if', ''))
       endif
     elseif has_key(case, 'do')
       call s:append(prefix, 'do', s:comment(case, 'do'))
@@ -403,15 +416,15 @@ function! s:run(filename, cases, options)
         if v:throwpoint !~ 'vader#assert'
           call vader#log(v:throwpoint)
         endif
-        let ok = 0
+        let error = v:exception
         let errpos = case.fpos.do
       endtry
     endif
 
     if has_key(case, 'then')
       call s:append(prefix, 'then', s:comment(case, 'then'))
-      if ok
-        let [ok, errpos] = s:execute(prefix, 'then', then.lines, then.fpos, '')
+      if empty(error)
+        let [error, errpos] = s:execute(prefix, 'then', then.lines, then.fpos, '')
       endif
     endif
 
@@ -421,8 +434,8 @@ function! s:run(filename, cases, options)
       if match
         call s:append(prefix, 'expect', s:comment(case, 'expect'))
       else
-        let begin = s:append(prefix, 'expect', s:comment(case, 'expect'), 1)
-        let ok = 0
+        let error = s:comment(case, 'expect')
+        let begin = s:append(prefix, 'expect', error, 1)
         let errpos = case.fpos.expect
         let data = { 'type': get(case, 'type', ''), 'got': result, 'expect': case.expect }
         call vader#window#append('- Expected:', 3)
@@ -439,24 +452,27 @@ function! s:run(filename, cases, options)
 
     if !empty(after)
       let s:indent = 2
-      let g:vader_case_ok = ok
-      let [after_ok, after_errpos] = s:execute(prefix, 'after', after.lines, after.fpos, '')
-      let ok = after_ok && ok
+      let g:vader_case_ok = empty(error)
+      let [after_error, after_errpos] = s:execute(prefix, 'after', after.lines, after.fpos, '')
+      if empty(error)
+        let error = after_error
+      endif
       if empty(errpos)
         let errpos = after_errpos
       endif
     endif
 
-    if ok
+    if empty(error)
       let success += 1
     else
       let pending += case.pending
-      let description = join(filter([
+      let description = prefix.' '.join(filter([
             \ comment.given,
             \ get(case.comment, 'do', get(case.comment, 'execute', '')),
             \ get(case.comment, 'then', ''),
             \ get(case.comment, 'expect', '')], '!empty(v:val)'), ' / ') .
             \ ' (#'.s:error_line.')'
+      let description .= ': '.error
       if empty(errpos)
         let errpos = [a:filename, case.lnum]
       endif
