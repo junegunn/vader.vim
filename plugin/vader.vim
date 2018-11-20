@@ -22,6 +22,9 @@
 " WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 if exists('g:loaded_vader') || &compatible
+  if &compatible
+    echoerr 'Not loading vader as compatible mode set'
+  endif
   finish
 endif
 let g:loaded_vader = 1
