@@ -30,7 +30,8 @@ Running Vader tests
       the block is recognized as a pending test case and does not affect the
       exit status.
     - If the environment variable `VADER_OUTPUT_FILE` is set, the test results
-      will be written to it as well
+      will be written to it as well, otherwise they are written to stderr using
+      different methods (depending on Neovim/Vim).
 
 Syntax of .vader file
 ---------------------
