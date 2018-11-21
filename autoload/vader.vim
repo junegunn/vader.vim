@@ -464,8 +464,9 @@ function! s:run(filename, cases, options)
 
     if empty(error)
       let success += 1
-    else
+    elseif case.pending
       let pending += case.pending
+    else
       let description = prefix.' '.join(filter([
             \ comment.given,
             \ get(case.comment, 'do', get(case.comment, 'execute', '')),
@@ -477,7 +478,7 @@ function! s:run(filename, cases, options)
         let errpos = [a:filename, case.lnum]
       endif
       call add(qfl, { 'type': 'E', 'filename': fnamemodify(errpos[0], ':~:.'), 'lnum': errpos[1], 'text': description })
-      if exitfirst && !case.pending
+      if exitfirst
         call vader#window#append('Stopping after first failure.', 2)
         break
       endif
