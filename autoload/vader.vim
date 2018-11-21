@@ -473,7 +473,7 @@ function! s:run(filename, cases, options)
             \ get(case.comment, 'then', ''),
             \ get(case.comment, 'expect', '')], '!empty(v:val)'), ' / ') .
             \ ' (#'.s:error_line.')'
-      let description .= ': '.error
+      let description .= ': '.substitute(error, "\n.*", '', '')
       if empty(errpos)
         let errpos = [a:filename, case.lnum]
       endif
