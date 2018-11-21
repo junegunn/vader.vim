@@ -286,7 +286,7 @@ function! s:comment(case, label)
   return get(a:case.comment, a:label, '')
 endfunction
 
-function! s:get_source_linenr_from_tb_entry(tb_entry)
+function! s:get_source_from_tb_entry(tb_entry)
   let func_line = split(a:tb_entry, '\v[\[\]]')
   if len(func_line) == 2
     let [f, l] = func_line
@@ -296,7 +296,7 @@ function! s:get_source_linenr_from_tb_entry(tb_entry)
       let [f, l] = split_f_linenr
     else
       let f = split_f_linenr[0]
-      return ['', 0, f]
+      return ['', 0, f, '']
     endif
   endif
   if f =~# '\v^\d+$'
@@ -304,21 +304,30 @@ function! s:get_source_linenr_from_tb_entry(tb_entry)
   endif
   try
     if exists('*execute')
-      let func = execute('function '.f)
+      let func = execute('verb function '.f)
     else
       redir => func
-        silent exe 'function '.f
+        silent exe 'verb function '.f
       redir END
     endif
   catch /^Vim\%((\a\+)\)\=:E123/
-    return ['', l, f]
+    return ['', l, f, '']
   endtry
 
-  let source = map(filter(split(func, "\n"), "v:val =~# '\\v^".l."[^0-9]'"), "substitute(v:val, '\\v^\\d+\\s+', '', '')")
+  let func_lines = split(func, "\n")
+  " Vim patch v8.1.0362 will display source location of function.
+  let m = matchlist(func_lines[1], '\v^\s*Last set from (.*) line (\d+)$')
+  if empty(m)
+    let floc = ''
+  else
+    let floc = fnamemodify(m[1], ':~:.') . ':' . (m[2] + l)
+  endif
+
+  let source = map(filter(func_lines, "v:val =~# '\\v^".l."[^0-9]'"), "substitute(v:val, '\\v^\\d+\\s+', '', '')")
   if len(source) != 1
     throw printf('Internal error: could not find source of %s:%d (parsed function: %s, source: %s)', string(a:tb_entry), l, f, string(source))
   endif
-  return [source[0], l, f]
+  return [source[0], l, f, floc]
 endfunction
 
 function! s:execute(prefix, type, block, fpos, lang_if)
@@ -341,9 +350,12 @@ function! s:execute(prefix, type, block, fpos, lang_if)
   let tb_first = remove(tb_entries, -1)
   call filter(tb_entries, "v:val !~# '\\vvader#assert#[^,]+, line \\d+$'")
   for tb_entry in tb_entries
-    let [source, l, f] = s:get_source_linenr_from_tb_entry(tb_entry)
+    let [source, l, f, floc] = s:get_source_from_tb_entry(tb_entry)
     if l
-      call vader#log('in '.f.' (line '.l.')')
+      if empty(floc)
+        let floc = 'line '.l
+      endif
+      call vader#log('in '.f.' ('.floc.')')
       if len(source)
         call vader#log('  '.source)
       endif
@@ -352,7 +364,7 @@ function! s:execute(prefix, type, block, fpos, lang_if)
     endif
   endfor
   let tb_first = substitute(tb_first, '^function ', '', '')
-  let [source, l, _] = s:get_source_linenr_from_tb_entry(tb_first)
+  let [source, l, _, _] = s:get_source_from_tb_entry(tb_first)
   let errpos = [a:fpos[0], l + a:fpos[1]]
   if len(source)
     call vader#log(errpos[0].':'.(errpos[1]).': '.source)

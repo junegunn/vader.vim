@@ -70,7 +70,7 @@ Execute (TODO: Error in Execute (via file)):
 Execute (Validate error in Execute (via file)):
   let error = g:vader#window#_s.console_buffered[-2]
   Assert error =~# '\v^ +\(\d+/\d+\) \[EXECUTE\] \(X\) Error: custom_error'
-  Assert stridx(error, printf(' (in %s, line 6)', g:vader_test_include_file)) != -1
+  Assert stridx(error, printf(' (in %s, line 8)', g:vader_test_include_file)) != -1
 
 Execute (TODO: Error in Execute (via another file)):
   unlet g:vader_test_throw
@@ -78,11 +78,19 @@ Execute (TODO: Error in Execute (via another file)):
 
 Execute (Validate error in Execute (via another file)):
   let tb = g:vader#window#_s.console_buffered[-4:-2]
-  AssertEqual tb, [
-  \ '      > in VaderTestIncludedFunction (line 1)',
-  \ '      >   throw a:error',
-  \ printf('      > %s:77: call VaderTestIncludedFunction(''custom error'')', g:vader_current_file),
-  \ ]
+  if has('patch-8.1.0362')
+    AssertEqual tb, [
+    \ printf('      > in VaderTestIncludedFunction (%s:3)', fnamemodify(g:vader_test_include_file, ':~:.')),
+    \ '      >   throw a:error',
+    \ printf('      > %s:77: call VaderTestIncludedFunction(''custom error'')', g:vader_current_file),
+    \ ]
+  else
+    AssertEqual tb, [
+    \ '      > in VaderTestIncludedFunction (line 2)',
+    \ '      >   throw a:error',
+    \ printf('      > %s:77: call VaderTestIncludedFunction(''custom error'')', g:vader_current_file),
+    \ ]
+  endif
 
 Execute (Cleanup):
   unlet g:vader_test_include_file
