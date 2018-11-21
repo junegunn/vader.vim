@@ -25,26 +25,13 @@ if exists('g:loaded_vader')
   finish
 endif
 
-function! s:vader_compat(...) range
-  echomsg 'Cannot run Vader as compatible mode set'
-endfunction
-
-if &compatible
-  if !exists('g:loaded_compat')
-    command! -bang -nargs=* -range -complete=file Vader <line1>,<line2>call s:vader_compat(<bang>0, <f-args>)
-    let g:loaded_compat = 1
-  endif
-
-  finish
-endif
-
-let g:loaded_vader = 1
-
 if &compatible
   function! s:vader(...) range
     echoerr 'Cannot run Vader in compatible mode'
   endfunction
 else
+  let g:loaded_vader = 1
+
   function! s:vader(...) range
     if a:lastline - a:firstline > 0 && a:0 > 1
       echoerr 'Range and file arguments are mutually exclusive'
