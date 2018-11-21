@@ -30,6 +30,8 @@ let s:cat = executable('cat') ? 'cat' : 'type'
 function! vader#run(bang, ...) range
   let s:error_line = 0
 
+  let g:vader_bang = a:bang
+
   if a:lastline - a:firstline > 0
     if a:0 > 1
       echoerr "You can't apply range on multiple files"
@@ -47,6 +49,13 @@ function! vader#run(bang, ...) range
   let patterns = filter(copy(a:000), "index(['-x', '-q'], v:val) == -1")
   if empty(patterns)
     let patterns = [expand('%')]
+  endif
+
+  if a:bang && !options.quiet
+    redir => ver
+    silent version
+    redir END
+    call vader#print_stderr(ver . "\n\n")
   endif
 
   call vader#assert#reset()
@@ -110,31 +119,25 @@ function! vader#run(bang, ...) range
           \ substitute(reltimestr(reltime(st)), '^\s*', '', '') .' sec.', 0)
     call vader#window#cleanup()
 
-    let g:vader_report = join(getline(1, '$'), "\n")
-    let g:vader_errors = qfl
-    call setqflist(qfl)
-
     if a:bang
-      if !options.quiet
-        redir => ver
-        silent version
-        redir END
-        call s:print_stderr(ver . "\n\n")
-      endif
-
-      call s:print_stderr(g:vader_report)
       if successful
         qall!
       else
         cq
       endif
-    elseif !empty(qfl)
-      call vader#window#copen()
+    else
+      let g:vader_report = join(getline(1, '$'), "\n")
+      let g:vader_errors = qfl
+      call setqflist(qfl)
+
+      if !empty(qfl)
+        call vader#window#copen()
+      endif
     endif
   catch
     let error = 'Vader error: '.v:exception.' (in '.v:throwpoint.')'
     if a:bang
-      call s:print_stderr(error)
+      call vader#print_stderr(error)
       cq
     else
       echoerr error
@@ -144,17 +147,54 @@ function! vader#run(bang, ...) range
   endtry
 endfunction
 
-function! s:print_stderr(output)
-  let lines = split(a:output, '\n')
-  if !empty($VADER_OUTPUT_FILE)
+" Define vader#print_stderr based on available features / used options.
+" This is done a) for performance reasons, but b) mainly because `mode()`
+" might be e.g. "ic" during tests, and we need to detect the initial usage of
+" "-es" / "-Es".
+if !empty($VADER_OUTPUT_FILE)
+  function! vader#print_stderr(output) abort
+    let lines = split(a:output, '\n')
     call writefile(lines, $VADER_OUTPUT_FILE, 'a')
+  endfunction
+elseif has('nvim')
+  if exists('v:stderr')
+    function! vader#print_stderr(output) abort
+      call chansend(v:stderr, a:output)
+    endfunction
   else
-    let tmp = tempname()
-    call writefile(lines, tmp)
-    execute printf('silent !%s %s 1>&2', s:cat, tmp)
-    call delete(tmp)
+    function! vader#print_stderr(output) abort
+      let lines = split(a:output, '\n')
+      call writefile(lines, '/dev/stderr', 'a')
+    endfunction
   endif
-endfunction
+elseif mode(1) ==# 'ce' || mode(1) ==# 'cv'  " -es (silent ex mode)
+  function! vader#print_stderr(output) abort
+    let lines = split(a:output, '\n')
+    for line in lines
+      verbose echon line."\n"
+    endfor
+  endfunction
+else
+  " Cannot output single lines reliably in this case.
+  let s:stderr_buffer = [
+        \ printf('Vader note: cannot print to stderr reliably/directly.  Please consider using %s''s -es/-Es option (mode=%s).',
+            \ has('nvim') ? 'Neovim' : 'Vim',
+            \ mode(1))]
+  function! s:output_stderr_buffer() abort
+    let s:tmpfile = tempname()
+    call writefile(s:stderr_buffer, s:tmpfile)
+    execute printf('silent !%s %s 1>&2', s:cat, s:tmpfile)
+    let s:stderr_buffer = []
+  endfunction
+  augroup vader_exit
+    autocmd VimLeave * call s:output_stderr_buffer()
+  augroup END
+
+  function! vader#print_stderr(output) abort
+    let lines = split(a:output, '\n')
+    call extend(s:stderr_buffer, lines)
+  endfunction
+endif
 
 function! s:split_args(arg)
   let varnames = split(a:arg, ',')
