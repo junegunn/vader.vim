@@ -120,6 +120,9 @@ function! vader#run(bang, ...) range
     call vader#window#cleanup()
 
     if a:bang
+      if exists('*s:output_stderr_buffer')
+        call s:output_stderr_buffer()
+      endif
       if successful
         qall!
       else
