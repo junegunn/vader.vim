@@ -133,7 +133,6 @@ function! vader#window#append(message, indent, ...)
   endif
   if get(g:, 'vader_bang', 0)
     call vader#print_stderr(message."\n")
-    return 0
   endif
   call add(s:console_buffered, message)
   return len(s:console_buffered)
