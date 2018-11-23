@@ -3,6 +3,10 @@ Execute (Assert and AssertEqual command):
   Assert 1 == 1
   AssertEqual 'hey', tolower('HEY')
   AssertEqual 'vader.vader', fnamemodify(g:vader_file, ':t')
+  AssertEqual 'suite1.vader', fnamemodify(g:vader_current_file, ':t')
+
+# Test g:vader_current_file with explicit Include
+Include: ../include/vader_current_file.vader
 
 Execute (AssertThrows):
   function! VaderThrows()
@@ -11,10 +15,10 @@ Execute (AssertThrows):
   command! VaderThrows call VaderThrows()
   AssertThrows call reverse('not a list')
   AssertEqual g:vader_exception, 'Vim(call):E686: Argument of reverse() must be a List'
-  AssertEqual g:vader_throwpoint, 'function vader#assert#throws, line 5'
+  Assert g:vader_throwpoint =~# '\Vfunction <SNR>\d\+_vader_wrapper[5]..vader#assert#throws, line 5', g:vader_throwpoint
   AssertThrows VaderThrows
   AssertEqual g:vader_exception, 'Vim(echoerr):Error from VaderThrows'
-  AssertEqual g:vader_throwpoint, 'function vader#assert#throws[5]..VaderThrows, line 1'
+  Assert g:vader_throwpoint =~# '\Vfunction <SNR>\d\+_vader_wrapper[8]..vader#assert#throws[5]..VaderThrows, line 1', g:vader_throwpoint
 
 Execute (AssertEqual handles funcrefs):
   function! F1()
@@ -23,6 +27,15 @@ Execute (AssertEqual handles funcrefs):
   endfunction
   AssertEqual function('F1'), function('F1')
   AssertNotEqual function('F1'), function('F2')
+
+Execute (AssertEqual handles script-local variables):
+  let s:vader_test_foo = 42
+  AssertEqual s:vader_test_foo, 42
+
+Execute (Script-local variables are not kept across Execute blocks):
+  " NOTE: this appears to not be the case in Docker for some reason.
+  " (see 809e10c, "vader#window#execute: use a single tempfile", reverted).
+  Assert !has_key(s:, 'vader_test_foo')
 
 Execute (FIXME: AssertThrows expects an exception to be thrown):
   AssertThrows call reverse([1, 2, 3])

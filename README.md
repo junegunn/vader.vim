@@ -121,7 +121,9 @@ The following syntax helper functions are provided:
   at the first character of the nth match of the given pattern.
   Return `''` if there was no match.
 
-The path of the current `.vader` file can be accessed via `g:vader_file`.
+The `.vader` file for the current test case path is available in
+`g:vader_file`, which will not reflect included files (via `Include`).
+The path of the actual file is available in `g:vader_current_file`.
 
 In addition to plain Vimscript, you can also test Ruby/Python/Perl/Lua
 interface with Execute block as follows:
