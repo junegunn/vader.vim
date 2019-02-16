@@ -1,27 +1,32 @@
-sudo: false
+dist: xenial
 language: ruby
 rvm:
   - 2.2.3
 
 matrix:
   include:
-    - env: TESTVIM=vim
-    - env: TESTVIM=nvim
-    - env: TESTVIM=nvim VADER_OUTPUT_FILE=/dev/stderr
+    - env: TESTVIM=vim ENV=vim
+    - env: TESTVIM=vim ENV=vim-travis
+      addons:
+        apt:
+          packages:
+          - vim-nox-py2
+    - env: TESTVIM=nvim ENV=nvim
+    - env: TESTVIM=nvim ENV=nvim VADER_OUTPUT_FILE=/dev/stderr
 
 install:
   - pip install --user covimerage
   - |
     set -e
     pushd /tmp
-    if [ "$TESTVIM" = vim ]; then
+    if [ "$ENV" = vim ]; then
       git clone --depth=1 https://github.com/vim/vim
       cd vim
       ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp --prefix /tmp/vim
       make
       make install
       PATH=/tmp/vim/bin:$PATH
-    else
+    elif [ "$ENV" = nvim ]; then
       # Install Neovim nightly (into /tmp/_neovim).
       TRAVIS_BUILD_DIR=/tmp eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
       gem install neovim
