@@ -32,7 +32,7 @@ install:
       make
       make install
       PATH=/tmp/vim/bin:$PATH
-    elif [ "${ENV#nvim-}" != "$ENV" ]; then
+    elif [ "$ENV" = nvim ] || [ "${ENV#nvim-}" != "$ENV" ]; then
       if [ "$ENV" = nvim ]; then
         # Install Neovim nightly (into /tmp/_neovim).
         TRAVIS_BUILD_DIR=/tmp eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
