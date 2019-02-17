@@ -44,7 +44,7 @@ install:
 
 script:
   - export LD_LIBRARY_PATH=~/.rvm/rubies/ruby-2.2.3/lib
-  - export TESTVIM=${ENV%%-*}
+  - export TESTVIM="${ENV%%-*}"
   - $TESTVIM --version
   # Wrap $TESTVIM with covimerage for coverage reporting.
   # Uses --no-report, because test/run-tests.sh changes the directory, and that does not pick up .coveragerc then.
