@@ -164,10 +164,19 @@ elseif has('nvim')
     function! vader#print_stderr(output) abort
       call chansend(v:stderr, a:output)
     endfunction
-  else
+  elseif filewritable('/dev/stderr')
     function! vader#print_stderr(output) abort
       let lines = split(a:output, '\n')
       call writefile(lines, '/dev/stderr', 'a')
+    endfunction
+  else
+    " Assume --headless mode being used.  Could be detected using
+    " "len(nvim_list_uis()) == 0 after VimEnter", but not available with
+    " Neovim 0.2.0 at least.
+    function! vader#print_stderr(output) abort
+      for line in split(a:output, '\n')
+        echom line
+      endfor
     endfunction
   endif
 else
