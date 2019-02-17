@@ -4,11 +4,6 @@ language: generic
 matrix:
   include:
     - env: ENV=vim
-      addons:
-        apt:
-          packages:
-            - ruby
-            - ruby-dev
     - env: ENV=vim-travis
       addons:
         apt:
