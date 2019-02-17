@@ -31,6 +31,7 @@ install:
     set -e
     pushd /tmp
     if [ "$ENV" = vim ]; then
+      rvm use system
       git clone --depth=1 https://github.com/vim/vim
       cd vim
       ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp --prefix /tmp/vim
