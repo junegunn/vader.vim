@@ -1,18 +1,29 @@
 dist: xenial
-language: ruby
-rvm:
-  - 2.2.3
+language: minimal
 
 matrix:
   include:
-    - env: TESTVIM=vim ENV=vim
-    - env: TESTVIM=vim ENV=vim-travis
+    - env: ENV=vim
       addons:
         apt:
           packages:
-          - vim-nox-py2
-    - env: TESTVIM=nvim ENV=nvim
-    - env: TESTVIM=nvim ENV=nvim VADER_OUTPUT_FILE=/dev/stderr
+            - ruby
+            - ruby-dev
+    - env: ENV=vim-travis
+      addons:
+        apt:
+          packages:
+            - vim-nox-py2
+    - env: ENV=nvim
+    - env: ENV=nvim VADER_OUTPUT_FILE=/dev/stderr
+    - env: ENV=nvim TESTVIM_OPTS=--headless
+    - env: ENV=nvim-stable
+      addons:
+        apt:
+          sources:
+            - sourceline: 'ppa:neovim-ppa/stable'
+          packages:
+            - neovim
 
 install:
   - pip install --user covimerage
@@ -20,33 +31,36 @@ install:
     set -e
     pushd /tmp
     if [ "$ENV" = vim ]; then
+      rvm use system
       git clone --depth=1 https://github.com/vim/vim
       cd vim
       ./configure --with-features=huge --enable-rubyinterp --enable-pythoninterp --prefix /tmp/vim
       make
       make install
       PATH=/tmp/vim/bin:$PATH
-    elif [ "$ENV" = nvim ]; then
-      # Install Neovim nightly (into /tmp/_neovim).
-      TRAVIS_BUILD_DIR=/tmp eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
+    elif [ "$ENV" = nvim ] || [ "${ENV#nvim-}" != "$ENV" ]; then
+      if [ "$ENV" = nvim ]; then
+        # Install Neovim nightly (into /tmp/_neovim).
+        TRAVIS_BUILD_DIR=/tmp eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
+      fi
       gem install neovim
-      pip install --user neovim
+      pip install --user pynvim
     fi
     popd
 
 script:
-  - export LD_LIBRARY_PATH=~/.rvm/rubies/ruby-2.2.3/lib
+  - export TESTVIM="${ENV%%-*}"
   - $TESTVIM --version
   # Wrap $TESTVIM with covimerage for coverage reporting.
   # Uses --no-report, because test/run-tests.sh changes the directory, and that does not pick up .coveragerc then.
-  - VADER_TEST_VIM="covimerage run --source $PWD --data-file $PWD/.coverage_covimerage --no-report $TESTVIM" ./test/run-tests.sh
+  - VADER_TEST_VIM="covimerage run --source $PWD --data-file $PWD/.coverage_covimerage --no-report $TESTVIM $TESTVIM_OPTS" ./test/run-tests.sh
   # Test/cover :Vader use case (without bang).
   - |
-    covimerage run --append --source . --no-report $TESTVIM -Nu test/vimrc \
+    covimerage run --append --source . --no-report $TESTVIM $TESTVIM_OPTS -Nu test/vimrc \
       -c 'Vader test/*' \
       -c 'exe get(get(g:, "vader_result", {}), "successful", 0) ? "qall!" : "cq"'
 
 after_success:
   - covimerage -vv xml
   - covimerage report -m
-  - bash <(curl -s https://codecov.io/bash) -X search -X gcov -X coveragepy -f coverage.xml -F $TESTVIM
+  - bash <(curl -s https://codecov.io/bash) -X search -X gcov -X coveragepy -f coverage.xml -F "$TESTVIM,$ENV"
