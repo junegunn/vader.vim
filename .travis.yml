@@ -14,6 +14,13 @@ matrix:
     - env: TESTVIM=nvim ENV=nvim
     - env: TESTVIM=nvim ENV=nvim VADER_OUTPUT_FILE=/dev/stderr
     - env: TESTVIM=nvim ENV=nvim TESTVIM_OPTS=--headless
+    - env: TESTVIM=nvim ENV=nvim-stable
+      addons:
+        apt:
+          sources:
+            - sourceline: 'ppa:neovim-ppa/stable'
+          packages:
+            - neovim
 
 install:
   - pip install --user covimerage
@@ -27,9 +34,11 @@ install:
       make
       make install
       PATH=/tmp/vim/bin:$PATH
-    elif [ "$ENV" = nvim ]; then
-      # Install Neovim nightly (into /tmp/_neovim).
-      TRAVIS_BUILD_DIR=/tmp eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
+    elif [ "$TESTVIM" = nvim ]; then
+      if [ "$ENV" = nvim ]; then
+        # Install Neovim nightly (into /tmp/_neovim).
+        TRAVIS_BUILD_DIR=/tmp eval "$(curl -Ss https://raw.githubusercontent.com/neovim/bot-ci/master/scripts/travis-setup.sh) nightly-x64"
+      fi
       gem install neovim
       pip install --user neovim
     fi
