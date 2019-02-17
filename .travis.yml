@@ -1,16 +1,18 @@
 dist: xenial
-language: ruby
-rvm:
-  - 2.2.3
+language: generic
 
 matrix:
   include:
     - env: TESTVIM=vim ENV=vim
+      addons:
+        apt:
+          packages:
+            - ruby-dev
     - env: TESTVIM=vim ENV=vim-travis
       addons:
         apt:
           packages:
-          - vim-nox-py2
+            - vim-nox-py2
     - env: TESTVIM=nvim ENV=nvim
     - env: TESTVIM=nvim ENV=nvim VADER_OUTPUT_FILE=/dev/stderr
     - env: TESTVIM=nvim ENV=nvim TESTVIM_OPTS=--headless
