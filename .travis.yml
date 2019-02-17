@@ -43,7 +43,6 @@ install:
     popd
 
 script:
-  - export LD_LIBRARY_PATH=~/.rvm/rubies/ruby-2.2.3/lib
   - export TESTVIM="${ENV%%-*}"
   - $TESTVIM --version
   # Wrap $TESTVIM with covimerage for coverage reporting.
