@@ -99,8 +99,7 @@ function! vader#window#append(message, indent, ...)
     let message = substitute(message, '\s*$', '', '')
   endif
   if !exists('s:console_buffered')
-    echom printf('Vader: got message before startup: %s', message)
-    echom ''
+    call vader#print_stderr(printf("Vader: got message before startup: %s\n", message))
     return 0
   endif
   if get(g:, 'vader_bang', 0)
