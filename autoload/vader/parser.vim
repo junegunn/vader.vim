@@ -129,7 +129,7 @@ function! s:parse_vader(lines, line1)
     endif
 
     let matched = 0
-    for l in ['Before', 'After', 'Given', 'Execute', 'Expect', 'Do', 'Then']
+    for l in ['Before', 'After', 'Given', 'Execute', 'Expect', 'Do', 'Then', 'SkipIf']
       let m = matchlist(line, '^'.l.'\%(\s\+\([^:;(]\+\)\)\?\s*\%((\(.*\))\)\?\s*\([:;]\)\s*$')
       if !empty(m)
         let newlabel = tolower(l)

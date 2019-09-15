@@ -327,7 +327,30 @@ function! s:run(filename, cases, options)
 
   call vader#window#append("Starting Vader: ". a:filename, 1)
 
+  " Check for SkipIf commands before anything else
   for case in a:cases
+    let cnt += 1
+    let prefix = printf('(%'.just.'d/%'.just.'d)', cnt, total)
+    if has_key(case, 'skipif')
+      if empty(case.skipif)
+          throw 'SkipIf condition is missing'
+      endif
+
+      if eval(join(case.skipif, ' | ')) == 1
+          let pending += 1
+          let description = 'reason for skipping: ' . case.comment.skipif
+          call add(qfl, { 'type': 'S', 'filename': a:filename, 'lnum': case.lnum, 'text': description })
+      endif
+    endif
+  endfor
+
+  let cnt = 0
+
+  for case in a:cases
+    if has_key(case, 'skipif')
+      continue
+    endif
+
     let cnt += 1
     let ok = 1
     let prefix = printf('(%'.just.'d/%'.just.'d)', cnt, total)
