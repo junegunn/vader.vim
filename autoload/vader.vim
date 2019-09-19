@@ -327,33 +327,28 @@ function! s:run(filename, cases, options)
 
   call vader#window#append("Starting Vader: ". a:filename, 1)
 
-  " Check for SkipIf commands before anything else
   for case in a:cases
-    let cnt += 1
-    let prefix = printf('(%'.just.'d/%'.just.'d)', cnt, total)
-    if has_key(case, 'skipif')
-      if empty(case.skipif)
-          throw 'SkipIf condition is missing'
-      endif
-
-      if eval(join(case.skipif, ' | ')) == 1
-          let pending += 1
-          let description = 'reason for skipping: ' . case.comment.skipif
-          call add(qfl, { 'type': 'S', 'filename': a:filename, 'lnum': case.lnum, 'text': description })
-      endif
-    endif
-  endfor
-
-  let cnt = 0
-
-  for case in a:cases
-    if has_key(case, 'skipif')
-      continue
-    endif
-
     let cnt += 1
     let ok = 1
     let prefix = printf('(%'.just.'d/%'.just.'d)', cnt, total)
+
+    " Check for SkipIf command before anything else
+    if has_key(case, 'skipif')
+      if empty(case.skipif) || join(case.skipif, '') =~# '^\s*$'
+        throw 'SkipIf condition is missing'
+      elseif len(case.skipif) > 1
+        " Require that only a single line is used to avoid 'E488: Trailing
+        " characters' warning in eval()
+        throw 'SkipIf must use only a single expression'
+      endif
+
+      if eval(case.skipif[0]) == 1
+          let pending += 1
+          let description = 'reason for skipping: ' . case.comment.skipif
+          call add(qfl, { 'type': 'S', 'filename': a:filename, 'lnum': case.lnum, 'text': description })
+          continue
+      endif
+    endif
 
     for label in ['given', 'before', 'after', 'then']
       if has_key(case, label)
