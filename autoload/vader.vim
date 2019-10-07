@@ -352,7 +352,7 @@ function! s:run(filename, cases, options)
       if result != 0
           let pending += 1
           let description = 'reason for skipping: ' . case.comment.skipif
-          call add(qfl, { 'type': 'S', 'filename': a:filename, 'lnum': case.lnum, 'text': description })
+          call s:append(prefix, 'skipped', case.comment.skipif)
           continue
       endif
     endif
