@@ -342,7 +342,7 @@ function! s:run(filename, cases, options)
         throw 'SkipIf must use only a single expression'
       endif
 
-      if eval(case.skipif[0]) == 1
+      if eval(case.skipif[0]) != 0
           let pending += 1
           let description = 'reason for skipping: ' . case.comment.skipif
           call add(qfl, { 'type': 'S', 'filename': a:filename, 'lnum': case.lnum, 'text': description })
