@@ -351,7 +351,6 @@ function! s:run(filename, cases, options)
 
       if result != 0
           let pending += 1
-          let description = 'reason for skipping: ' . case.comment.skipif
           call s:append(prefix, 'skipif', case.comment.skipif)
           continue
       endif
