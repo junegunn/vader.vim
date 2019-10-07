@@ -335,18 +335,18 @@ function! s:run(filename, cases, options)
     " Check for SkipIf command before anything else
     if has_key(case, 'skipif')
       if empty(case.skipif) || join(case.skipif, '') =~# '^\s*$'
-        throw 'SkipIf condition is missing ' . prefix
+        throw printf('SkipIf condition is missing at line %d %s', case.lnum, prefix)
       elseif len(case.skipif) > 1
         " Require that only a single line is used to avoid 'E488: Trailing
         " characters' warning in eval()
-        throw 'SkipIf condition must be a single expression ' . prefix
+        throw printf('SkipIf condition must be a single expression at line %d %s', case.lnum, prefix)
       endif
 
       let result = eval(case.skipif[0])
 
       " Result of evaluated condition must be a number
       if type(result) != type(0)
-        throw 'Result of SkipIf condition must be a number ' . prefix
+        throw printf('Result of SkipIf condition must be a number at line %d %s', case.lnum, prefix)
       endif
 
       if result != 0
