@@ -334,12 +334,12 @@ function! s:run(filename, cases, options)
 
     " Check for SkipIf command before anything else
     if has_key(case, 'skipif')
-      if empty(case.skipif) || join(case.skipif, '') =~# '^\s*$'
-        throw printf('SkipIf condition is missing at line %d %s', case.lnum, prefix)
-      elseif len(case.skipif) > 1
+      if len(case.skipif) > 1
         " Require that only a single line is used to avoid 'E488: Trailing
         " characters' warning in eval()
         throw printf('SkipIf condition must be a single expression at line %d %s', case.lnum, prefix)
+      elseif empty(case.skipif) || case.skipif[0] =~# '^\s*$'
+        throw printf('SkipIf condition is missing at line %d %s', case.lnum, prefix)
       endif
 
       let result = eval(case.skipif[0])
