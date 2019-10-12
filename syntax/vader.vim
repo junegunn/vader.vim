@@ -55,7 +55,7 @@ syn region vaderExpect  start=/^Expect\(\s*(.*)\)\?\s*:\s*$/  end=/\(^[^ "^#~=*-
 syn region vaderDo      start=/^Do\(\s*(.*)\)\?\s*:\s*$/      end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
 syn region vaderThen    start=/^Then\(\s*(.*)\)\?\s*:\s*$/    end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
 syn region vaderExecute start=/^Execute\(\s*(.*)\)\?\s*:\s*$/ end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
-syn region vaderSkipIf start=/^SkipIf\(\s*(.*)\)\?\s*:\s*$/   end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
+syn region vaderSkipIf  start=/^SkipIf\(\s*(.*)\)\?\s*:\s*$/  end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
 syn region vaderBefore  start=/^Before\(\s*(.*)\)\?\s*:\s*$/  end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
 syn region vaderAfter   start=/^After\(\s*(.*)\)\?\s*:\s*$/   end=/\(^[^ "^#~=*-]\)\@=/ contains=vaderMessage,vaderCommand,vaderComment,@vaderIgnored nextgroup=@vaderTopLevel skipempty
 
@@ -64,6 +64,7 @@ execute printf('syn region vaderExpectRaw  start=/^Expect\(\s*(.*)\)\?\s*;\s*$/ 
 execute printf('syn region vaderDoRaw      start=/^Do\(\s*(.*)\)\?\s*;\s*$/      end=/%s/ contains=vaderMessage,vaderCommandRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
 execute printf('syn region vaderThenRaw    start=/^Then\(\s*(.*)\)\?\s*;\s*$/    end=/%s/ contains=vaderMessage,vaderCommandRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
 execute printf('syn region vaderExecuteRaw start=/^Execute\(\s*(.*)\)\?\s*;\s*$/ end=/%s/ contains=vaderMessage,vaderCommandRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
+execute printf('syn region vaderSkipIfRaw  start=/^SkipIf\(\s*(.*)\)\?\s*:\s*$/  end=/%s/ contains=vaderMessage,vaderCommandRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
 execute printf('syn region vaderBeforeRaw  start=/^Before\(\s*(.*)\)\?\s*;\s*$/  end=/%s/ contains=vaderMessage,vaderCommandRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
 execute printf('syn region vaderAfterRaw   start=/^After\(\s*(.*)\)\?\s*;\s*$/   end=/%s/ contains=vaderMessage,vaderCommandRaw,@vaderIgnored nextgroup=@vaderTopLevel skipempty', vader#syntax#_head())
 
@@ -88,6 +89,7 @@ hi def link vaderExecuteRaw  Statement
 hi def link vaderExecuteType Identifier
 hi def link vaderSkipIf      Exception
 hi def link vaderSkipIfType  Exception
+hi def link vaderSkipIfRaw   Exception
 hi def link vaderExpect      Boolean
 hi def link vaderExpectRaw   Boolean
 hi def link vaderMessage     Title
