@@ -115,8 +115,8 @@ function! vader#run(bang, ...) range
     call vader#window#append(printf('Success/Total: %s/%s (%sassertions: %d/%d)',
           \ success, total, (pending > 0 ? pending . ' pending, ' : ''),
           \ stats[0], stats[1]), 0)
-    call vader#window#append('Elapsed time: '.
-          \ substitute(reltimestr(reltime(st)), '^\s*', '', '') .' sec.', 0)
+    call vader#window#append(printf('Elapsed time: %.2f sec.',
+          \ reltimefloat(reltime(st))), 0)
     call vader#window#cleanup()
 
     if a:bang

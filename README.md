@@ -397,7 +397,7 @@ Starting Vader: 1 suite(s), 3 case(s)
     (3/3) [EXECUTE] (X) Assertion failure: 'runaway' != ''
   Success/Total: 2/3
 Success/Total: 2/3 (assertions: 0/1)
-Elapsed time: 0.366118 sec.
+Elapsed time: 0.36 sec.
 ```
 
 License
