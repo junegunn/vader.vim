@@ -79,7 +79,7 @@ function! vader#assert#equal(...)
     let type_name = get(s:type_names, type)
     let type_name_plural = type_name ==# 'Dictionary' ? 'Dictionaries' : type_name.'s'
     let msg = (type == type({}) || type == type([]))
-          \ ? printf("Unequal %s\n      %%s should be equal to\n      %%s", type_name_plural)
+          \ ? printf("Unequal %s\n      %%s\n      should be equal to\n      %%s", type_name_plural)
           \ : '%s should be equal to %s'
     throw get(a:000, 2, printf(msg, string(Got), string(Exp)))
   endif
