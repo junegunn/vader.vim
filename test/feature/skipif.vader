@@ -1,0 +1,17 @@
+Given:
+  hello
+
+SkipIf (skip this test for some reason):
+  1
+
+Do:
+  gUw
+
+Expect:
+  HELLO
+
+Do:
+  g~~
+
+Expect:
+  HELLO

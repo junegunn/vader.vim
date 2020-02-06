@@ -332,6 +332,11 @@ function! s:run(filename, cases, options)
     let ok = 1
     let prefix = printf('(%'.just.'d/%'.just.'d)', cnt, total)
 
+    if has_key(case, 'given')
+        let given = case['given']
+        let comment['given'] = get(case.comment, 'given', '')
+    endif
+
     " Check for SkipIf command before anything else
     if has_key(case, 'skipif')
       if len(case.skipif) > 1
@@ -356,7 +361,7 @@ function! s:run(filename, cases, options)
       endif
     endif
 
-    for label in ['given', 'before', 'after', 'then']
+    for label in ['before', 'after', 'then']
       if has_key(case, label)
         execute 'let '.label.' = case[label]'
         let comment[label] = get(case.comment, label, '')
