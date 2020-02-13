@@ -102,6 +102,8 @@ endfunction
 function! vader#assert#throws(exp)
   let s:assertions[1] += 1
 
+  let g:vader_exception = ''
+  let g:vader_throwpoint = ''
   let ok = 0
   try
     execute a:exp
