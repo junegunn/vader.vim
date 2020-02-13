@@ -63,4 +63,4 @@ script:
   # Report coverage.  This should fail the build to detect any problems.
   - covimerage -vv xml
   - covimerage report -m
-  - bash <(curl -s https://codecov.io/bash) -X search -X gcov -X coveragepy -f coverage.xml -F "$TESTVIM,${ENV//-/_}"
+  - bash <(curl -s https://codecov.io/bash) -Z -f coverage.xml -F "$TESTVIM,${ENV//-/_}"
