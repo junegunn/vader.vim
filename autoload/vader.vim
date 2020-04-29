@@ -75,8 +75,8 @@ function! vader#run(bang, ...) range
       endif
       for fn in files
         let afn = fnamemodify(fn, ':p')
-        let cases = vader#parser#parse(afn, line1, line2)
-        call add(all_cases, [afn, cases])
+        let [require; cases] = vader#parser#parse(afn, line1, line2)
+        call add(all_cases, [afn, require, cases])
         let total += len(cases)
       endfor
     endfor
@@ -88,9 +88,9 @@ function! vader#run(bang, ...) range
     call vader#window#append(
     \ printf("Starting Vader: %d suite(s), %d case(s)", len(all_cases), total), 0)
 
-    for pair in all_cases
-      let [fn, case] = pair
-      let [cs, cp, ct, lqfl] = s:run(fn, case, options)
+    for test_case in all_cases
+      let [fn, require, case] = test_case
+      let [cs, cp, ct, lqfl] = s:run(fn, require, case, options)
       let success += cs
       let pending += cp
       call extend(qfl, lqfl)
@@ -297,6 +297,9 @@ function! s:execute(prefix, type, block, lang_if)
   try
     call vader#window#execute(a:block, a:lang_if)
     return 1
+  catch /^VaderSkipped$/
+    " Rethrow the exception to be caught by the caller
+    throw v:exception
   catch
     call s:append(a:prefix, a:type, v:exception, 1)
     call s:print_throwpoint()
@@ -310,12 +313,27 @@ function! s:print_throwpoint()
   endif
 endfunction
 
-function! s:run(filename, cases, options)
+function! s:execute_test_skip(prefix, type, block, lang_if) abort
+  command! -nargs=0 VaderSkip :throw 'VaderSkipped'
+
+  try
+    call s:execute(a:prefix, a:type, a:block, a:lang_if)
+  catch /^VaderSkipped$/
+    return 1
+  finally
+    delcommand VaderSkip
+  endtry
+
+  return 0
+endfunction
+
+function! s:run(filename, require, cases, options)
   let given = []
   let before = []
   let after = []
   let then = []
   let comment = { 'given': '', 'before': '', 'after': '' }
+  let require_skip_test = 0
   let total = len(a:cases)
   let just  = len(string(total))
   let cnt = 0
@@ -327,121 +345,120 @@ function! s:run(filename, cases, options)
 
   call vader#window#append("Starting Vader: ". a:filename, 1)
 
-  for case in a:cases
-    let cnt += 1
-    let ok = 1
-    let prefix = printf('(%'.just.'d/%'.just.'d)', cnt, total)
+  " Check for Require command before any other running blocks
+  if a:require.lnum > 0
+    let require_skip_test = s:execute_test_skip('', 'require', a:require.require, '')
 
-    if has_key(case, 'given')
+    if require_skip_test
+      " Entire vader test was skipped
+      let info = len(a:require.comment) ? a:require.comment : 'Skipping all cases'
+      let pending += total
+      call s:append('', 'require', info)
+    endif
+  endif
+
+  if !require_skip_test
+    for case in a:cases
+      let cnt += 1
+      let ok = 1
+      let prefix = printf('(%'.just.'d/%'.just.'d)', cnt, total)
+
+      if has_key(case, 'given')
         let given = case['given']
         let comment['given'] = get(case.comment, 'given', '')
-    endif
-
-    " Check for SkipIf command before anything else
-    if has_key(case, 'skipif')
-      if len(case.skipif) > 1
-        " Require that only a single line is used to avoid 'E488: Trailing
-        " characters' warning in eval()
-        throw printf('SkipIf condition must be a single expression at line %d %s', case.lnum, prefix)
-      elseif empty(case.skipif) || case.skipif[0] =~# '^\s*$'
-        throw printf('SkipIf condition is missing at line %d %s', case.lnum, prefix)
       endif
 
-      let result = eval(case.skipif[0])
-
-      " Result of evaluated condition must be a number
-      if type(result) != type(0)
-        throw printf('Result of SkipIf condition must be a number at line %d %s', case.lnum, prefix)
-      endif
-
-      if result != 0
+      " Check for SkipIf block before do/execute blocks
+      if has_key(case, 'skipif')
+        if s:execute_test_skip(prefix, 'skipif', case.skipif, '')
           let pending += 1
           call s:append(prefix, 'skipif', case.comment.skipif)
           continue
+        endif
       endif
-    endif
 
-    for label in ['before', 'after', 'then']
-      if has_key(case, label)
-        execute 'let '.label.' = case[label]'
-        let comment[label] = get(case.comment, label, '')
+      for label in ['before', 'after', 'then']
+        if has_key(case, label)
+          execute 'let '.label.' = case[label]'
+          let comment[label] = get(case.comment, label, '')
+        endif
+      endfor
+
+      if !empty(given)
+        call s:append(prefix, 'given', comment.given)
+      endif
+      call vader#window#prepare(given, get(case, 'type', ''))
+
+      if !empty(before)
+        let s:indent = 2
+        let ok = ok && s:execute(prefix, 'before', before, '')
+      endif
+
+      let s:indent = 3
+      if has_key(case, 'execute')
+        call s:append(prefix, 'execute', s:comment(case, 'execute'))
+        let ok = ok && s:execute(prefix, 'execute', case.execute, get(case, 'lang_if', ''))
+      elseif has_key(case, 'do')
+        call s:append(prefix, 'do', s:comment(case, 'do'))
+        try
+          call vader#window#replay(case.do)
+        catch
+          call s:append(prefix, 'do', v:exception, 1)
+          call s:print_throwpoint()
+          let ok = 0
+        endtry
+      endif
+
+      if has_key(case, 'then')
+        call s:append(prefix, 'then', s:comment(case, 'then'))
+        let ok = ok && s:execute(prefix, 'then', then, '')
+      endif
+
+      if has_key(case, 'expect')
+        let result = vader#window#result()
+        let match = case.expect ==# result
+        if match
+          call s:append(prefix, 'expect', s:comment(case, 'expect'))
+        else
+          let begin = s:append(prefix, 'expect', s:comment(case, 'expect'), 1)
+          let ok = 0
+          let data = { 'type': get(case, 'type', ''), 'got': result, 'expect': case.expect }
+          call vader#window#append('- Expected:', 3)
+          for line in case.expect
+            call vader#window#append(line, 5, 0)
+          endfor
+          let end = vader#window#append('- Got:', 3)
+          for line in result
+            let end = vader#window#append(line, 5, 0)
+          endfor
+          call vader#window#set_data(begin, end, data)
+        endif
+      endif
+
+      if !empty(after)
+        let s:indent = 2
+        let g:vader_case_ok = ok
+        let ok = s:execute(prefix, 'after', after, '') && ok
+      endif
+
+      if ok
+        let success += 1
+      else
+        let pending += case.pending
+        let description = join(filter([
+              \ comment.given,
+              \ get(case.comment, 'do', get(case.comment, 'execute', '')),
+              \ get(case.comment, 'then', ''),
+              \ get(case.comment, 'expect', '')], '!empty(v:val)'), ' / ') .
+              \ ' (#'.s:error_line.')'
+        call add(qfl, { 'type': 'E', 'filename': a:filename, 'lnum': case.lnum, 'text': description })
+        if exitfirst && !case.pending
+          call vader#window#append('Stopping after first failure.', 2)
+          break
+        endif
       endif
     endfor
-
-    if !empty(given)
-      call s:append(prefix, 'given', comment.given)
-    endif
-    call vader#window#prepare(given, get(case, 'type', ''))
-
-    if !empty(before)
-      let s:indent = 2
-      let ok = ok && s:execute(prefix, 'before', before, '')
-    endif
-
-    let s:indent = 3
-    if has_key(case, 'execute')
-      call s:append(prefix, 'execute', s:comment(case, 'execute'))
-      let ok = ok && s:execute(prefix, 'execute', case.execute, get(case, 'lang_if', ''))
-    elseif has_key(case, 'do')
-      call s:append(prefix, 'do', s:comment(case, 'do'))
-      try
-        call vader#window#replay(case.do)
-      catch
-        call s:append(prefix, 'do', v:exception, 1)
-        call s:print_throwpoint()
-        let ok = 0
-      endtry
-    endif
-
-    if has_key(case, 'then')
-      call s:append(prefix, 'then', s:comment(case, 'then'))
-      let ok = ok && s:execute(prefix, 'then', then, '')
-    endif
-
-    if has_key(case, 'expect')
-      let result = vader#window#result()
-      let match = case.expect ==# result
-      if match
-        call s:append(prefix, 'expect', s:comment(case, 'expect'))
-      else
-        let begin = s:append(prefix, 'expect', s:comment(case, 'expect'), 1)
-        let ok = 0
-        let data = { 'type': get(case, 'type', ''), 'got': result, 'expect': case.expect }
-        call vader#window#append('- Expected:', 3)
-        for line in case.expect
-          call vader#window#append(line, 5, 0)
-        endfor
-        let end = vader#window#append('- Got:', 3)
-        for line in result
-          let end = vader#window#append(line, 5, 0)
-        endfor
-        call vader#window#set_data(begin, end, data)
-      endif
-    endif
-
-    if !empty(after)
-      let s:indent = 2
-      let g:vader_case_ok = ok
-      let ok = s:execute(prefix, 'after', after, '') && ok
-    endif
-
-    if ok
-      let success += 1
-    else
-      let pending += case.pending
-      let description = join(filter([
-            \ comment.given,
-            \ get(case.comment, 'do', get(case.comment, 'execute', '')),
-            \ get(case.comment, 'then', ''),
-            \ get(case.comment, 'expect', '')], '!empty(v:val)'), ' / ') .
-            \ ' (#'.s:error_line.')'
-      call add(qfl, { 'type': 'E', 'filename': a:filename, 'lnum': case.lnum, 'text': description })
-      if exitfirst && !case.pending
-        call vader#window#append('Stopping after first failure.', 2)
-        break
-      endif
-    endif
-  endfor
+  endif
 
   unlet g:vader_file
   return [success, pending, total, qfl]

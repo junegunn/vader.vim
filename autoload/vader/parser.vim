@@ -25,22 +25,38 @@ function! vader#parser#parse(fn, line1, line2)
   return s:parse_vader(s:read_vader(a:fn, a:line1, a:line2), a:line1)
 endfunction
 
-function! s:flush_buffer(cases, case, fn, lnum, raw, label, newlabel, buffer, final)
+function! s:flush_buffer(cases, case, require, fn, lnum, raw, label, newlabel, buffer, final)
+  if a:newlabel == 'require'
+    let a:require['lnum'] = a:lnum
+    return
+  endif
   let is_validation = index(['then', 'expect'], a:newlabel) >= 0
   let fpos = a:fn.':'.a:lnum
 
-  if empty(a:label)
+  if empty(a:label) && a:newlabel != 'require'
     if is_validation
       echoerr 'Expect/Then should not appear before Do/Execute ('.fpos.')'
     endif
   else
+    if a:label == 'skipif' && has_key(a:case, 'skipif')
+      " SkipIf block is about to be set for the second time. This happens when
+      " the SkipIf comes before the Given block in the second test or later tests
+      echoerr 'Duplicate SkipIf block (SkipIf should follow Given blocks)'
+    endif
+
     let rev = reverse(copy(a:buffer))
     while len(rev) > 0 && empty(rev[0])
       call remove(rev, 0)
     endwhile
 
     let data = map(reverse(rev), (a:case.raw ? 'v:val' : 'strpart(v:val, 2)'))
-    let a:case[a:label] = data
+
+    if a:label == 'require'
+      let a:require[a:label] = data
+    else
+      let a:case[a:label] = data
+    endif
+
     if !empty(a:buffer)
       call remove(a:buffer, 0, -1)
     endif
@@ -55,15 +71,24 @@ function! s:flush_buffer(cases, case, fn, lnum, raw, label, newlabel, buffer, fi
       endif
     endif
 
-    if a:final ||
-     \ a:newlabel == 'given' ||
-     \ index(['before', 'after', 'do', 'execute'], a:newlabel) >= 0 && fulfilled
-      call add(a:cases, deepcopy(a:case))
-      let new = { 'comment': {}, 'lnum': a:lnum, 'pending': 0 }
-      if !empty(get(a:case, 'type', ''))
-        let new.type = a:case.type " To reuse Given block with type
+    if a:label != 'require'
+      if a:final ||
+      \ a:newlabel == 'given' ||
+      \ index(['before', 'after', 'do', 'execute'], a:newlabel) >= 0 && fulfilled
+        if has_key(a:case, 'skipif') && !has_key(a:case, 'given')
+          " SkipIf block was set before Given block. This happens when a SkipIf
+          " comes before a Given block in the first test
+          echoerr 'SkipIf should appear after its corresponding Given'
+        endif
+        if a:label != 'require'
+          call add(a:cases, deepcopy(a:case))
+          let new = { 'comment': {}, 'lnum': a:lnum, 'pending': 0 }
+          if !empty(get(a:case, 'type', ''))
+            let new.type = a:case.type " To reuse Given block with type
+          endif
+          call extend(filter(a:case, '0'), new)
+        endif
       endif
-      call extend(filter(a:case, '0'), new)
     endif
   endif
   let a:case.raw = a:raw
@@ -117,9 +142,11 @@ function! s:parse_vader(lines, line1)
   let buffer   = []
   let cases    = []
   let case     = { 'lnum': a:line1, 'comment': {}, 'pending': 0, 'raw': 0 }
+  let require  = { 'lnum': 0,       'comment': '', 'pending': 0, 'raw': 0 }
+  let require_defined = 0
 
   if empty(a:lines)
-    return []
+    return [], []
   endif
 
   for [fn, lnum, line] in a:lines
@@ -129,11 +156,19 @@ function! s:parse_vader(lines, line1)
     endif
 
     let matched = 0
-    for l in ['Before', 'After', 'Given', 'Execute', 'Expect', 'Do', 'Then', 'SkipIf']
+    for l in ['Before', 'After', 'Given', 'Execute', 'Expect', 'Do', 'Then', 'Require', 'SkipIf']
       let m = matchlist(line, '^'.l.'\%(\s\+\([^:;(]\+\)\)\?\s*\%((\(.*\))\)\?\s*\([:;]\)\s*$')
       if !empty(m)
         let newlabel = tolower(l)
-        call s:flush_buffer(cases, case, fn, lnum, m[3] == ';', label, newlabel, buffer, 0)
+        call s:flush_buffer(cases, case, require, fn, lnum, m[3] == ';', label, newlabel, buffer, 0)
+
+        if l == 'Require'
+          if require_defined == 1
+            throw 'Syntax error (only one Require block is allowed per file): ' . line
+          endif
+
+          let require_defined = 1
+        endif
 
         let label   = newlabel
         let arg     = m[1]
@@ -146,10 +181,14 @@ function! s:parse_vader(lines, line1)
           let case.type = ''
         endif
         if !empty(comment)
-          let case.comment[tolower(l)] = comment
-          if index(['do', 'execute'], label) >= 0 &&
-                \ comment =~# '\<TODO\>\|\<FIXME\>'
-            let case.pending = 1
+          if l == 'Require'
+            let require.comment = comment
+          else
+            let case.comment[tolower(l)] = comment
+            if index(['do', 'execute'], label) >= 0 &&
+                  \ comment =~# '\<TODO\>\|\<FIXME\>'
+              let case.pending = 1
+            endif
           endif
         endif
         let matched = 1
@@ -166,9 +205,9 @@ function! s:parse_vader(lines, line1)
       call add(buffer, line)
     endif
   endfor
-  call s:flush_buffer(cases, case, fn, lnum, case.raw, label, '', buffer, 1)
+  call s:flush_buffer(cases, case, require, fn, lnum, case.raw, label, '', buffer, 1)
 
-  let ret = []
+  let ret = [require]
   let prev = {}
   for case in cases
     if has_key(case, "do") || has_key(case, "execute")
