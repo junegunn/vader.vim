@@ -52,7 +52,7 @@ function! vader#window#open()
   tabnew
   setlocal buftype=nofile noswapfile nospell
   setf vader-result
-  silent f \[Vader\]
+  silent exe 'file '.fnameescape('[Vader]')
   let s:console_tab = tabpagenr()
   let s:console_bfr = bufnr('')
   let s:console_buffered = []
@@ -62,7 +62,7 @@ function! vader#window#open()
   tabnew
   setlocal buftype=nofile
   setlocal noswapfile
-  silent f \[Vader-workbench\]
+  silent exe 'file '.fnameescape('[Vader-workbench]')
   let s:workbench_tab = tabpagenr()
   let s:workbench_bfr = bufnr('')
 endfunction
