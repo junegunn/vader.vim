@@ -118,3 +118,59 @@ function! vader#assert#throws(exp)
   else  | throw 'Exception expected but not raised: '.a:exp
   endif
 endfunction
+
+function! vader#assert#diff(Exp, Got, ...) abort
+  let desc_only = a:0 ? a:1 : 0  " used for recursion with lists.
+  if type(a:Exp) !=# type(a:Got)
+    return printf("type mismatch: %s (%s) should be equal to %s (%s)",
+          \ string(a:Got), get(s:type_names, type(a:Got), type(a:Got)),
+          \ string(a:Exp), get(s:type_names, type(a:Exp), type(a:Exp)))
+  endif
+
+  if a:Exp ==# a:Got
+    return ''
+  endif
+
+  if type(a:Exp) == type({})
+    let desc = {'only in expected': [], 'only in gotten': [], 'diff': []}
+    for [k, V] in items(a:Exp)
+      if !has_key(a:Got, k)
+        call add(desc['only in expected'], k)
+        continue
+      endif
+      if type(V) !=# type(a:Got[k]) || V !=# a:Got[k]
+        call add(desc['diff'], printf('%s (%s / %s)', k, string(a:Got[k]), string(V)))
+      endif
+    endfor
+    for [k, V] in items(a:Got)
+      if !has_key(a:Exp, k)
+        call add(desc['only in gotten'], k)
+      endif
+    endfor
+    let desc = join(values(map(filter(desc, '!empty(v:val)'), "v:key.': '.join(v:val, ', ')")), '; ')
+    if desc_only
+      return 'unequal dicts: '.desc
+    endif
+    return printf('%s should be equal to %s (%s)', string(a:Got), string(a:Exp), desc)
+  elseif type(a:Exp) == type([])
+    let msg = ''
+    if len(a:Exp) != len(a:Got)
+      let desc = 'different lengths'
+    else
+      let idx = 0
+      for V in a:Exp
+        if type(V) != type(a:Got[idx]) || V !=# a:Got[idx]
+          let desc = printf('diff at index %d: %s', idx, vader#assert#diff(V, a:Got[idx], 1))
+          break
+        endif
+        let idx += 1
+      endfor
+    endif
+    if desc_only
+      return 'unequal lists: '.desc
+    endif
+    return printf('%s should be equal to %s (%s)', string(a:Got), string(a:Exp), desc)
+  else
+    return printf('%s should be equal to %s', string(a:Got), string(a:Exp))
+  endif
+endfunction
