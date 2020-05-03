@@ -267,6 +267,14 @@ function! vader#restore(args)
   endfor
 endfunction
 
+" Workaround possible error (at least with vim71):
+" Error detected while processing function <SNR>20_vader..vader#run..<SNR>22_prepare:
+" line    8:
+" E700: Unknown function: vader#helper#syntax_at
+" line    9:
+" E700: Unknown function: vader#helper#syntax_of
+runtime autoload/vader/helper.vim
+
 function! s:prepare()
   command! -nargs=+ Log            :call vader#log(<args>)
   command! -nargs=+ Save           :call vader#save(<q-args>)
