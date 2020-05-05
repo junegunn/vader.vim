@@ -256,6 +256,34 @@ Execute (syntax is good):
   AssertEqual SyntaxOf('0'), 'cNumber'
 ```
 
+Running tests from within vim
+-----------------------------
+
+When running interactively the `:Vader` command opens the test results in a
+separate tab.  This is helpful for immediate feedback while developing a
+plugin.
+
+In this tab a window displays the actual test results as can be seen in the
+screenshots above.
+
+If there were test failures these will be filled into the quickfix list and
+the quickfix window is opened.
+
+When navigating the items in the quickfix list, another window is opened
+with the selected error location.
+
+
+Mappings
+--------
+
+Vader provides some useful mappings:
+
+- Inside a vader file the common keys for section navigation (`]]`, `[[`,
+  `][`, `[]`) can be used to jump between the vader blocks.
+- When inside the vader summary tab `q` can be used to close the summary
+  tab.
+
+
 Setting up isolated testing environment
 ---------------------------------------
 
