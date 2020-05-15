@@ -1,0 +1,14 @@
+Require (require something to run test):
+  if 1
+    VaderSkip
+  endif
+
+Given:
+  This is just a test
+
+Do (nothing):
+  jk
+
+Expect:
+  This is not the same as Given so will fail
+  if the entire test file is not skipped

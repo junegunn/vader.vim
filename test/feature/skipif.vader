@@ -1,0 +1,13 @@
+Given:
+  hello
+
+SkipIf (skip this test for some reason):
+  if 1
+    VaderSkip
+  endif
+
+Do (nothing):
+  jk
+
+Expect (this would fail but the test is skipped):
+  HELLO
