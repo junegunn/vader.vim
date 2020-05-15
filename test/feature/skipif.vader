@@ -2,16 +2,12 @@ Given:
   hello
 
 SkipIf (skip this test for some reason):
-  1
+  if 1
+    VaderSkip
+  endif
 
-Do:
-  gUw
+Do (nothing):
+  jk
 
-Expect:
-  HELLO
-
-Do:
-  g~~
-
-Expect:
+Expect (this would fail but the test is skipped):
   HELLO
