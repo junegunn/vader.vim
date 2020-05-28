@@ -37,6 +37,11 @@ setlocal iskeyword+=#
 let &l:commentstring = '" %s'
 let &l:comments      = 'sO:" -,mO:"  ,eO:"",:"'
 
+if get(g:, 'vader_enable_folding', 0) !=# 0
+  setlocal foldexpr=vader#folding#foldExpr(v:lnum)
+  setlocal foldmethod=expr
+endif
+
 nnoremap <buffer><silent> [[ :call search(b:vader_label, 'bW')<CR>
 nnoremap <buffer><silent> [] :call search(b:vader_eos, 'bW')<CR>
 
@@ -59,7 +64,7 @@ augroup vader_syntax
   " autocmd FileType <buffer> call vader#syntax#include(1, '$')
 augroup END
 
-let b:undo_ftplugin = 'setl sw< ts< sts< et< cms< isk<'
+let b:undo_ftplugin = 'setl sw< ts< sts< et< cms< isk< fde< fdm<'
       \ . ' | exe "au! vader_syntax * <buffer>"'
       \ . ' | unlet b:vader_label b:vader_eos'
 

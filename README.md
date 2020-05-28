@@ -256,6 +256,13 @@ Execute (syntax is good):
   AssertEqual SyntaxOf('0'), 'cNumber'
 ```
 
+Folding of .vader files
+-----------------------
+
+Folding of .vader files can be enabled by setting the the
+`g:vader_enable_folding` to 1. This will set `foldmethod` to `expr` and
+declare a corresponding fold expression.
+
 Setting up isolated testing environment
 ---------------------------------------
 
