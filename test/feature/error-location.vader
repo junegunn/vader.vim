@@ -32,14 +32,14 @@ Then (Thrown from line 3):
 # Vader comment
   " Comment
   AssertThrows throw "testexception"
-  let m = matchlist(g:vader_throwpoint, '\Vfunction <SNR>\d\+_vader_wrapper[\(\d\+\)]..vader#assert#throws, line 5')
+  let m = matchlist(g:vader_throwpoint, '\Vfunction <SNR>\d\+_vader_wrapper[\(\d\+\)]..vader#assert#throws, line \d\+')
   AssertEqual m[1], '3', 'Thrown from line 3'
 
 Execute (Thrown from line 3):
 # Vader comment
   " Comment
   AssertThrows throw "testexception"
-  let m = matchlist(g:vader_throwpoint, '\Vfunction <SNR>\d\+_vader_wrapper[\(\d\+\)]..vader#assert#throws, line 5')
+  let m = matchlist(g:vader_throwpoint, '\Vfunction <SNR>\d\+_vader_wrapper[\(\d\+\)]..vader#assert#throws, line \d\+')
   AssertEqual m[1], '3', 'Thrown from line 3'
 
 Execute (Error in scoped function cannot get source, but continues):
