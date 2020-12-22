@@ -78,7 +78,7 @@ Execute (TODO: Error in Execute (via another file)):
 
 Execute (Validate error in Execute (via another file)):
   let tb = g:vader#window#_s.console_buffered[-4:-2]
-  if has('patch-8.1.0362')
+  if has('patch-8.1.0362') || has('nvim-0.4.0')
     AssertEqual tb, [
     \ printf('      > in VaderTestIncludedFunction (%s:3)', fnamemodify(g:vader_test_include_file, ':~:.')),
     \ '      >   throw a:error',
