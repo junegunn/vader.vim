@@ -72,7 +72,7 @@ Execute (Validate error in Execute (via file)):
     let error = g:vader#window#_s.console_buffered[-5]
     Assert error =~# '\v^ +\(\s*\d+/\d+\) \[EXECUTE\] \(X\) custom_error', string(error)
     AssertEqual g:vader#window#_s.console_buffered[-4:-2], [
-    \ printf('      > in %s (feature/error-location-include.vim:8)', g:vader_test_include_file),
+    \ printf('      > in %s (%s:8)', g:vader_test_include_file, fnamemodify(g:vader_test_include_file, ':~:.')),
     \ '      >     throw g:vader_test_throw',
     \ printf('      > %s:68: execute ''source '' . g:vader_test_include_file', g:vader_current_file),
     \ ]
