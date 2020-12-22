@@ -23,7 +23,7 @@ Execute (AssertThrows):
 
   AssertThrows VaderThrows
   AssertEqual g:vader_exception, 'Vim(echoerr):Error from VaderThrows'
-  AssertEqual g:vader_throwpoint, 'function <SNR>48_vader_wrapper[13]..vader#assert#throws[7]..VaderThrows, line 1'
+  Assert g:vader_throwpoint =~# '\Vfunction <SNR>\d\+_vader_wrapper[13]..vader#assert#throws[7]..VaderThrows, line 1', g:vader_throwpoint
 
   try
     AssertThrows let g:vader_exception = 42
