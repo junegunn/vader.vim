@@ -68,9 +68,19 @@ Execute (TODO: Error in Execute (via file)):
   execute 'source ' . g:vader_test_include_file
 
 Execute (Validate error in Execute (via file)):
-  let error = g:vader#window#_s.console_buffered[-2]
-  Assert error =~# '\v^ +\(\d+/\d+\) \[EXECUTE\] \(X\) Error: custom_error'
-  Assert stridx(error, printf(' (in %s, line 8)', g:vader_test_include_file)) != -1
+  if has('patch-8.2.1297')
+    let error = g:vader#window#_s.console_buffered[-5]
+    Assert error =~# '\v^ +\(\s*\d+/\d+\) \[EXECUTE\] \(X\) custom_error', string(error)
+    AssertEqual g:vader#window#_s.console_buffered[-4:-2], [
+    \ printf('      > in %s (feature/error-location-include.vim:8)', g:vader_test_include_file),
+    \ '      >     throw g:vader_test_throw',
+    \ printf('      > %s:68: execute ''source '' . g:vader_test_include_file', g:vader_current_file),
+    \ ]
+  else
+    let error = g:vader#window#_s.console_buffered[-2]
+    Assert error =~# '\v^ +\(\s*\d+/\d+\) \[EXECUTE\] \(X\) Error: custom_error', string(error)
+    Assert stridx(error, printf(' (in %s, line 8)', g:vader_test_include_file)) != -1
+  endif
 
 Execute (TODO: Error in Execute (via another file)):
   unlet g:vader_test_throw
@@ -82,13 +92,13 @@ Execute (Validate error in Execute (via another file)):
     AssertEqual tb, [
     \ printf('      > in VaderTestIncludedFunction (%s:3)', fnamemodify(g:vader_test_include_file, ':~:.')),
     \ '      >   throw a:error',
-    \ printf('      > %s:77: call VaderTestIncludedFunction(''custom error'')', g:vader_current_file),
+    \ printf('      > %s:87: call VaderTestIncludedFunction(''custom error'')', g:vader_current_file),
     \ ]
   else
     AssertEqual tb, [
     \ '      > in VaderTestIncludedFunction (line 2)',
     \ '      >   throw a:error',
-    \ printf('      > %s:77: call VaderTestIncludedFunction(''custom error'')', g:vader_current_file),
+    \ printf('      > %s:87: call VaderTestIncludedFunction(''custom error'')', g:vader_current_file),
     \ ]
   endif
 

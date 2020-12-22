@@ -287,6 +287,13 @@ function! s:comment(case, label)
 endfunction
 
 function! s:get_source_from_tb_entry(tb_entry)
+  if a:tb_entry =~# '\v^script '
+    let split_f_linenr = split(a:tb_entry[7:], ', line ')
+    let [f, l] = split_f_linenr
+    let source = readfile(f, "", l)
+    let floc = fnamemodify(f, ':~:.').':'.l
+    return [source[l-1], l, f, floc]
+  endif
   let func_line = split(a:tb_entry, '\v[\[\]]')
   if len(func_line) == 2
     let [f, l] = func_line
@@ -338,15 +345,15 @@ function! s:execute(prefix, type, block, fpos, lang_if)
   endif
 
   " Get line number from wrapper function or throwpoint.
-  let match_prefix = matchstr(error[1], '\v^function \zs\<SNR\>\d+_vader_wrapper')
-  if empty(match_prefix)
+  let throwpoint = matchstr(error[1], '\v<function \zs\<SNR\>\d+_vader_wrapper.*')
+  if empty(throwpoint)
     call s:append(a:prefix, a:type, 'Error: '.error[0]. ' (in '.error[1].')', 1)
     return [0, []]
   endif
 
   call s:append(a:prefix, a:type, error[0], 1)
 
-  let tb_entries = reverse(split(error[1], '\.\.'))
+  let tb_entries = reverse(split(throwpoint, '\.\.'))
   let tb_first = remove(tb_entries, -1)
   call filter(tb_entries, "v:val !~# '\\vvader#assert#[^,]+, line \\d+$'")
   for tb_entry in tb_entries
@@ -363,7 +370,6 @@ function! s:execute(prefix, type, block, fpos, lang_if)
       call vader#log('in '.f)
     endif
   endfor
-  let tb_first = substitute(tb_first, '^function ', '', '')
   let [source, l, _, _] = s:get_source_from_tb_entry(tb_first)
   let errpos = [a:fpos[0], l + a:fpos[1]]
   if len(source)
