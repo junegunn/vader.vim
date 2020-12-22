@@ -18,6 +18,7 @@ matrix:
     - env: ENV=nvim VADER_OUTPUT_FILE=/dev/stderr
     - env: ENV=nvim TESTVIM_OPTS=--headless
     - env: ENV=nvim-stable
+      dist: focal
       addons:
         apt:
           sources:
@@ -58,7 +59,7 @@ script:
   - |
     covimerage run --append --source . --no-report $TESTVIM $TESTVIM_OPTS -Nu test/vimrc \
       -c 'Vader test/*' \
-      -c 'exe get(get(g:, "vader_result", {}), "successful", 0) ? "qall!" : "cq"'
+      -c 'exe get(get(g:, "vader_result", {}), "successful", 0) ? "qall!" : "cq 99"'
 
   # Report coverage.  This should fail the build to detect any problems.
   - covimerage -vv xml

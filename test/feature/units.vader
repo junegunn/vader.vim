@@ -4,3 +4,9 @@ Execute (vader#assert#equal checks types):
 
   AssertThrows call vader#assert#equal([], [1])
   AssertEqual g:vader_exception, "Unequal Lists\n      [1] should be equal to\n      []"
+
+Execute (Uses utf-8 scriptencoding):
+  AssertEqual '…', '…'
+
+  " This would fail on Vim for Windows, without "scriptencoding utf-8" in the wrapper script.
+  AssertEqual matchstr('…', '.\{,1}', 0, 1), '…'

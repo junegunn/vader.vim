@@ -27,6 +27,9 @@ let s:console_tab   = 0
 let s:workbench_tab = 0
 let s:workbench_bfr = 0
 
+" Used in tests.
+let g:vader#window#_s = s:
+
 function! s:switch_to_console()
   execute 'normal! '.s:console_tab.'gt'
   if tabpagenr() != s:console_tab
@@ -70,18 +73,44 @@ endfunction
 function! vader#window#execute(lines, lang_if)
   let temp = tempname()
   try
+    let lines = [
+          \ 'scriptencoding utf-8',
+          \ 'command! -nargs=+ Log            :call vader#log(<args>)',
+          \ 'command! -nargs=+ Save           :call vader#save(<q-args>)',
+          \ 'command! -nargs=* Restore        :call vader#restore(<q-args>)',
+          \ 'command! -nargs=+ Assert         :call vader#assert#true(<args>)',
+          \ 'command! -nargs=+ AssertEqual    :call vader#assert#equal(<args>)',
+          \ 'command! -nargs=+ AssertNotEqual :call vader#assert#not_equal(<args>)',
+          \ 'command! -nargs=+ AssertThrows   :call vader#assert#throws(<q-args>)',
+          \ 'function! SyntaxAt(...) abort',
+          \ "  return call('vader#helper#syntax_at', a:000)",
+          \ 'endfunction',
+          \ 'function! SyntaxOf(...) abort',
+          \ "  return call('vader#helper#syntax_of', a:000)",
+          \ 'endfunction',
+          \ ]
+
+    call add(lines, 'function! s:vader_wrapper()')
     if empty(a:lang_if)
-      let lines = a:lines
+      call extend(lines, copy(a:lines))
     else
-      let lines = copy(a:lines)
-      call insert(lines, a:lang_if . ' << __VADER__LANG__IF__')
+      call add(lines, a:lang_if . ' << __VADER__LANG__IF__')
+      call extend(lines, copy(a:lines))
       call add(lines, '__VADER__LANG__IF__')
     endif
+
+    " Copy all local variables to the global scope so that Vim generates
+    " profiling information for it.
+    " Works around https://github.com/vim/vim/issues/2350.
+    call extend(lines, ['if v:profiling | if !exists("g:vader_locals") | let g:vader_locals = [] | endif | call extend(g:vader_locals, items(l:)) | endif'])
+
+    call extend(lines, ['endfunction', 'call s:vader_wrapper()'])
     call writefile(lines, temp)
     execute 'source '.temp
-  finally
-    call delete(temp)
+  catch
+    return [[v:exception, v:throwpoint], lines]
   endtry
+  return [[], lines]
 endfunction
 
 function! vader#window#replay(lines)
@@ -104,7 +133,6 @@ function! vader#window#append(message, indent, ...)
   endif
   if get(g:, 'vader_bang', 0)
     call vader#print_stderr(message."\n")
-    return 0
   endif
   call add(s:console_buffered, message)
   return len(s:console_buffered)

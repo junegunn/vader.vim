@@ -59,7 +59,6 @@ function! vader#run(bang, ...) range
   endif
 
   call vader#assert#reset()
-  call s:prepare()
   try
     let all_cases = []
     let qfl = []
@@ -267,58 +266,126 @@ function! vader#restore(args)
   endfor
 endfunction
 
-function! s:prepare()
-  command! -nargs=+ Log            :call vader#log(<args>)
-  command! -nargs=+ Save           :call vader#save(<q-args>)
-  command! -nargs=* Restore        :call vader#restore(<q-args>)
-  command! -nargs=+ Assert         :call vader#assert#true(<args>)
-  command! -nargs=+ AssertEqual    :call vader#assert#equal(<args>)
-  command! -nargs=+ AssertNotEqual :call vader#assert#not_equal(<args>)
-  command! -nargs=+ AssertThrows   :call vader#assert#throws(<q-args>)
-  let g:SyntaxAt = function('vader#helper#syntax_at')
-  let g:SyntaxOf = function('vader#helper#syntax_of')
-endfunction
-
 function! s:cleanup()
   let s:register = {}
   let s:register_undefined = []
-  delcommand Log
-  delcommand Save
-  delcommand Restore
-  delcommand Assert
-  delcommand AssertEqual
-  delcommand AssertNotEqual
-  delcommand AssertThrows
-  unlet g:SyntaxAt
-  unlet g:SyntaxOf
+  if exists(':Log') == 2
+    delcommand Log
+    delcommand Save
+    delcommand Restore
+    delcommand Assert
+    delcommand AssertEqual
+    delcommand AssertNotEqual
+    delcommand AssertThrows
+    delfunction SyntaxAt
+    delfunction SyntaxOf
+  endif
 endfunction
 
 function! s:comment(case, label)
   return get(a:case.comment, a:label, '')
 endfunction
 
-function! s:execute(prefix, type, block, lang_if)
+function! s:get_source_from_tb_entry(tb_entry)
+  if a:tb_entry =~# '\v^script '
+    let split_f_linenr = split(a:tb_entry[7:], ', line ')
+    let [f, l] = split_f_linenr
+    let source = readfile(f, "", l)
+    let floc = fnamemodify(f, ':~:.').':'.l
+    return [source[l-1], l, f, floc]
+  endif
+  let func_line = split(a:tb_entry, '\v[\[\]]')
+  if len(func_line) == 2
+    let [f, l] = func_line
+  else
+    let split_f_linenr = split(a:tb_entry, ', line ')
+    if len(split_f_linenr) == 2
+      let [f, l] = split_f_linenr
+    else
+      let f = split_f_linenr[0]
+      return ['', 0, f, '']
+    endif
+  endif
+  if f =~# '\v^\d+$'
+    let f = '{'.f.'}'
+  endif
   try
-    call vader#window#execute(a:block, a:lang_if)
-    return 1
-  catch
-    call s:append(a:prefix, a:type, v:exception, 1)
-    call s:print_throwpoint()
-    return 0
+    if exists('*execute')
+      let func = execute('verb function '.f)
+    else
+      redir => func
+        silent exe 'verb function '.f
+      redir END
+    endif
+  catch /^Vim\%((\a\+)\)\=:E123/
+    return ['', l, f, '']
   endtry
+
+  let func_lines = split(func, "\n")
+  " Vim patch v8.1.0362 will display source location of function.
+  let m = matchlist(func_lines[1], '\v^\s*Last set from (.*) line (\d+)$')
+  if empty(m)
+    let floc = ''
+  else
+    let floc = fnamemodify(m[1], ':~:.') . ':' . (m[2] + l)
+  endif
+
+  let source = map(filter(func_lines, "v:val =~# '\\v^".l."[^0-9]'"), "substitute(v:val, '\\v^\\d+\\s+', '', '')")
+  if len(source) != 1
+    throw printf('Internal error: could not find source of %s:%d (parsed function: %s, source: %s)', string(a:tb_entry), l, f, string(source))
+  endif
+  return [source[0], l, f, floc]
 endfunction
 
-function! s:print_throwpoint()
-  if v:throwpoint !~ 'vader#assert'
-    Log v:throwpoint
+function! s:execute(prefix, type, block, fpos, lang_if)
+  let g:vader_current_file = a:fpos[0]
+  let [error, lines] = vader#window#execute(a:block, a:lang_if)
+  if empty(error)
+    return [1, []]
   endif
+
+  " Get line number from wrapper function or throwpoint.
+  let throwpoint = matchstr(error[1], '\v<function \zs\<SNR\>\d+_vader_wrapper.*')
+  if empty(throwpoint)
+    call s:append(a:prefix, a:type, 'Error: '.error[0]. ' (in '.error[1].')', 1)
+    return [0, []]
+  endif
+
+  call s:append(a:prefix, a:type, error[0], 1)
+
+  let tb_entries = reverse(split(throwpoint, '\.\.'))
+  let tb_first = remove(tb_entries, -1)
+  call filter(tb_entries, "v:val !~# '\\vvader#assert#[^,]+, line \\d+$'")
+  for tb_entry in tb_entries
+    let [source, l, f, floc] = s:get_source_from_tb_entry(tb_entry)
+    if l
+      if empty(floc)
+        let floc = 'line '.l
+      endif
+      call vader#log('in '.f.' ('.floc.')')
+      if len(source)
+        call vader#log('  '.source)
+      endif
+    else
+      call vader#log('in '.f)
+    endif
+  endfor
+  let [source, l, _, _] = s:get_source_from_tb_entry(tb_first)
+  let errpos = [a:fpos[0], l + a:fpos[1]]
+  if len(source)
+    call vader#log(errpos[0].':'.(errpos[1]).': '.source)
+  else
+    call vader#log(errpos[0].':'.(errpos[1]))
+  endif
+
+  return [0, errpos]
 endfunction
 
 function! s:run(filename, cases, options)
-  let given = []
-  let before = []
-  let after = []
-  let then = []
+  let given = { 'lines': [] }
+  let before = {}
+  let after = {}
+  let then = {}
   let comment = { 'given': '', 'before': '', 'after': '' }
   let total = len(a:cases)
   let just  = len(string(total))
@@ -338,39 +405,46 @@ function! s:run(filename, cases, options)
 
     for label in ['given', 'before', 'after', 'then']
       if has_key(case, label)
-        execute 'let '.label.' = case[label]'
+        execute 'let '.label." = {'lines': case[label], 'fpos': case.fpos[label]}"
         let comment[label] = get(case.comment, label, '')
       endif
     endfor
 
-    if !empty(given)
+    if !empty(given.lines)
       call s:append(prefix, 'given', comment.given)
     endif
-    call vader#window#prepare(given, get(case, 'type', ''))
+    call vader#window#prepare(given.lines, get(case, 'type', ''))
 
     if !empty(before)
       let s:indent = 2
-      let ok = ok && s:execute(prefix, 'before', before, '')
+      let [ok, errpos] = s:execute(prefix, 'before', before.lines, before.fpos, '')
     endif
 
     let s:indent = 3
     if has_key(case, 'execute')
       call s:append(prefix, 'execute', s:comment(case, 'execute'))
-      let ok = ok && s:execute(prefix, 'execute', case.execute, get(case, 'lang_if', ''))
+      if ok
+        let [ok, errpos] = s:execute(prefix, 'execute', case.execute, case.fpos.execute, get(case, 'lang_if', ''))
+      endif
     elseif has_key(case, 'do')
       call s:append(prefix, 'do', s:comment(case, 'do'))
       try
         call vader#window#replay(case.do)
       catch
         call s:append(prefix, 'do', v:exception, 1)
-        call s:print_throwpoint()
+        if v:throwpoint !~ 'vader#assert'
+          call vader#log(v:throwpoint)
+        endif
         let ok = 0
+        let errpos = case.fpos.do
       endtry
     endif
 
     if has_key(case, 'then')
       call s:append(prefix, 'then', s:comment(case, 'then'))
-      let ok = ok && s:execute(prefix, 'then', then, '')
+      if ok
+        let [ok, errpos] = s:execute(prefix, 'then', then.lines, then.fpos, '')
+      endif
     endif
 
     if has_key(case, 'expect')
@@ -381,6 +455,7 @@ function! s:run(filename, cases, options)
       else
         let begin = s:append(prefix, 'expect', s:comment(case, 'expect'), 1)
         let ok = 0
+        let errpos = case.fpos.expect
         let data = { 'type': get(case, 'type', ''), 'got': result, 'expect': case.expect }
         call vader#window#append('- Expected:', 3)
         for line in case.expect
@@ -397,7 +472,11 @@ function! s:run(filename, cases, options)
     if !empty(after)
       let s:indent = 2
       let g:vader_case_ok = ok
-      let ok = s:execute(prefix, 'after', after, '') && ok
+      let [after_ok, after_errpos] = s:execute(prefix, 'after', after.lines, after.fpos, '')
+      let ok = after_ok && ok
+      if empty(errpos)
+        let errpos = after_errpos
+      endif
     endif
 
     if ok
@@ -410,7 +489,10 @@ function! s:run(filename, cases, options)
             \ get(case.comment, 'then', ''),
             \ get(case.comment, 'expect', '')], '!empty(v:val)'), ' / ') .
             \ ' (#'.s:error_line.')'
-      call add(qfl, { 'type': 'E', 'filename': a:filename, 'lnum': case.lnum, 'text': description })
+      if empty(errpos)
+        let errpos = [a:filename, case.lnum]
+      endif
+      call add(qfl, { 'type': 'E', 'filename': fnamemodify(errpos[0], ':~:.'), 'lnum': errpos[1], 'text': description })
       if exitfirst && !case.pending
         call vader#window#append('Stopping after first failure.', 2)
         break
