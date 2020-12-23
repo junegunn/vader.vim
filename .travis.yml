@@ -18,12 +18,14 @@ matrix:
     - env: ENV=nvim VADER_OUTPUT_FILE=/dev/stderr
     - env: ENV=nvim TESTVIM_OPTS=--headless
     - env: ENV=nvim-stable
+      dist: bionic
       addons:
         apt:
           sources:
             - sourceline: 'ppa:neovim-ppa/stable'
           packages:
             - neovim
+            - python-neovim
 
 install:
   - pip install --user covimerage
