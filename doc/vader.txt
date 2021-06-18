@@ -338,9 +338,9 @@ as follows:
 >
     vim -Nu <(cat << EOF
     filetype off
-    set rtp+=~/.vim/bundle/vader.vim
-    set rtp+=~/.vim/bundle/vim-markdown
-    set rtp+=~/.vim/bundle/vim-markdown/after
+    set rtp+=~/.vim/plugged/vader.vim
+    set rtp+=~/.vim/plugged/vim-markdown
+    set rtp+=~/.vim/plugged/vim-markdown/after
     filetype plugin indent on
     syntax enable
     EOF) +Vader*
