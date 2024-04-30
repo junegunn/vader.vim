@@ -37,9 +37,9 @@ execute printf('syn region vaderTextRaw start=/\(;$\)\@<=/ end=/%s/ contained', 
 execute printf('syn region vaderCommandRaw start=/\(;$\)\@<=/ end=/%s/ contains=@vimSnippet contained', vader#syntax#_head())
 
 syn match vaderMessage /(\@<=.*)\@=/ contained contains=Todo
-syn match vaderGivenType /\(Given\s*\)\@<=[^;:()\s]\+/ contained
-syn match vaderExpectType /\(Expect\s*\)\@<=[^;:()\s]\+/ contained
-syn match vaderExecuteType /\(Execute\s*\)\@<=[^;:()\s]\+/ contained
+syn match vaderGivenType /\(Given\s*\)\@<=[^:; (]\+/ contained
+syn match vaderExpectType /\(Expect\s*\)\@<=[^:; (]\+/ contained
+syn match vaderExecuteType /\(Execute\s*\)\@<=[^:; (]\+/ contained
 
 syn match vaderComment /^["#].*/ contains=Todo
 syn match vaderSepCaret /^^.*/ contains=Todo
