@@ -34,6 +34,7 @@ let b:vader_eos = '\(.*\n'.vader#syntax#_head().'\)\|\%$'
 
 setlocal shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 setlocal iskeyword+=#
+setlocal keywordprg=:help
 let &l:commentstring = '" %s'
 let &l:comments      = 'sO:" -,mO:"  ,eO:"",:"'
 
@@ -59,7 +60,7 @@ augroup vader_syntax
   " autocmd FileType <buffer> call vader#syntax#include(1, '$')
 augroup END
 
-let b:undo_ftplugin = 'setl sw< ts< sts< et< cms< isk<'
+let b:undo_ftplugin = 'setl sw< ts< sts< et< cms< isk< kp<'
       \ . ' | exe "au! vader_syntax * <buffer>"'
       \ . ' | unlet b:vader_label b:vader_eos'
 
