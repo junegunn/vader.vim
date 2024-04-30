@@ -275,6 +275,42 @@ syntax enable
 EOF) +Vader*
 ```
 
+GitHub Actions
+--------------
+
+Create `.github/workflows/test.yml` file with the following content:
+
+```yaml
+---
+name: Test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install Vim
+        run: sudo apt-get install vim
+
+      - name: Test
+        run: |
+          git clone https://github.com/junegunn/vader.vim.git
+          vim -Nu <(cat << VIMRC
+          set rtp+=vader.vim
+          set rtp+=.
+          VIMRC) -c 'silent Vader! test/*' > /dev/null
+```
+
 Travis CI integration
 ---------------------
 
